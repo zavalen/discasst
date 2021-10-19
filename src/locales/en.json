@@ -1,0 +1,26 @@
+{
+  "message": "Hello i18n !!",
+  "username": "Username",
+  "email": "Email",
+  "password": "Password",
+  "header": {
+    "home": "Home",
+    "register": "Registration",
+    "login": "Login",
+    "logout": "Logout",
+    "createArticle": "Create Article",
+    "settings": "Settings"
+  },
+  "register": {
+    "header": "Registration",
+    "subHeader": "Already have an account?",
+    "subHeaderLink": "Login",
+    "button": "Register"
+  },
+  "login": {
+    "header": "Login",
+    "subHeader": "Don't have an account?",
+    "subHeaderLink": "Register",
+    "button": "Login"
+  }
+}

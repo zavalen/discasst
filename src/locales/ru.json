@@ -1,0 +1,26 @@
+{
+  "message": "Привет i18n !!",
+  "username": "Имя пользователя",
+  "email": "Email",
+  "password": "Пароль",
+  "header": {
+    "home": "Главная",
+    "register": "Регистрация",
+    "login": "Войти",
+    "logout": "Выйти",
+    "createArticle": "Создать статью",
+    "settings": "Настройки"
+  },
+  "register": {
+    "header": "Регистрация",
+    "subHeader": "Уже есть аккаунт?",
+    "subHeaderLink": "Войдите",
+    "button": "Зарегистрироваться"
+  },
+  "login": {
+    "header": "Войти",
+    "subHeader": "Нет аккаунта?",
+    "subHeaderLink": "Зарегистрироваться",
+    "button": "Войти"
+  }
+}
