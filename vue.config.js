@@ -9,5 +9,6 @@ module.exports = {
       compositionOnly: false,
       fullInstall: true
     }
-  }
+  },
+  productionSourceMap: false
 }

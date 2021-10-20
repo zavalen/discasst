@@ -1,5 +1,6 @@
 <template>
   <header class="header">
+    <base-svg name="./about-tab.svg" />
     <div class="header__wrapper container">
       <a class="header__logo" href="/">Discasst</a>
       <ul
@@ -77,18 +78,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.active {
-      color: #42b983;
-    }
-  }
-}
-</style>
