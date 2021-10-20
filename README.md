@@ -1,4 +1,4 @@
-# podcastium
+# Discasst
 
 ## Project setup
 ```
