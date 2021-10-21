@@ -1,7 +1,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   color: var(--text-color);
-  background-color: var(--site-bg);
+  background-color: var(--bg-site);
 }
 
 a {
@@ -22,6 +22,7 @@ a {
   min-height: 100vh;
 
   &__header {
+    background-color: var(--header-color);
   }
 
   &__main {

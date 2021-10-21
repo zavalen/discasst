@@ -100,7 +100,6 @@ export default {
 
 <style lang="scss">
 .header {
-  background: rgb(233, 233, 233);
   position: sticky;
   top: 0;
   left: 0;

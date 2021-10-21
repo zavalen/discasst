@@ -1,8 +1,9 @@
 [data-theme='light'] {
-  --site-bg: #ffffff;
-  --text-color: rgb(27, 27, 27);
-  --link-color: #cacaff;
+  --bg-site: #f7f7f7;
+  --bg-header: #d3d3d3;
 
+  --text-color: #1b1b1b;
+  --link-color: #cacaff;
   --btn-color: #17181a;
   --btn-hover-color: #232425;
   --accent: #ffd100;
@@ -10,6 +11,8 @@
 }
 
 [data-theme='dark'] {
-  --site-bg: #0f3057;
+  --bg-site: #0f3057;
+  --header-color: rgb(31, 30, 41);
+
   --text-color: #e7e7de;
 }
