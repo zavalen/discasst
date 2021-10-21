@@ -1,18 +1,18 @@
 [data-theme='light'] {
-  --bg-site: #f7f7f7;
-  --bg-header: #d3d3d3;
+  --bg-site: #f6f6f6;
+  --bg-header: #fff;
+  --border-color: #ececec;
 
   --text-color: #1b1b1b;
   --link-color: #cacaff;
   --btn-color: #17181a;
   --btn-hover-color: #232425;
-  --accent: #ffd100;
-  --selected-episode: #1d1b24;
 }
 
 [data-theme='dark'] {
-  --bg-site: #0f3057;
-  --header-color: rgb(31, 30, 41);
+  --bg-site: #010101;
+  --bg-header: #17181a;
+  --border-color: #0f0f0f;
 
   --text-color: #e7e7de;
 }

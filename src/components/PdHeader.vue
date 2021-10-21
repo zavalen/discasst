@@ -1,87 +1,104 @@
 <template>
-  <header class="app_header header">
+  <header class="app__header header">
     <div class="header__wrapper container">
       <router-link class="header__logo" :to="{name: 'home'}"
         >Discasst</router-link
       >
 
-      <ul
-        show-authed="false"
-        class="header__menu nav navbar-nav pull-xs-right"
-        style="display: inherit"
-      >
-        <li class="nav-item">
-          <router-link :to="{name: 'register'}" active-class="active">{{
-            $t('header.feed')
-          }}</router-link>
+      <ul class="header__nav nav">
+        <li class="nav__item">
+          <router-link
+            :to="{name: 'home'}"
+            class="nav__item-link"
+            active-class="nav__item-link_active"
+            >{{ $t('header.feed') }}</router-link
+          >
         </li>
-        <li class="nav-item">
-          <router-link :to="{name: 'register'}" active-class="active">{{
-            $t('header.podcasts')
-          }}</router-link>
+        <li class="nav__item">
+          <router-link
+            :to="{name: 'home'}"
+            class="nav__item-link"
+            active-class="nav__item-link_active"
+            >{{ $t('header.podcasts') }}</router-link
+          >
         </li>
       </ul>
 
       <ul class="header__user-menu">
-        <template v-if="!isLoggedIn">
-          <li class="nav-item">
-            <router-link :to="{name: 'register'}" active-class="active">{{
-              $t('header.register')
-            }}</router-link>
+        <li>
+          <a
+            href="#"
+            style="display: flex"
+            class="nav__item"
+            @click.prevent="switchTheme"
+          >
+            <svg-icon :name="theme === 'light' ? 'dark' : 'light'" />
+          </a>
+        </li>
+        <template v-if="isAnonymus">
+          <li class="nav__item">
+            <a class="nav__item-link"> <svg-icon name="notification" /> </a>
           </li>
-
-          <li class="nav-item">
-            <router-link :to="{name: 'login'}" active-class="active">
+          <li class="nav__item">
+            <router-link
+              :to="{name: 'login'}"
+              class="nav__item-link"
+              active-class="nav__item-link_active"
+            >
+              <svg-icon name="user" />
               {{ $t('header.login') }}</router-link
             >
           </li>
         </template>
         <template v-if="isLoggedIn">
-          <li class="nav-item">
-            <router-link :to="{name: 'home'}" active-class="active">{{
-              $t('header.home')
-            }}</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link :to="{name: 'home'}" active-class="active">{{
-              $t('header.createArticle')
-            }}</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link :to="{name: 'home'}" active-class="active">{{
-              $t('header.settings')
-            }}</router-link>
+          <li class="nav__item">
+            <router-link
+              :to="{name: 'home'}"
+              class="nav__item-link"
+              active-class="nav__item-link_active"
+              >{{ $t('header.createArticle') }}</router-link
+            >
           </li>
 
-          <li class="nav-item">
-            <a href="#" @click="logout(e)"> {{ $t('header.logout') }}</a>
+          <li class="nav__item">
+            <a href="#" style="display: flex">
+              <img
+                style="width: 30px"
+                :src="currentUser.image"
+                :alt="currentUser.username"
+                :title="currentUser.username" />
+              <svg-icon style="transform: rotate(90deg)" name="play"
+            /></a>
           </li>
         </template>
       </ul>
-      <div class="nav-item">
-        <select v-model="$i18n.locale">
-          <option>en</option>
-          <option>ru</option>
-        </select>
-      </div>
-      <a href="#" class="nav-item" @click.prevent="switchTheme">
-        Переключить тему
-      </a>
     </div>
   </header>
 </template>
 
 <script>
 import {mapState} from 'vuex'
+import {mutationTypes as mutationTheme} from '@/store/modules/theme'
+import {getterTypes} from '@/store/modules/auth'
 
 export default {
   name: 'PdNavbar',
 
   computed: {
     ...mapState({
-      currentUser: state => state.auth.currentUser,
-      isLoggedIn: state => state.auth.isLoggedIn
-    })
+      // currentUser: (state) => state.auth.currentUser,
+      // isLoggedIn: (state) => state.auth.isLoggedIn,
+      theme: (state) => state.theme.theme,
+    }),
+    currentUser() {
+      return this.$store.getters[getterTypes.currentUser]
+    },
+    isLoggedIn() {
+      return this.$store.getters[getterTypes.isLoggedIn]
+    },
+    isAnonymus() {
+      return this.$store.getters[getterTypes.isAnonymus]
+    },
   },
   methods: {
     logout(e) {
@@ -90,11 +107,10 @@ export default {
     },
     switchTheme() {
       let html = document.getElementsByTagName('html')[0]
-      let theme = html.getAttribute('data-theme')
-
-      html.setAttribute('data-theme', theme === 'light' ? 'dark' : 'light')
-    }
-  }
+      this.$store.commit(mutationTheme.switchTheme)
+      html.setAttribute('data-theme', this.theme)
+    },
+  },
 }
 </script>
 
@@ -104,11 +120,13 @@ export default {
   top: 0;
   left: 0;
   right: 0;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
   &__wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 50px;
+    height: 54px;
   }
 
   &__logo {
@@ -116,7 +134,7 @@ export default {
     font-size: 1.5rem;
     padding-top: 0rem;
     margin-right: 2rem;
-    color: #5cb85c;
+    color: #db1313;
     text-decoration: none;
 
     &:hover {
@@ -124,12 +142,37 @@ export default {
     }
   }
 
-  &__menu {
+  &__nav {
     flex: auto;
   }
 
   &__user-menu {
     display: flex;
+  }
+}
+
+.nav {
+  height: 100%;
+  display: flex;
+
+  &__item {
+    display: flex;
+    &-link {
+      height: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      text-decoration: none;
+      color: var(--text-color);
+      &:hover {
+      }
+
+      &_active,
+      &:active {
+        text-shadow: 0 0 1px var(--text-color);
+      }
+    }
   }
 }
 </style>

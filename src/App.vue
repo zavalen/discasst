@@ -1,9 +1,9 @@
 <template>
   <pd-header> </pd-header>
-  <main class="app_main">
+  <main class="app__main">
     <router-view />
   </main>
-  <footer class="app_footer"></footer>
+  <footer class="app__footer"></footer>
 </template>
 
 <script>
@@ -12,8 +12,8 @@ import PdHeader from '@/components/PdHeader'
 export default {
   name: 'app',
   components: {
-    PdHeader
-  }
+    PdHeader,
+  },
 }
 </script>
 
