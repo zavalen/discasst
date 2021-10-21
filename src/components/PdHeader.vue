@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapGetters} from 'vuex'
 import {mutationTypes as mutationTheme} from '@/store/modules/theme'
 import {getterTypes} from '@/store/modules/auth'
 
@@ -90,15 +90,11 @@ export default {
       // isLoggedIn: (state) => state.auth.isLoggedIn,
       theme: (state) => state.theme.theme,
     }),
-    currentUser() {
-      return this.$store.getters[getterTypes.currentUser]
-    },
-    isLoggedIn() {
-      return this.$store.getters[getterTypes.isLoggedIn]
-    },
-    isAnonymus() {
-      return this.$store.getters[getterTypes.isAnonymus]
-    },
+    ...mapGetters({
+      currentUser: getterTypes.currentUser,
+      isLoggedIn: getterTypes.isLoggedIn,
+      isAnonymus: getterTypes.isAnonymus,
+    }),
   },
   methods: {
     logout(e) {
