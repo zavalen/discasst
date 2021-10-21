@@ -5,6 +5,8 @@
   "password": "Пароль",
   "header": {
     "home": "Главная",
+    "feed": "Лента",
+    "podcasts": "Подкасты",
     "register": "Регистрация",
     "login": "Войти",
     "logout": "Выйти",

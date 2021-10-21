@@ -1,0 +1,15 @@
+[data-theme='light'] {
+  --site-bg: #ffffff;
+  --text-color: rgb(27, 27, 27);
+  --link-color: #cacaff;
+
+  --btn-color: #17181a;
+  --btn-hover-color: #232425;
+  --accent: #ffd100;
+  --selected-episode: #1d1b24;
+}
+
+[data-theme='dark'] {
+  --site-bg: #0f3057;
+  --text-color: #e7e7de;
+}

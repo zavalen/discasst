@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page">
+  <div class="auth-page container">
     <h1>{{ $t('login.header') }}</h1>
     <p>
       {{ $t('login.subHeader') }}
@@ -58,14 +58,14 @@ export default {
   data() {
     return {
       email: '',
-      password: '',
+      password: ''
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: (state) => state.auth.isSubmitting,
-      validationErrors: (state) => state.auth.validationErrors,
-    }),
+      isSubmitting: state => state.auth.isSubmitting,
+      validationErrors: state => state.auth.validationErrors
+    })
   },
   mounted() {
     this.resetErrors()
@@ -78,13 +78,13 @@ export default {
       this.$store
         .dispatch(actionTypes.login, {
           email: this.email,
-          password: this.password,
+          password: this.password
         })
-        .then((user) => {
+        .then(user => {
           console.log('successfully register', user)
           this.$router.push({name: 'home'})
         })
-    },
-  },
+    }
+  }
 }
 </script>
