@@ -58,33 +58,33 @@ export default {
   data() {
     return {
       email: '',
-      password: '',
+      password: ''
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: (state) => state.auth.isSubmitting,
-      validationErrors: (state) => state.auth.validationErrors,
-    }),
+      isSubmitting: state => state.auth.isSubmitting,
+      validationErrors: state => state.auth.validationErrors
+    })
   },
   mounted() {
-    this.resetErrors()
+    this.logout()
   },
   methods: {
-    resetErrors() {
-      this.$store.commit(mutationTypes.resetErrors)
+    logout() {
+      this.$store.commit(mutationTypes.logout)
     },
     onSubmit() {
       this.$store
         .dispatch(actionTypes.login, {
           email: this.email,
-          password: this.password,
+          password: this.password
         })
-        .then((user) => {
+        .then(user => {
           console.log('successfully register', user)
           this.$router.push({name: 'home'})
         })
-    },
-  },
+    }
+  }
 }
 </script>

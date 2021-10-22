@@ -11,10 +11,8 @@ export const mutationTypes = {
 
 const mutations = {
   [mutationTypes.setTheme](state) {
-    const theme = getItem('theme', state.theme)
-    if (state.theme !== theme) {
-      state.theme = state.theme === 'light' ? 'dark' : 'light'
-    }
+    const theme = getItem('theme') || 'light'
+    state.theme = theme
   },
   [mutationTypes.switchTheme](state) {
     state.theme = state.theme === 'light' ? 'dark' : 'light'

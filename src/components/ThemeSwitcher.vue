@@ -26,6 +26,11 @@ export default {
   methods: {
     switchTheme() {
       this.$store.commit(mutationTheme.switchTheme)
+    },
+    setTheme() {
+      this.$store.commit(mutationTheme.setTheme)
+      let html = document.getElementsByTagName('html')[0]
+      html.setAttribute('data-theme', this.theme)
     }
   }
 }

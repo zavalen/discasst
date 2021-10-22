@@ -71,7 +71,7 @@
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import {getterTypes} from '@/store/modules/auth'
+import {getterTypes, mutationTypes as mutationAuth} from '@/store/modules/auth'
 import ThemeSwitcher from './ThemeSwitcher.vue'
 
 export default {
@@ -81,8 +81,6 @@ export default {
   },
   computed: {
     ...mapState({
-      // currentUser: (state) => state.auth.currentUser,
-      // isLoggedIn: (state) => state.auth.isLoggedIn,
       theme: state => state.theme.theme
     }),
     ...mapGetters({
@@ -92,9 +90,8 @@ export default {
     })
   },
   methods: {
-    logout(e) {
-      e.preventDefault()
-      console.log('logout')
+    logout() {
+      this.$store.commit(mutationAuth.logout)
     }
   }
 }

@@ -22,6 +22,8 @@ export const mutationTypes = {
   getCurrentUserSuccess: '[auth] getCurrentUserSuccess',
   getCurrentUserFailure: '[auth] getCurrentUserFailure',
 
+  logout: '[auth] logout',
+
   resetErrors: '[auth] resetErrors'
 }
 
@@ -92,6 +94,13 @@ const mutations = {
     state.isLoading = false
     state.isLoggedIn = false
     state.currentUser = null
+  },
+  [mutationTypes.logout](state) {
+    state.isLoading = false
+    state.isLoggedIn = false
+    state.currentUser = null
+    state.validationErrors = null
+    setItem('accessToken', null)
   }
 }
 

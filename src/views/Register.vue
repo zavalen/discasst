@@ -78,11 +78,11 @@ export default {
     })
   },
   mounted() {
-    this.resetErrors()
+    this.logout()
   },
   methods: {
-    resetErrors() {
-      this.$store.commit(mutationTypes.resetErrors)
+    logout() {
+      this.$store.commit(mutationTypes.logout)
     },
     onSubmit() {
       this.$store
