@@ -3,17 +3,29 @@
   <main class="app__main">
     <router-view />
   </main>
-  <footer class="app__footer"></footer>
+  <footer class="app__footer">
+    <li class="nav-item">
+      <select v-model="$i18n.locale">
+        <option>en</option>
+        <option>ru</option>
+      </select>
+    </li>
+  </footer>
 </template>
 
 <script>
 import PdHeader from '@/components/PdHeader'
+import {actionTypes as actionAuth} from '@/store/modules/auth'
 
 export default {
   name: 'app',
   components: {
-    PdHeader,
+    PdHeader
   },
+
+  mounted() {
+    this.$store.dispatch(actionAuth.getCurrentUser)
+  }
 }
 </script>
 

@@ -8,7 +8,7 @@
       <ul class="header__nav nav">
         <li class="nav__item">
           <router-link
-            :to="{name: 'home'}"
+            :to="{name: 'login'}"
             class="nav__item-link"
             active-class="nav__item-link_active"
             >{{ $t('header.feed') }}</router-link
@@ -16,7 +16,7 @@
         </li>
         <li class="nav__item">
           <router-link
-            :to="{name: 'home'}"
+            :to="{name: 'register'}"
             class="nav__item-link"
             active-class="nav__item-link_active"
             >{{ $t('header.podcasts') }}</router-link
@@ -26,14 +26,7 @@
 
       <ul class="header__user-menu">
         <li>
-          <a
-            href="#"
-            style="display: flex"
-            class="nav__item"
-            @click.prevent="switchTheme"
-          >
-            <svg-icon :name="theme === 'light' ? 'dark' : 'light'" />
-          </a>
+          <theme-switcher />
         </li>
         <template v-if="isAnonymus">
           <li class="nav__item">
@@ -66,7 +59,7 @@
                 style="width: 30px"
                 :src="currentUser.image"
                 :alt="currentUser.username"
-                :title="currentUser.username" />
+                :title="currentUser.username"/>
               <svg-icon style="transform: rotate(90deg)" name="play"
             /></a>
           </li>
@@ -78,35 +71,32 @@
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import {mutationTypes as mutationTheme} from '@/store/modules/theme'
 import {getterTypes} from '@/store/modules/auth'
+import ThemeSwitcher from './ThemeSwitcher.vue'
 
 export default {
   name: 'PdNavbar',
-
+  components: {
+    ThemeSwitcher
+  },
   computed: {
     ...mapState({
       // currentUser: (state) => state.auth.currentUser,
       // isLoggedIn: (state) => state.auth.isLoggedIn,
-      theme: (state) => state.theme.theme,
+      theme: state => state.theme.theme
     }),
     ...mapGetters({
       currentUser: getterTypes.currentUser,
       isLoggedIn: getterTypes.isLoggedIn,
-      isAnonymus: getterTypes.isAnonymus,
-    }),
+      isAnonymus: getterTypes.isAnonymus
+    })
   },
   methods: {
     logout(e) {
       e.preventDefault()
       console.log('logout')
-    },
-    switchTheme() {
-      let html = document.getElementsByTagName('html')[0]
-      this.$store.commit(mutationTheme.switchTheme)
-      html.setAttribute('data-theme', this.theme)
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -130,7 +120,7 @@ export default {
     font-size: 1.5rem;
     padding-top: 0rem;
     margin-right: 2rem;
-    color: #db1313;
+    color: var(--accent);
     text-decoration: none;
 
     &:hover {
@@ -161,12 +151,15 @@ export default {
       padding: 0 10px;
       text-decoration: none;
       color: var(--text-color);
-      &:hover {
-      }
+      text-shadow: 0 0 1px var(--text-color);
+      border-right: 1px solid transparent;
+      border-left: 1px solid transparent;
 
       &_active,
-      &:active {
-        text-shadow: 0 0 1px var(--text-color);
+      &:active,
+      &:hover {
+        background-color: var(--bg-menu-item-hover);
+        border-color: var(--border-color);
       }
     }
   }

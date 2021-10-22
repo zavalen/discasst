@@ -1,6 +1,9 @@
+:root,
 [data-theme='light'] {
   --bg-site: #f6f6f6;
   --bg-header: #fff;
+  --bg-menu-item-hover: #f8f8f8;
+  --accent: #db1313;
   --border-color: #ececec;
 
   --text-color: #1b1b1b;
@@ -13,6 +16,7 @@
   --bg-site: #010101;
   --bg-header: #17181a;
   --border-color: #0f0f0f;
-
+  --bg-menu-item-hover: #222222;
+  --accent: #db1313;
   --text-color: #e7e7de;
 }
