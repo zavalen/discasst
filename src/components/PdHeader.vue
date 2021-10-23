@@ -24,23 +24,15 @@
         </li>
       </ul>
 
-      <ul class="header__user-menu">
-        <li>
-          <theme-switcher />
-        </li>
+      <ul class="header__user-menu nav">
         <template v-if="isAnonymus">
           <li class="nav__item">
             <a class="nav__item-link"> <svg-icon name="notification" /> </a>
           </li>
           <li class="nav__item">
-            <router-link
-              :to="{name: 'login'}"
-              class="nav__item-link"
-              active-class="nav__item-link_active"
-            >
-              <svg-icon name="user" />
-              {{ $t('header.login') }}</router-link
-            >
+            <a href="#" class="nav__item-link" @click.prevent="openAuthPopup"
+              >{{ $t('header.login') }}<svg-icon name="user"
+            /></a>
           </li>
         </template>
         <template v-if="isLoggedIn">
@@ -52,48 +44,101 @@
               >{{ $t('header.createArticle') }}</router-link
             >
           </li>
-
           <li class="nav__item">
             <a href="#" style="display: flex">
               <img
+                v-if="currentUser.image"
                 style="width: 30px"
                 :src="currentUser.image"
                 :alt="currentUser.username"
-                :title="currentUser.username"/>
-              <svg-icon style="transform: rotate(90deg)" name="play"
-            /></a>
+                :title="currentUser.username"
+              />
+            </a>
           </li>
         </template>
+        <li class="nav__item" v-click-outside="hideUserSubMenu">
+          <a
+            class="nav__item-link"
+            href="#"
+            @click.prevent.stop="toggleUserSubMenu"
+          >
+            <svg-icon name="settings" />
+          </a>
+          <div
+            v-show="userSubMenuVisible"
+            ref="usersubmenu"
+            class="user-submenu"
+          >
+            <li class="nav__item">
+              <theme-switcher class="nav__item-link" />
+            </li>
+            <li class="nav__item">
+              <lang-switcher class="nav__item-link" />
+            </li>
+          </div>
+        </li>
       </ul>
     </div>
   </header>
+  <pd-popup ref="authPopup">
+    <button @click="authComponent = 'LoginForm'">Login</button>
+    <button @click="authComponent = 'RegisterForm'">Register</button>
+    <component :is="authComponent" />
+  </pd-popup>
 </template>
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import {getterTypes, mutationTypes as mutationAuth} from '@/store/modules/auth'
-import ThemeSwitcher from './ThemeSwitcher.vue'
+import {getterTypes} from '@/store/modules/auth'
+import PdPopup from '@/components/PdPopup'
+import LoginForm from '@/components/auth/LoginForm'
+import RegisterForm from '@/components/auth/RegisterForm'
 
 export default {
   name: 'PdNavbar',
   components: {
-    ThemeSwitcher
+    PdPopup,
+    LoginForm,
+    RegisterForm,
   },
+  data() {
+    return {
+      userSubMenuVisible: false,
+      authComponent: 'LoginForm',
+    }
+  },
+
   computed: {
     ...mapState({
-      theme: state => state.theme.theme
+      theme: (state) => state.theme.theme,
     }),
     ...mapGetters({
       currentUser: getterTypes.currentUser,
       isLoggedIn: getterTypes.isLoggedIn,
-      isAnonymus: getterTypes.isAnonymus
-    })
+      isAnonymus: getterTypes.isAnonymus,
+    }),
+  },
+  watch: {
+    isLoggedIn(newVal) {
+      if (newVal === true) {
+        const authPopup = this.$refs.authPopup
+        authPopup.ok()
+      }
+    },
   },
   methods: {
-    logout() {
-      this.$store.commit(mutationAuth.logout)
-    }
-  }
+    hideUserSubMenu() {
+      this.userSubMenuVisible = false
+    },
+    toggleUserSubMenu() {
+      this.userSubMenuVisible = !this.userSubMenuVisible
+    },
+    async openAuthPopup() {
+      const authPopup = this.$refs.authPopup
+
+      await authPopup.open()
+    },
+  },
 }
 </script>
 
@@ -140,6 +185,7 @@ export default {
 
   &__item {
     display: flex;
+    position: relative;
     &-link {
       height: 100%;
       height: 100%;
@@ -160,5 +206,20 @@ export default {
       }
     }
   }
+}
+
+.user-submenu {
+  position: absolute;
+  background: var(--bg-header);
+  border: 1px solid var(--border-color);
+  box-shadow: 3px 5px 10px #0000001f;
+  max-width: 400px;
+  width: 256px;
+  height: 100px;
+  right: 0;
+  top: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
 }
 </style>
