@@ -21,6 +21,11 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/Login')
+  },
+  {
+    path: '/feed',
+    name: 'feed',
+    component: () => import('@/views/GlobalFeed')
   }
 ]
 

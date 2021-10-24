@@ -4,18 +4,29 @@ const state = {
   lang: getItem('lang') || 'ru'
 }
 
-export const mutationTypes = {
-  switchLang: '[colorLang] switchLang'
+export const langMutations = {
+  switch: '[lang] switch'
+}
+
+export const langActions = {
+  switchAndSave: '[lang] switchAndSave'
 }
 
 const mutations = {
-  [mutationTypes.switchLang](state) {
+  [langMutations.switch](state) {
     state.lang = state.lang === 'ru' ? 'en' : 'ru'
+  }
+}
+
+const actions = {
+  [langActions.switchAndSave](ctx) {
+    ctx.commit(langMutations.switch)
     setItem('lang', state.lang)
   }
 }
 
 export default {
   state,
-  mutations
+  mutations,
+  actions
 }

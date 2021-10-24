@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import {mutationTypes as mutationTheme} from '@/store/modules/theme'
+import {themeActions} from '@/store/modules/theme'
 
 export default {
   name: 'ThemeSwitcher',
@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     switchTheme() {
-      this.$store.commit(mutationTheme.switchTheme)
+      this.$store.dispatch(themeActions.switchAndSave)
       this.setTheme()
     },
     setTheme() {

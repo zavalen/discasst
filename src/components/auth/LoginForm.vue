@@ -44,7 +44,7 @@
 
 <script>
 import PdValidationErrors from '@/components/ValidationErrors'
-import {actionTypes, mutationTypes} from '@/store/modules/auth'
+import {authActions} from '@/store/modules/auth'
 import {mapState} from 'vuex'
 
 export default {
@@ -63,15 +63,19 @@ export default {
     }),
   },
   mounted() {
+    this.$router.push('?auth=login')
     this.logout()
+  },
+  unmounted() {
+    this.$router.push('?')
   },
   methods: {
     logout() {
-      this.$store.commit(mutationTypes.logout)
+      this.$store.dispatch(authActions.logout)
     },
     onSubmit() {
       this.$store
-        .dispatch(actionTypes.login, {
+        .dispatch(authActions.login, {
           email: this.email,
           password: this.password,
         })

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import {mutationTypes as mutationLang} from '@/store/modules/lang'
+import {langActions} from '@/store/modules/lang'
 
 export default {
   name: 'LangSwitcher',
@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     switchLang() {
-      this.$store.commit(mutationLang.switchLang)
+      this.$store.dispatch(langActions.switchAndSave)
       this.setLang()
     },
     setLang() {

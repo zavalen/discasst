@@ -1,11 +1,14 @@
 <template>
   <div class="home container">{{ $t('message') }}</div>
+  <global-feed />
 </template>
 
 <script>
-// @ is an alias to /src
-
+import GlobalFeed from '@/views/GlobalFeed'
 export default {
-  name: 'Home'
+  name: 'Home',
+  components: {
+    GlobalFeed,
+  },
 }
 </script>

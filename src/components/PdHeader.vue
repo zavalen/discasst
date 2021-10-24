@@ -1,5 +1,5 @@
 <template>
-  <header class="app__header header">
+  <header class="header">
     <div class="header__wrapper container">
       <router-link class="header__logo" :to="{name: 'home'}"
         >Discasst</router-link
@@ -8,7 +8,7 @@
       <ul class="header__nav nav">
         <li class="nav__item">
           <router-link
-            :to="{name: 'login'}"
+            :to="{name: 'feed'}"
             class="nav__item-link"
             active-class="nav__item-link_active"
             >{{ $t('header.feed') }}</router-link
@@ -27,12 +27,9 @@
       <ul class="header__user-menu nav">
         <template v-if="isAnonymus">
           <li class="nav__item">
-            <a class="nav__item-link"> <svg-icon name="notification" /> </a>
-          </li>
-          <li class="nav__item">
-            <a href="#" class="nav__item-link" @click.prevent="openAuthPopup"
-              >{{ $t('header.login') }}<svg-icon name="user"
-            /></a>
+            <a href="#" class="nav__item-link" @click.prevent="openAuthPopup">{{
+              $t('header.login')
+            }}</a>
           </li>
         </template>
         <template v-if="isLoggedIn">
@@ -56,55 +53,55 @@
             </a>
           </li>
         </template>
+        <li class="nav__item">
+          <a class="nav__item-link"> <svg-icon name="notification" /> </a>
+        </li>
         <li class="nav__item" v-click-outside="hideUserSubMenu">
           <a
             class="nav__item-link"
             href="#"
             @click.prevent.stop="toggleUserSubMenu"
           >
-            <svg-icon name="settings" />
+            <svg-icon name="user" />
           </a>
           <div
             v-show="userSubMenuVisible"
             ref="usersubmenu"
             class="user-submenu"
           >
-            <li class="nav__item">
-              <theme-switcher class="nav__item-link" />
-            </li>
-            <li class="nav__item">
-              <lang-switcher class="nav__item-link" />
-            </li>
+            <ul>
+              <li>
+                <a href="?logout" @click="logout">{{ $t('header.logout') }}</a>
+              </li>
+              <li class="nav__item">
+                <theme-switcher class="nav__item-link" />
+              </li>
+              <li class="nav__item">
+                <lang-switcher class="nav__item-link" />
+              </li>
+            </ul>
           </div>
         </li>
       </ul>
     </div>
   </header>
-  <pd-popup ref="authPopup">
-    <button @click="authComponent = 'LoginForm'">Login</button>
-    <button @click="authComponent = 'RegisterForm'">Register</button>
-    <component :is="authComponent" />
-  </pd-popup>
 </template>
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import {getterTypes} from '@/store/modules/auth'
-import PdPopup from '@/components/PdPopup'
-import LoginForm from '@/components/auth/LoginForm'
-import RegisterForm from '@/components/auth/RegisterForm'
+import {authGetters, authActions, authMutations} from '@/store/modules/auth'
+import LangSwitcher from '@/components/LangSwitcher.vue'
+import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 export default {
   name: 'PdNavbar',
   components: {
-    PdPopup,
-    LoginForm,
-    RegisterForm,
+    ThemeSwitcher,
+    LangSwitcher,
   },
   data() {
     return {
       userSubMenuVisible: false,
-      authComponent: 'LoginForm',
     }
   },
 
@@ -113,18 +110,10 @@ export default {
       theme: (state) => state.theme.theme,
     }),
     ...mapGetters({
-      currentUser: getterTypes.currentUser,
-      isLoggedIn: getterTypes.isLoggedIn,
-      isAnonymus: getterTypes.isAnonymus,
+      currentUser: authGetters.currentUser,
+      isLoggedIn: authGetters.isLoggedIn,
+      isAnonymus: authGetters.isAnonymus,
     }),
-  },
-  watch: {
-    isLoggedIn(newVal) {
-      if (newVal === true) {
-        const authPopup = this.$refs.authPopup
-        authPopup.ok()
-      }
-    },
   },
   methods: {
     hideUserSubMenu() {
@@ -133,10 +122,11 @@ export default {
     toggleUserSubMenu() {
       this.userSubMenuVisible = !this.userSubMenuVisible
     },
-    async openAuthPopup() {
-      const authPopup = this.$refs.authPopup
-
-      await authPopup.open()
+    openAuthPopup() {
+      this.$store.commit(authMutations.openAuthPopup)
+    },
+    logout() {
+      this.$store.dispatch(authActions.logout)
     },
   },
 }
