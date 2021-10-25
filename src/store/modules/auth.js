@@ -100,6 +100,7 @@ const mutations = {
     state.isLoggedIn = false
     state.currentUser = null
     state.validationErrors = null
+    state.isAuthPopupOpen = false
   },
   [authMutations.openAuthPopup](state) {
     state.isAuthPopupOpen = true
@@ -172,7 +173,9 @@ const actions = {
   },
   [authActions.logout](context) {
     context.commit(authMutations.logout)
-    setItem('accessToken', null)
+    setItem('accessToken', '')
+
+    window.location.reload()
   }
 }
 

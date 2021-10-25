@@ -15,7 +15,7 @@ export default {
 
   data() {
     return {
-      isOpen: false,
+      isOpen: false
     }
   },
   mounted() {
@@ -27,7 +27,6 @@ export default {
   methods: {
     open() {
       this.isOpen = true
-
       let resolve, reject
       const popupPromise = new Promise((ok, fail) => {
         resolve = ok
@@ -52,8 +51,8 @@ export default {
       if (e.key === 'Escape') {
         this.close()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

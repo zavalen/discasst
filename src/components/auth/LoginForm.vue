@@ -53,18 +53,18 @@ export default {
   data() {
     return {
       email: '',
-      password: '',
+      password: ''
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: (state) => state.auth.isSubmitting,
-      validationErrors: (state) => state.auth.validationErrors,
-    }),
+      isSubmitting: state => state.auth.isSubmitting,
+      validationErrors: state => state.auth.validationErrors
+    })
   },
   mounted() {
     this.$router.push('?auth=login')
-    this.logout()
+    // this.logout()
   },
   unmounted() {
     this.$router.push('?')
@@ -77,13 +77,12 @@ export default {
       this.$store
         .dispatch(authActions.login, {
           email: this.email,
-          password: this.password,
+          password: this.password
         })
-        .then((user) => {
-          console.log('successfully register', user)
-          this.$router.push({name: 'home'})
+        .then(() => {
+          this.$router.push('?')
         })
-    },
-  },
+    }
+  }
 }
 </script>

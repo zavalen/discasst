@@ -63,19 +63,19 @@ export default {
     return {
       username: '',
       email: '',
-      password: '',
+      password: ''
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: (state) => state.auth.isSubmitting,
-      validationErrors: (state) => state.auth.validationErrors,
-    }),
+      isSubmitting: state => state.auth.isSubmitting,
+      validationErrors: state => state.auth.validationErrors
+    })
   },
   mounted() {
     this.$router.push('?auth=register')
 
-    this.logout()
+    // this.logout()
   },
   unmounted() {
     this.$router.push('?')
@@ -89,13 +89,12 @@ export default {
         .dispatch(authActions.register, {
           username: this.username,
           email: this.email,
-          password: this.password,
+          password: this.password
         })
-        .then((user) => {
-          console.log('successfully register', user)
-          this.$router.push({name: 'home'})
+        .then(() => {
+          this.$router.push('?')
         })
-    },
-  },
+    }
+  }
 }
 </script>

@@ -27,9 +27,12 @@
       <ul class="header__user-menu nav">
         <template v-if="isAnonymus">
           <li class="nav__item">
-            <a href="#" class="nav__item-link" @click.prevent="openAuthPopup">{{
-              $t('header.login')
-            }}</a>
+            <a
+              href="?auth=login"
+              @click.prevent="openAuthPopup"
+              class="nav__item-link"
+              >{{ $t('header.login') }}</a
+            >
           </li>
         </template>
         <template v-if="isLoggedIn">
@@ -71,7 +74,9 @@
           >
             <ul>
               <li>
-                <a href="?logout" @click="logout">{{ $t('header.logout') }}</a>
+                <a v-if="isLoggedIn" href="?auth=logout" @click="logout">{{
+                  $t('header.logout')
+                }}</a>
               </li>
               <li class="nav__item">
                 <theme-switcher class="nav__item-link" />
@@ -97,23 +102,23 @@ export default {
   name: 'PdNavbar',
   components: {
     ThemeSwitcher,
-    LangSwitcher,
+    LangSwitcher
   },
   data() {
     return {
-      userSubMenuVisible: false,
+      userSubMenuVisible: false
     }
   },
 
   computed: {
     ...mapState({
-      theme: (state) => state.theme.theme,
+      theme: state => state.theme.theme
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus,
-    }),
+      isAnonymus: authGetters.isAnonymus
+    })
   },
   methods: {
     hideUserSubMenu() {
@@ -127,8 +132,8 @@ export default {
     },
     logout() {
       this.$store.dispatch(authActions.logout)
-    },
-  },
+    }
+  }
 }
 </script>
 

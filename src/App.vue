@@ -4,31 +4,30 @@
     <router-view />
   </main>
   <footer class="app__footer"></footer>
-  <auth-popup v-if="!isLoggedIn && isAuthPopupOpen" />
+  <auth-popup v-if="isAnonymus" />
 </template>
 
 <script>
 import PdHeader from '@/components/PdHeader'
-import {authActions} from '@/store/modules/auth'
+import {authActions, authGetters} from '@/store/modules/auth'
 import AuthPopup from '@/components/popups/AuthPopup'
-import {mapState} from 'vuex'
+import {mapGetters} from 'vuex'
 
 export default {
   name: 'app',
 
   components: {
     PdHeader,
-    AuthPopup,
+    AuthPopup
   },
   computed: {
-    ...mapState({
-      isAuthPopupOpen: (state) => state.auth.isAuthPopupOpen,
-      isLoggedIn: (state) => state.auth.isLoggedIn,
-    }),
+    ...mapGetters({
+      isAnonymus: authGetters.isAnonymus
+    })
   },
   mounted() {
     this.$store.dispatch(authActions.getCurrentUser)
-  },
+  }
 }
 </script>
 
