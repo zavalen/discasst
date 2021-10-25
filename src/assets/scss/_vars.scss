@@ -1,10 +1,11 @@
-// :root,
+:root,
 [data-theme='light'] {
   --bg-site: #f6f6f6;
   --bg-header: #fff;
+  --bg-header-submenu: #fff;
   --bg-menu-item-hover: #f8f8f8;
   --accent: #db1313;
-  --border-color: #ececec;
+  --border-color: #f0f0f0;
 
   --text-color: #1b1b1b;
   --link-color: #cacaff;
@@ -14,9 +15,11 @@
 
 [data-theme='dark'] {
   --bg-site: #010101;
-  --bg-header: #17181a;
+  --bg-header: #242529;
+  --bg-header-submenu: #242529;
+
   --border-color: #0f0f0f;
-  --bg-menu-item-hover: #222222;
+  --bg-menu-item-hover: #1f1f1f;
   --accent: #db1313;
   --text-color: #e7e7de;
 }

@@ -11,7 +11,10 @@
     "login": "Войти",
     "logout": "Выйти",
     "createArticle": "Создать статью",
-    "settings": "Настройки"
+    "settings": "Настройки",
+    "darkTheme": "Темная тема",
+    "lightTheme": "Светлая тема",
+    "anonymus": "Вы не авторизованы"
   },
   "register": {
     "header": "Регистрация",

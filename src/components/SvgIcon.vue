@@ -9,7 +9,7 @@
 <script>
 const icons = {}
 const requireComponents = require.context('@/assets/icons/', false, /.svg$/)
-requireComponents.keys().forEach((fileName) => {
+requireComponents.keys().forEach(fileName => {
   const iconName = fileName.replace(/^.*[\\/]/, '').replace('.svg', '')
   icons[iconName] = true
 })
@@ -22,21 +22,24 @@ export default {
       require: true,
       validator(value) {
         return Object.prototype.hasOwnProperty.call(icons, value)
-      },
-    },
+      }
+    }
   },
   computed: {
     isIconExist() {
       return Object.prototype.hasOwnProperty.call(icons, this.name)
-    },
-  },
+    }
+  }
 }
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 .icon {
   height: 24px;
   width: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   > svg,
   > path {
     fill: var(--text-color);

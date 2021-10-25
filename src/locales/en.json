@@ -5,11 +5,15 @@
   "password": "Password",
   "header": {
     "home": "Home",
+    "feed": "Feed",
+    "podcasts": "Podcasts",
     "register": "Registration",
     "login": "Login",
-    "logout": "Logout",
+    "logout": "Log out",
     "createArticle": "Create Article",
-    "settings": "Settings"
+    "settings": "Settings",
+    "darkTheme": "Dark mode",
+    "lightTheme": "Light mode"
   },
   "register": {
     "header": "Registration",

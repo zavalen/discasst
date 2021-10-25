@@ -44,17 +44,6 @@
               >{{ $t('header.createArticle') }}</router-link
             >
           </li>
-          <li class="nav__item">
-            <a href="#" style="display: flex">
-              <img
-                v-if="currentUser.image"
-                style="width: 30px"
-                :src="currentUser.image"
-                :alt="currentUser.username"
-                :title="currentUser.username"
-              />
-            </a>
-          </li>
         </template>
         <li class="nav__item">
           <a class="nav__item-link"> <svg-icon name="notification" /> </a>
@@ -62,29 +51,69 @@
         <li class="nav__item" v-click-outside="hideUserSubMenu">
           <a
             class="nav__item-link"
+            :class="{'nav__item-link_active': userSubMenuVisible}"
             href="#"
             @click.prevent.stop="toggleUserSubMenu"
           >
-            <svg-icon name="user" />
+            <user-icon />
           </a>
           <div
             v-show="userSubMenuVisible"
             ref="usersubmenu"
             class="user-submenu"
           >
-            <ul>
-              <li>
-                <a v-if="isLoggedIn" href="?auth=logout" @click="logout">{{
-                  $t('header.logout')
-                }}</a>
-              </li>
-              <li class="nav__item">
-                <theme-switcher class="nav__item-link" />
-              </li>
-              <li class="nav__item">
-                <lang-switcher class="nav__item-link" />
-              </li>
+            <div v-if="isAnonymus" class="user-submenu__top">
+              <user-icon />
+              {{ $t('header.anonymus') }}
+            </div>
+            <router-link v-if="isLoggedIn" :to="{name: 'home'}">
+              <div class="user-submenu__top">
+                <user-icon />
+                {{ currentUser ? currentUser.username : $t('header.anonymus') }}
+              </div>
+            </router-link>
+            <ul class="user-submenu__main">
+              <template v-if="isLoggedIn">
+                <li class="user-submenu__item">
+                  <router-link
+                    class="user-submenu__item-link"
+                    :to="{name: 'home'}"
+                    >{{ $t('header.settings') }}</router-link
+                  >
+                </li>
+                <li class="user-submenu__item">
+                  <a
+                    class="user-submenu__item-link"
+                    href="?auth=logout"
+                    @click="logout"
+                    >{{ $t('header.logout') }}</a
+                  >
+                </li></template
+              >
+
+              <template v-if="isAnonymus">
+                <li class="user-submenu__item">
+                  <a
+                    class="user-submenu__item-link"
+                    href="?auth=login"
+                    @click.prevent="openAuthPopup"
+                    >{{ $t('header.login') }}</a
+                  >
+                </li>
+                <!-- <li class="user-submenu__item">
+                  <a
+                    class="user-submenu__item-link"
+                    href="?auth=register"
+                    @click.prevent="openAuthPopup"
+                    >{{ $t('header.register') }}</a
+                  >
+                </li> -->
+              </template>
             </ul>
+            <div class="user-submenu__bottom">
+              <theme-switcher class="user-submenu__theme" />
+              <lang-switcher class="user-submenu__lang" />
+            </div>
           </div>
         </li>
       </ul>
@@ -97,12 +126,14 @@ import {mapState, mapGetters} from 'vuex'
 import {authGetters, authActions, authMutations} from '@/store/modules/auth'
 import LangSwitcher from '@/components/LangSwitcher.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
+import UserIcon from '@/components/UserIcon.vue'
 
 export default {
   name: 'PdNavbar',
   components: {
     ThemeSwitcher,
-    LangSwitcher
+    LangSwitcher,
+    UserIcon
   },
   data() {
     return {
@@ -129,6 +160,7 @@ export default {
     },
     openAuthPopup() {
       this.$store.commit(authMutations.openAuthPopup)
+      this.userSubMenuVisible = false
     },
     logout() {
       this.$store.dispatch(authActions.logout)
@@ -139,12 +171,18 @@ export default {
 
 <style lang="scss">
 .header {
+  * {
+    transition: 0.2s;
+  }
+
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
   background: var(--bg-header);
   border-bottom: 1px solid var(--border-color);
+  box-shadow: 0px 0.3px 0.8px rgba(0, 0, 0, 0.008),
+    0px 0.9px 2.7px rgba(0, 0, 0, 0.012), 0px 4px 12px rgba(0, 0, 0, 0.02);
   &__wrapper {
     display: flex;
     align-items: center;
@@ -205,16 +243,110 @@ export default {
 
 .user-submenu {
   position: absolute;
-  background: var(--bg-header);
-  border: 1px solid var(--border-color);
-  box-shadow: 3px 5px 10px #0000001f;
+  background: var(--bg-header-submenu);
+  // border: 1px solid var(--border-color);
+  border-top: 0;
   max-width: 400px;
-  width: 256px;
-  height: 100px;
+  width: 300px;
   right: 0;
-  top: 100%;
+  top: calc(100% + 10px);
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0.3px 0.3px 0.3px -6px rgba(0, 0, 0, 0.011),
+    0.7px 0.7px 0.8px -6px rgba(0, 0, 0, 0.016),
+    1.3px 1.3px 1.5px -6px rgba(0, 0, 0, 0.02),
+    2.2px 2.2px 2.7px -6px rgba(0, 0, 0, 0.024),
+    4.2px 4.2px 5px -6px rgba(0, 0, 0, 0.029),
+    10px 10px 12px -6px rgba(0, 0, 0, 0.04);
+
+  a {
+    color: var(--text-color);
+    text-decoration: none;
+  }
+
+  &__top {
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    height: 64px;
+    padding: 0 24px;
+
+    &:before {
+      content: '\A';
+      border-style: solid;
+      border-width: 0 8px 8px 8px;
+      border-color: transparent transparent var(--bg-header-submenu) transparent;
+      position: absolute;
+      right: 14px;
+      top: -8px;
+    }
+
+    &:hover {
+      background: var(--bg-menu-item-hover);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      &:before {
+        border-color: transparent transparent var(--bg-menu-item-hover)
+          transparent;
+      }
+    }
+
+    .user-icon {
+      width: 30px;
+      margin-right: 10px;
+    }
+  }
+
+  &__main {
+    flex: auto;
+    padding: 0;
+  }
+
+  &__item {
+    display: flex;
+    &-link {
+      padding: 16px 32px;
+      flex: auto;
+      &:hover {
+        background: var(--bg-menu-item-hover);
+        text-shadow: 0 0 1px var(--text-color);
+      }
+    }
+  }
+
+  &__bottom {
+    display: flex;
+    border-top: 1px solid var(--border-color);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: hidden;
+  }
+
+  &__theme {
+    border-right: 1px solid var(--border-color);
+  }
+
+  &__theme,
+  &__lang {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 12px 14px;
+    flex: auto;
+    text-align: center;
+    font-size: 14px;
+
+    &:hover {
+      background: var(--bg-menu-item-hover);
+    }
+
+    .icon {
+      margin-right: 8px;
+    }
+  }
 }
 </style>
