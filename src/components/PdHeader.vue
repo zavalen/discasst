@@ -63,15 +63,22 @@
             class="user-submenu"
           >
             <div v-if="isAnonymus" class="user-submenu__top">
-              <user-icon />
               {{ $t('header.anonymus') }}
             </div>
-            <router-link v-if="isLoggedIn" :to="{name: 'home'}">
-              <div class="user-submenu__top">
-                <user-icon />
-                {{ currentUser ? currentUser.username : $t('header.anonymus') }}
-              </div>
-            </router-link>
+            <div
+              v-if="isLoggedIn"
+              class="user-submenu__top"
+              :class="{'user-submenu__top_logged': isLoggedIn}"
+            >
+              <user-icon />
+              {{ currentUser.username }}
+              <router-link
+                class="user-submenu__profile-link"
+                :to="{name: 'home'}"
+              >
+              </router-link>
+            </div>
+
             <ul class="user-submenu__main">
               <template v-if="isLoggedIn">
                 <li class="user-submenu__item">
@@ -197,9 +204,13 @@ export default {
     margin-right: 2rem;
     color: var(--accent);
     text-decoration: none;
-
+    position: relative;
     &:hover {
       text-decoration: none;
+    }
+
+    &:active {
+      bottom: -1px;
     }
   }
 
@@ -244,12 +255,12 @@ export default {
 .user-submenu {
   position: absolute;
   background: var(--bg-header-submenu);
-  // border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-top: 0;
   max-width: 400px;
   width: 300px;
   right: 0;
-  top: calc(100% + 10px);
+  top: calc(100% + 12px);
   display: flex;
   flex-direction: column;
   border-radius: 10px;
@@ -270,8 +281,9 @@ export default {
     display: flex;
     align-items: center;
     height: 64px;
-    padding: 0 24px;
-
+    padding: 0 32px;
+    font-weight: 600;
+    position: relative;
     &:before {
       content: '\A';
       border-style: solid;
@@ -282,20 +294,34 @@ export default {
       top: -8px;
     }
 
-    &:hover {
-      background: var(--bg-menu-item-hover);
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-      &:before {
-        border-color: transparent transparent var(--bg-menu-item-hover)
-          transparent;
-      }
-    }
-
     .user-icon {
       width: 30px;
       margin-right: 10px;
     }
+
+    &_logged {
+      padding: 0 24px;
+
+      &:hover {
+        background: var(--bg-menu-item-hover);
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        &:before {
+          border-color: transparent transparent var(--bg-menu-item-hover)
+            transparent;
+        }
+      }
+    }
+  }
+
+  &__profile-link {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__profile {
+    font-size: 12px;
   }
 
   &__main {
