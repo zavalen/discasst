@@ -11,49 +11,45 @@
       @submit.prevent="onSubmit"
       class="ng-pristine ng-valid ng-valid-email"
     >
-      <fieldset>
-        <fieldset class="form-group">
+      <div>
+        <div class="form-group">
           <input
             class="form-control form-control-lg"
             type="text"
             :placeholder="$t('username')"
             v-model="username"
           />
-        </fieldset>
+        </div>
 
-        <fieldset class="form-group">
+        <div class="form-group">
           <input
             class="form-control form-control-lg"
             placeholder="Email"
             type="email"
             v-model="email"
           />
-        </fieldset>
+        </div>
 
-        <fieldset class="form-group">
+        <div class="form-group">
           <input
             class="form-control form-control-lg"
             type="password"
             :placeholder="$t('password')"
             v-model="password"
           />
-        </fieldset>
+        </div>
 
-        <button
-          :disabled="isSubmitting"
-          class="btn btn-lg btn-primary pull-xs-right"
-          type="submit"
-        >
+        <button :disabled="isSubmitting" class="button_primary" type="submit">
           {{ $t('register.button') }}
         </button>
-      </fieldset>
+      </div>
     </form>
   </div>
 </template>
 
 <script>
 import PdValidationErrors from '@/components/ValidationErrors'
-import {authActions} from '@/store/modules/auth'
+import {authActions, authMutations} from '@/store/modules/auth'
 import {mapState} from 'vuex'
 
 export default {
@@ -63,23 +59,20 @@ export default {
     return {
       username: '',
       email: '',
-      password: ''
+      password: '',
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: state => state.auth.isSubmitting,
-      validationErrors: state => state.auth.validationErrors
-    })
+      isSubmitting: (state) => state.auth.isSubmitting,
+      validationErrors: (state) => state.auth.validationErrors,
+    }),
   },
   mounted() {
     this.$router.push('?auth=register')
+    this.$store.commit(authMutations.resetErrors)
+  },
 
-    // this.logout()
-  },
-  unmounted() {
-    this.$router.push('?')
-  },
   methods: {
     logout() {
       this.$store.dispatch(authActions.logout)
@@ -89,12 +82,12 @@ export default {
         .dispatch(authActions.register, {
           username: this.username,
           email: this.email,
-          password: this.password
+          password: this.password,
         })
         .then(() => {
           this.$router.push('?')
         })
-    }
-  }
+    },
+  },
 }
 </script>

@@ -1,21 +1,30 @@
 <template>
-  <div v-if="isOpen" class="modal">
-    <div class="modal__window">
-      <div class="modal__close" @click="close"><svg-icon name="close" /></div>
-      <slot> </slot>
+  <fade-transition>
+    <div v-if="isOpen" class="modal">
+      <div class="modal__window scrollbar">
+        <div class="modal__close button" @click="close">
+          <svg-icon name="close" />
+        </div>
+        <slot> </slot>
+      </div>
+      <div class="modal__bg" @click="close"></div>
     </div>
-    <div class="modal__bg" @click="close"></div>
-  </div>
+  </fade-transition>
 </template>
 
 <script>
+import FadeTransition from '@/components/ui/FadeTransition'
+
 export default {
   name: 'PdPopup',
+  components: {
+    FadeTransition,
+  },
   currentPopupController: null,
 
   data() {
     return {
-      isOpen: false
+      isOpen: false,
     }
   },
   mounted() {
@@ -51,8 +60,8 @@ export default {
       if (e.key === 'Escape') {
         this.close()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -63,6 +72,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 9999;
 
   &__bg {
     position: absolute;
@@ -70,31 +80,45 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.397);
+    background: var(--color-popup-overlay);
     z-index: 9998;
     cursor: pointer;
+    backdrop-filter: blur(1px);
   }
 
   &__window {
-    max-width: 500px;
+    max-width: 460px;
     width: 100%;
-    background: var(--bg-header);
+    background: var(--color-header-bg);
     z-index: 9999;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.63);
+    border-radius: 10px;
+    padding: 20px 50px 40px 30px;
+    box-shadow: 0 0.5rem 0.5rem 0.5rem var(--color-default-shadow);
+
     position: relative;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 100px;
+    margin-top: 10vh;
+    max-height: 70vh;
+    overflow: auto;
+    .custom-scroll::-webkit-scrollbar-thumb,
+    .custom-scroll-x::-webkit-scrollbar-thumb {
+      background-color: rgba(90, 90, 90, 0);
+      border-radius: 0.35rem;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
   }
 
   &__close {
     position: absolute;
-    right: 10px;
-    top: 10px;
-    width: 20px;
+    right: 0px;
+    top: 0px;
+    width: 16px;
     cursor: pointer;
+    padding: 20px;
   }
 }
 </style>

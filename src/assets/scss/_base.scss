@@ -1,7 +1,7 @@
 body {
   font-family: 'Roboto', sans-serif;
-  color: var(--text-color);
-  background-color: var(--bg-site);
+  color: var(--color-text);
+  background-color: var(--color-body-bg);
 }
 
 ol,
@@ -30,20 +30,113 @@ a {
   min-height: 100vh;
 
   &__header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9996;
   }
 
   &__main {
     flex: auto;
+    min-height: 100vh;
+    & > div:first-child {
+      min-height: 100vh;
+    }
   }
   &__footer {
     background: #383838;
     min-height: 100px;
+    z-index: 100;
+  }
+  &__zPlayer {
+    position: sticky;
+    bottom: 12px;
+    left: 0;
+    right: 0;
+    z-index: 97;
   }
 }
 
 .container {
-  max-width: 1300px;
+  max-width: 1240px;
   width: 100%;
   padding: 0 20px;
   margin: 0 auto;
+}
+.button,
+button {
+  &_primary {
+    background: var(--color-primary);
+    color: var(--color-btn-text);
+    border-radius: 8px;
+    padding: 10px 20px;
+
+    &:hover,
+    &:active,
+    &_active {
+      background: var(--color-primary);
+      color: var(--color-btn-text);
+      filter: grayscale(0.3);
+    }
+  }
+
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  color: var(--color-text-secondary);
+  text-shadow: 0 0 1px var(--color-text-secondary);
+  border: 1px solid transparent;
+  padding: 0 12px 0;
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+
+  &_active,
+  &:active,
+  &:hover {
+    background-color: var(--bg-menu-item-hover);
+    color: var(--color-text);
+  }
+
+  &_active,
+  &:active {
+    border: 1px solid var(--color-border);
+    box-shadow: 0 2px 2px var(--color-light-shadow);
+  }
+}
+
+input:not([type='submit']),
+input:not([type='checkbox']),
+input:not([type='select']) {
+  border-radius: 10px;
+  background: var(--color-input-bg);
+  border: 2px solid var(--color-border);
+  padding: 8px 20px;
+  outline: 0;
+  transition: 0.3s;
+  width: calc(100% - 40px);
+  margin-bottom: 16px;
+  &:active,
+  &:focus {
+    background: var(--color-input-bg-active);
+    border-color: var(--color-text-secondary);
+  }
+}
+
+.scrollbar::-webkit-scrollbar {
+  width: 14px; /* width of the entire scrollbar */
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  // background: var(--color-header-bg);
+  background: transparent; /* color of the tracking area */
+  border-left: 0px solid var(--color-border); /* creates padding around scroll thumb */
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-text-secondary); /* color of the scroll thumb */
+  border-radius: 20px; /* roundness of the scroll thumb */
+  border: 3px solid var(--color-header-bg); /* creates padding around scroll thumb */
 }

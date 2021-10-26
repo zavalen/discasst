@@ -43,11 +43,7 @@ const actions = {
           resolve(response.data.articles)
         })
         .catch(result => {
-          console.log('Error: ', result)
-          context.commit(
-            feedMutations.getFeedFailure,
-            result.response.data.errors
-          )
+          context.commit(feedMutations.getFeedFailure, result.response.data)
         })
     })
   }

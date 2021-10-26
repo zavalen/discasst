@@ -10,17 +10,18 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/Register')
+    redirect: '?auth=register'
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/Login')
+    redirect: '?auth=login'
   },
+
   {
-    path: '/profile',
-    name: 'profile',
-    component: () => import('@/views/Login')
+    path: '/search',
+    name: 'search',
+    component: () => import('@/views/Search')
   },
   {
     path: '/feed',

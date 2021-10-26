@@ -7,7 +7,7 @@
     "home": "Главная",
     "feed": "Лента",
     "podcasts": "Подкасты",
-    "register": "Регистрация",
+    "register": "Зарегистрироваться",
     "login": "Войти",
     "logout": "Выйти",
     "createArticle": "Создать статью",
@@ -27,5 +27,8 @@
     "subHeader": "Нет аккаунта?",
     "subHeaderLink": "Зарегистрироваться",
     "button": "Войти"
+  },
+  "search": {
+    "placeholder": "Поиск"
   }
 }

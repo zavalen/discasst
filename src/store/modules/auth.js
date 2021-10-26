@@ -7,8 +7,7 @@ const state = {
   isLoading: false,
   currentUser: null,
   validationErrors: null,
-  isLoggedIn: null,
-  isAuthPopupOpen: false
+  isLoggedIn: null
 }
 
 export const authMutations = {
@@ -25,8 +24,7 @@ export const authMutations = {
   getCurrentUserFailure: '[auth] getCurrentUserFailure',
 
   logout: '[auth] logout',
-  openAuthPopup: '[auth] openAuthPopup',
-  closeAuthPopup: '[auth] closeAuthPopup'
+  resetErrors: '[auth] resetErrors'
 }
 
 export const authActions = {
@@ -102,11 +100,9 @@ const mutations = {
     state.validationErrors = null
     state.isAuthPopupOpen = false
   },
-  [authMutations.openAuthPopup](state) {
-    state.isAuthPopupOpen = true
-  },
-  [authMutations.closeAuthPopup](state) {
-    state.isAuthPopupOpen = false
+
+  [authMutations.resetErrors](state) {
+    state.validationErrors = null
   }
 }
 

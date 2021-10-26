@@ -1,6 +1,9 @@
 <template>
   <header class="header">
     <div class="header__wrapper container">
+      <a href="#" class="header__burger button">
+        <svg-icon name="menu" />
+      </a>
       <router-link class="header__logo" :to="{name: 'home'}"
         >Discasst</router-link
       >
@@ -9,16 +12,16 @@
         <li class="nav__item">
           <router-link
             :to="{name: 'feed'}"
-            class="nav__item-link"
-            active-class="nav__item-link_active"
+            class="nav__item-link button"
+            active-class="button_active"
             >{{ $t('header.feed') }}</router-link
           >
         </li>
         <li class="nav__item">
           <router-link
             :to="{name: 'register'}"
-            class="nav__item-link"
-            active-class="nav__item-link_active"
+            class="nav__item-link button"
+            active-class="button_active"
             >{{ $t('header.podcasts') }}</router-link
           >
         </li>
@@ -27,87 +30,102 @@
       <ul class="header__user-menu nav">
         <template v-if="isAnonymus">
           <li class="nav__item">
-            <a
-              href="?auth=login"
-              @click.prevent="openAuthPopup"
-              class="nav__item-link"
-              >{{ $t('header.login') }}</a
-            >
+            <router-link :to="{name: 'login'}" class="nav__item-link button">{{
+              $t('header.login')
+            }}</router-link>
           </li>
         </template>
         <template v-if="isLoggedIn">
           <li class="nav__item">
             <router-link
               :to="{name: 'home'}"
-              class="nav__item-link"
-              active-class="nav__item-link_active"
+              class="nav__item-link button"
+              active-class="button_active"
               >{{ $t('header.createArticle') }}</router-link
             >
           </li>
         </template>
         <li class="nav__item">
-          <a class="nav__item-link"> <svg-icon name="notification" /> </a>
+          <router-link
+            :to="{name: 'search'}"
+            active-class="button_active"
+            class="nav__item-link button"
+          >
+            <svg-icon name="search" />
+          </router-link>
+        </li>
+        <li class="nav__item">
+          <a class="nav__item-link button">
+            <svg-icon name="notification" />
+          </a>
         </li>
         <li class="nav__item" v-click-outside="hideUserSubMenu">
           <a
-            class="nav__item-link"
-            :class="{'nav__item-link_active': userSubMenuVisible}"
+            class="nav__item-link button"
+            :class="{button_active: userSubMenuVisible}"
             href="#"
             @click.prevent.stop="toggleUserSubMenu"
           >
             <user-icon />
           </a>
-          <div
-            v-show="userSubMenuVisible"
-            ref="usersubmenu"
-            class="user-submenu"
-          >
-            <div v-if="isAnonymus" class="user-submenu__top">
-              {{ $t('header.anonymus') }}
-            </div>
+          <fade-transition>
             <div
-              v-if="isLoggedIn"
-              class="user-submenu__top"
-              :class="{'user-submenu__top_logged': isLoggedIn}"
+              v-show="userSubMenuVisible"
+              ref="usersubmenu"
+              class="user-submenu"
             >
-              <user-icon />
-              {{ currentUser.username }}
-              <router-link
-                class="user-submenu__profile-link"
-                :to="{name: 'home'}"
+              <div v-if="isAnonymus" class="user-submenu__top">
+                {{ $t('header.anonymus') }}
+              </div>
+              <div
+                v-if="isLoggedIn"
+                class="user-submenu__top"
+                :class="{'user-submenu__top_logged': isLoggedIn}"
               >
-              </router-link>
-            </div>
+                <user-icon />
+                {{ currentUser.username }}
+                <router-link
+                  class="user-submenu__profile-link"
+                  :to="{name: 'home'}"
+                >
+                </router-link>
+              </div>
 
-            <ul class="user-submenu__main">
-              <template v-if="isLoggedIn">
-                <li class="user-submenu__item">
-                  <router-link
-                    class="user-submenu__item-link"
-                    :to="{name: 'home'}"
-                    >{{ $t('header.settings') }}</router-link
-                  >
-                </li>
-                <li class="user-submenu__item">
-                  <a
-                    class="user-submenu__item-link"
-                    href="?auth=logout"
-                    @click="logout"
-                    >{{ $t('header.logout') }}</a
-                  >
-                </li></template
-              >
+              <ul class="user-submenu__main">
+                <template v-if="isLoggedIn">
+                  <li class="user-submenu__item">
+                    <router-link
+                      class="user-submenu__item-link"
+                      :to="{name: 'home'}"
+                      >{{ $t('header.settings') }}</router-link
+                    >
+                  </li>
+                  <li class="user-submenu__item">
+                    <a
+                      class="user-submenu__item-link"
+                      href="?auth=logout"
+                      @click="logout"
+                      >{{ $t('header.logout') }}</a
+                    >
+                  </li></template
+                >
 
-              <template v-if="isAnonymus">
-                <li class="user-submenu__item">
-                  <a
-                    class="user-submenu__item-link"
-                    href="?auth=login"
-                    @click.prevent="openAuthPopup"
-                    >{{ $t('header.login') }}</a
-                  >
-                </li>
-                <!-- <li class="user-submenu__item">
+                <template v-if="isAnonymus">
+                  <li class="user-submenu__item">
+                    <router-link
+                      :to="{name: 'login'}"
+                      class="user-submenu__item-link"
+                      >{{ $t('header.login') }}</router-link
+                    >
+                  </li>
+                  <li class="user-submenu__item">
+                    <router-link
+                      :to="{name: 'register'}"
+                      class="user-submenu__item-link"
+                      >{{ $t('header.register') }}</router-link
+                    >
+                  </li>
+                  <!-- <li class="user-submenu__item">
                   <a
                     class="user-submenu__item-link"
                     href="?auth=register"
@@ -115,13 +133,14 @@
                     >{{ $t('header.register') }}</a
                   >
                 </li> -->
-              </template>
-            </ul>
-            <div class="user-submenu__bottom">
-              <theme-switcher class="user-submenu__theme" />
-              <lang-switcher class="user-submenu__lang" />
+                </template>
+              </ul>
+              <div class="user-submenu__bottom">
+                <theme-switcher class="user-submenu__theme" />
+                <lang-switcher class="user-submenu__lang" />
+              </div>
             </div>
-          </div>
+          </fade-transition>
         </li>
       </ul>
     </div>
@@ -133,30 +152,35 @@ import {mapState, mapGetters} from 'vuex'
 import {authGetters, authActions, authMutations} from '@/store/modules/auth'
 import LangSwitcher from '@/components/LangSwitcher.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
-import UserIcon from '@/components/UserIcon.vue'
+import UserIcon from '@/components/ui/UserIcon.vue'
+import FadeTransition from '@/components/ui/FadeTransition.vue'
 
 export default {
   name: 'PdNavbar',
   components: {
     ThemeSwitcher,
     LangSwitcher,
-    UserIcon
+    UserIcon,
+    FadeTransition,
   },
   data() {
     return {
-      userSubMenuVisible: false
+      userSubMenuVisible: false,
     }
+  },
+  mounted() {
+    // console.log(this.$router.currentRoute.value.name)
   },
 
   computed: {
     ...mapState({
-      theme: state => state.theme.theme
+      theme: (state) => state.theme.theme,
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+    }),
   },
   methods: {
     hideUserSubMenu() {
@@ -166,13 +190,15 @@ export default {
       this.userSubMenuVisible = !this.userSubMenuVisible
     },
     openAuthPopup() {
-      this.$store.commit(authMutations.openAuthPopup)
       this.userSubMenuVisible = false
+      this.$store.commit(authMutations.openAuthPopup)
     },
     logout() {
+      this.userSubMenuVisible = false
+
       this.$store.dispatch(authActions.logout)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -182,26 +208,39 @@ export default {
     transition: 0.2s;
   }
 
-  position: sticky;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg-header);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: 0px 0.3px 0.8px rgba(0, 0, 0, 0.008),
-    0px 0.9px 2.7px rgba(0, 0, 0, 0.012), 0px 4px 12px rgba(0, 0, 0, 0.02);
+  a {
+    position: relative;
+    &:active {
+      bottom: -1px;
+    }
+  }
+
+  &__burger {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-top: 8px;
+    padding-bottom: 12px;
+    margin-right: 10px;
+  }
+
+  background: var(--color-header-bg);
+  padding-top: 8px;
+  padding-bottom: 12px;
+
+  box-shadow: 0 2px 2px var(--color-light-shadow);
   &__wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 54px;
+    height: 36px;
   }
 
   &__logo {
     font-family: 'Titillium Web', sans-serif;
-    font-size: 1.5rem;
+    font-size: 2rem;
     padding-top: 0rem;
-    margin-right: 2rem;
+    margin-right: 46px;
     color: var(--accent);
     text-decoration: none;
     position: relative;
@@ -226,72 +265,60 @@ export default {
 .nav {
   height: 100%;
   display: flex;
-
+  padding: 0;
   &__item {
     display: flex;
     position: relative;
+    margin-right: 4px;
+
     &-link {
       height: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      text-decoration: none;
-      color: var(--text-color);
-      text-shadow: 0 0 1px var(--text-color);
-      border-right: 1px solid transparent;
-      border-left: 1px solid transparent;
-
-      &_active,
-      &:active,
-      &:hover {
-        background-color: var(--bg-menu-item-hover);
-        border-color: var(--border-color);
-      }
     }
   }
 }
 
 .user-submenu {
   position: absolute;
-  background: var(--bg-header-submenu);
-  border: 1px solid var(--border-color);
+  background: var(--color-header-bg-submenu);
+  border: 1px solid var(--color-border);
   border-top: 0;
   max-width: 400px;
-  width: 300px;
-  right: 0;
-  top: calc(100% + 12px);
+  width: 290px;
+  right: 10px;
+  top: calc(100% + 24px);
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-  box-shadow: 0.3px 0.3px 0.3px -6px rgba(0, 0, 0, 0.011),
-    0.7px 0.7px 0.8px -6px rgba(0, 0, 0, 0.016),
-    1.3px 1.3px 1.5px -6px rgba(0, 0, 0, 0.02),
-    2.2px 2.2px 2.7px -6px rgba(0, 0, 0, 0.024),
-    4.2px 4.2px 5px -6px rgba(0, 0, 0, 0.029),
-    10px 10px 12px -6px rgba(0, 0, 0, 0.04);
 
+  box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   a {
-    color: var(--text-color);
+    color: var(--color-text-secondary);
     text-decoration: none;
   }
 
   &__top {
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
-    height: 64px;
+    height: 56px;
     padding: 0 32px;
     font-weight: 600;
     position: relative;
-    &:before {
+    // &:before,
+    &:after {
       content: '\A';
-      border-style: solid;
-      border-width: 0 8px 8px 8px;
-      border-color: transparent transparent var(--bg-header-submenu) transparent;
       position: absolute;
-      right: 14px;
-      top: -8px;
+      background: var(--color-header-bg-submenu);
+      transform: rotate(45deg);
+      width: 12px;
+      height: 12px;
+      right: 8px;
+      top: -6px;
+      transition: 0.2s;
+    }
+    &:before {
+      // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+      z-index: -1;
     }
 
     .user-icon {
@@ -306,9 +333,8 @@ export default {
         background: var(--bg-menu-item-hover);
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
-        &:before {
-          border-color: transparent transparent var(--bg-menu-item-hover)
-            transparent;
+        &:after {
+          background: var(--bg-menu-item-hover);
         }
       }
     }
@@ -336,21 +362,21 @@ export default {
       flex: auto;
       &:hover {
         background: var(--bg-menu-item-hover);
-        text-shadow: 0 0 1px var(--text-color);
+        text-shadow: 0 0 1px var(--color-text-secondary);
       }
     }
   }
 
   &__bottom {
     display: flex;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--color-border);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     overflow: hidden;
   }
 
   &__theme {
-    border-right: 1px solid var(--border-color);
+    border-right: 1px solid var(--color-border);
   }
 
   &__theme,
@@ -359,9 +385,9 @@ export default {
     align-items: center;
     justify-content: center;
     white-space: nowrap;
-    color: var(--text-color);
+    color: var(--color-text-secondary);
     text-decoration: none;
-    padding: 12px 14px;
+    padding: 8px 14px;
     flex: auto;
     text-align: center;
     font-size: 14px;

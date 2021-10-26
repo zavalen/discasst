@@ -5,6 +5,7 @@ import store from './store'
 import i18n from './i18n'
 import SvgIcon from '@/components/SvgIcon'
 import vClickOutside from 'click-outside-vue3'
+import 'vuesax/dist/vuesax.css'
 
 createApp(App)
   .use(store)

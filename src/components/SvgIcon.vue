@@ -2,6 +2,7 @@
   <span
     class="icon"
     v-if="isIconExist"
+    :style="{height: height + 'px', width: width + 'px'}"
     v-html="require(`!html-loader!@/assets/icons/${name}.svg`)"
   ></span>
 </template>
@@ -9,7 +10,7 @@
 <script>
 const icons = {}
 const requireComponents = require.context('@/assets/icons/', false, /.svg$/)
-requireComponents.keys().forEach(fileName => {
+requireComponents.keys().forEach((fileName) => {
   const iconName = fileName.replace(/^.*[\\/]/, '').replace('.svg', '')
   icons[iconName] = true
 })
@@ -22,14 +23,22 @@ export default {
       require: true,
       validator(value) {
         return Object.prototype.hasOwnProperty.call(icons, value)
-      }
-    }
+      },
+    },
+    height: {
+      type: Number,
+      require: false,
+    },
+    width: {
+      type: Number,
+      require: false,
+    },
   },
   computed: {
     isIconExist() {
       return Object.prototype.hasOwnProperty.call(icons, this.name)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -40,10 +49,11 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  > svg,
-  > path {
-    fill: var(--text-color);
-  }
+  // > svg,
+  // > path {
+  //   // fill: var(--color-text);
+  //   stroke: var(--color-text);
+  // }
 
   > svg {
     width: 100%;

@@ -1,8 +1,28 @@
 <template>
-  <pd-popup v-if="isAuthPopupOpen" ref="authPopup">
-    <button @click="authComponent = 'LoginForm'">Login</button>
-    <button @click="authComponent = 'RegisterForm'">Register</button>
+  <pd-popup v-if="isOpen" ref="authPopup">
     <component :is="authComponent" />
+    <router-link
+      class="button"
+      exact-path-active-class="button_active"
+      exact-path
+      :to="{
+        query: {
+          auth: 'login',
+        },
+      }"
+      >{{ $t('header.login') }}</router-link
+    >
+    <router-link
+      class="button"
+      exact-path
+      active-class="button_active"
+      :to="{
+        query: {
+          auth: 'register',
+        },
+      }"
+      >{{ $t('header.register') }}</router-link
+    >
   </pd-popup>
 </template>
 
@@ -10,7 +30,6 @@
 import PdPopup from '@/components/popups/PdPopup'
 import LoginForm from '@/components/auth/LoginForm'
 import RegisterForm from '@/components/auth/RegisterForm'
-import {authMutations} from '@/store/modules/auth'
 import {mapState} from 'vuex'
 import {nextTick} from 'vue'
 
@@ -19,63 +38,49 @@ export default {
   props: {
     authType: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   data() {
     return {
-      authComponent: 'LoginForm'
+      authComponent: 'LoginForm',
+      isOpen: false,
     }
   },
   components: {
     PdPopup,
     LoginForm,
-    RegisterForm
+    RegisterForm,
   },
   computed: {
     ...mapState({
-      isAuthPopupOpen: state => state.auth.isAuthPopupOpen
-    })
+      isAuthPopupOpen: (state) => state.auth.isAuthPopupOpen,
+    }),
   },
-  mounted() {
-    this.detectAuthUrlParam()
-    window.addEventListener('popstate', this.detectAuthUrlParam())
-  },
+
   watch: {
-    isAuthPopupOpen(newVal) {
-      if (newVal) {
+    $route(to) {
+      if (to.query.auth === 'login' || to.query.auth === 'register') {
+        this.authComponent = this.capitalizeFirstLetter(to.query.auth) + 'Form'
+        this.isOpen = true
         this.open()
+      } else {
+        this.isOpen = false
       }
-    }
+    },
   },
   methods: {
     async open() {
       await nextTick()
       const authPopup = this.$refs.authPopup
       await authPopup.open()
+      this.isOpen = false
+      this.$router.push({query: {}})
+    },
 
-      this.close()
-    },
-    close() {
-      this.$store.commit(authMutations.closeAuthPopup)
-    },
     capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1)
     },
-    detectAuthUrlParam() {
-      const location = new URL(window.location.href)
-      var auth = location.searchParams.get('auth')
-      if (!auth) {
-        return
-      }
-      if (auth === 'login' || auth === 'register') {
-        this.authComponent = this.capitalizeFirstLetter(auth) + 'Form'
-        this.$store.commit(authMutations.openAuthPopup)
-      }
-    }
   },
-  unmounted() {
-    window.removeEventListener('popstate', this.detectAuthUrlParam())
-  }
 }
 </script>

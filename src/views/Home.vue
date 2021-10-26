@@ -1,14 +1,14 @@
 <template>
   <div class="home container">{{ $t('message') }}</div>
-  <global-feed />
+  <!-- <global-feed /> -->
 </template>
 
 <script>
-import GlobalFeed from '@/views/GlobalFeed'
+// import GlobalFeed from '@/views/GlobalFeed'
 export default {
   name: 'Home',
   components: {
-    GlobalFeed,
+    // GlobalFeed,
   },
 }
 </script>

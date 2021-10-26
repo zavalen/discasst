@@ -1,50 +1,37 @@
 <template>
-  <div class="auth-page">
-    <h2>{{ $t('login.header') }}</h2>
+  <div class="auth-wrapper">
+    <h2 class="auth-wrapper__header">{{ $t('login.header') }}</h2>
 
     <pd-validation-errors
       v-if="validationErrors"
       :validation-errors="validationErrors"
     />
 
-    <form
-      @submit.prevent="onSubmit"
-      class="ng-pristine ng-valid ng-valid-email"
-    >
-      <fieldset>
-        <fieldset class="form-group">
-          <input
-            class="form-control form-control-lg"
-            :placeholder="$t('email')"
-            type="email"
-            v-model="email"
-          />
-        </fieldset>
+    <form class="auth-wrapper_form auth-form" @submit.prevent="onSubmit">
+      <div>
+        <div>
+          <input :placeholder="$t('email')" type="email" v-model="email" />
+        </div>
 
-        <fieldset class="form-group">
+        <div>
           <input
-            class="form-control form-control-lg"
             type="password"
             :placeholder="$t('password')"
             v-model="password"
           />
-        </fieldset>
+        </div>
 
-        <button
-          :disabled="isSubmitting"
-          class="btn btn-lg btn-primary pull-xs-right"
-          type="submit"
-        >
+        <button :disabled="isSubmitting" class="button_primary" type="submit">
           {{ $t('login.button') }}
         </button>
-      </fieldset>
+      </div>
     </form>
   </div>
 </template>
 
 <script>
 import PdValidationErrors from '@/components/ValidationErrors'
-import {authActions} from '@/store/modules/auth'
+import {authActions, authMutations} from '@/store/modules/auth'
 import {mapState} from 'vuex'
 
 export default {
@@ -53,22 +40,21 @@ export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: state => state.auth.isSubmitting,
-      validationErrors: state => state.auth.validationErrors
-    })
+      isSubmitting: (state) => state.auth.isSubmitting,
+      validationErrors: (state) => state.auth.validationErrors,
+    }),
   },
   mounted() {
-    this.$router.push('?auth=login')
-    // this.logout()
+    this.$router.push({query: {auth: 'login'}})
+    this.$store.commit(authMutations.resetErrors)
+    window.addEventListener('keydown', this.keyController)
   },
-  unmounted() {
-    this.$router.push('?')
-  },
+
   methods: {
     logout() {
       this.$store.dispatch(authActions.logout)
@@ -77,12 +63,17 @@ export default {
       this.$store
         .dispatch(authActions.login, {
           email: this.email,
-          password: this.password
+          password: this.password,
         })
         .then(() => {
-          this.$router.push('?')
+          this.$router.push({query: {}})
         })
-    }
-  }
+    },
+    keyController(e) {
+      if (e.key === 'Enter') {
+        this.onSubmit()
+      }
+    },
+  },
 }
 </script>
