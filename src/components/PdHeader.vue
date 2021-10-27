@@ -53,13 +53,7 @@
         </slide-right-transition>
       </div>
       <ul class="header__user-menu nav">
-        <template v-if="isAnonymus">
-          <!-- <li class="nav__item">
-            <router-link :to="{name: 'login'}" class="nav__item-link button">{{
-              $t('header.login')
-            }}</router-link>
-          </li> -->
-        </template>
+        <template v-if="isAnonymus"> </template>
         <template v-if="isLoggedIn">
           <li class="nav__item">
             <router-link

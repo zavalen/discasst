@@ -1,6 +1,10 @@
 <template>
   <li v-click-outside="hideNotifications">
-    <a class="nav__item-link button" @click="toggleNotifications">
+    <a
+      class="nav__item-link button"
+      :class="{button_active: isNotificationsOpen}"
+      @click="toggleNotifications"
+    >
       <svg-icon name="notification" />
       <span class="notifications-counter">1</span>
     </a>
