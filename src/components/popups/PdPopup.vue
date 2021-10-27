@@ -163,9 +163,9 @@ export default {
     position: absolute;
     right: 2px;
     top: 2px;
-    width: 16px;
+    width: 24px;
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 8px 8px;
     border-radius: 50%;
     display: flex;
     align-items: center;

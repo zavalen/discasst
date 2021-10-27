@@ -29,7 +29,7 @@ a {
   flex-direction: column;
   min-height: 100vh;
   max-width: 100%;
-  overflow: hidden;
+  // overflow: hidden;
 
   &__header {
     position: sticky;
@@ -62,8 +62,8 @@ a {
     z-index: 100;
   }
   &__zPlayer {
-    position: fixed;
-    bottom: 12px;
+    position: sticky;
+    bottom: 16px;
     left: 0;
     right: 0;
     z-index: 97;
@@ -73,7 +73,7 @@ a {
 
 .container {
   max-width: 1240px;
-  padding: 0 20px;
+  padding: 0 16px;
   margin: 0 auto;
 }
 .button,
@@ -83,7 +83,7 @@ button {
     color: var(--color-btn-text);
     border-radius: 8px;
     padding: 10px 20px;
-    margin-right: 8px;
+    margin-right: 12px;
     &:hover,
     &:active,
     &_active {
@@ -113,11 +113,16 @@ button {
   color: var(--color-text-secondary);
   text-shadow: 0 0 1px var(--color-text-secondary);
   border: 1px solid transparent;
-  padding: 0 12px 0;
+  padding: 0px 12px;
   text-decoration: none;
   border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
+  position: relative;
+
+  &:active {
+    bottom: -1px;
+  }
 
   &_active,
   &:active,
@@ -130,6 +135,11 @@ button {
   &:active {
     border: 1px solid var(--color-border);
     box-shadow: 0 2px 2px var(--color-light-shadow);
+  }
+
+  &:disabled {
+    background: var(--color-secondary);
+    opacity: 0.4;
   }
 }
 
@@ -152,17 +162,16 @@ input:not([type='select']) {
 }
 
 .scrollbar::-webkit-scrollbar {
-  width: 14px; /* width of the entire scrollbar */
+  width: 14px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
-  // background: var(--color-header-bg);
-  background: transparent; /* color of the tracking area */
-  border-left: 0px solid var(--color-border); /* creates padding around scroll thumb */
+  background: transparent;
+  border-left: 0px solid var(--color-border);
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-text-secondary); /* color of the scroll thumb */
-  border-radius: 20px; /* roundness of the scroll thumb */
-  border: 3px solid var(--color-header-bg); /* creates padding around scroll thumb */
+  background-color: var(--color-text-secondary);
+  border-radius: 20px;
+  border: 3px solid var(--color-header-bg);
 }

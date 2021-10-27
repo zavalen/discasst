@@ -79,17 +79,13 @@
             <svg-icon name="search" />
           </router-link>
         </li>
-        <li class="nav__item">
-          <a class="nav__item-link button">
-            <svg-icon name="notification" />
-          </a>
-        </li>
+        <pd-notifications class="nav__item" />
         <li class="nav__item" v-click-outside="hideUserSubMenu">
           <a
             class="nav__item-link button"
             :class="{button_active: userSubMenuVisible}"
             href="#"
-            @click.prevent.stop="toggleUserSubMenu"
+            @click.prevent="toggleUserSubMenu"
           >
             <user-icon />
           </a>
@@ -175,6 +171,7 @@ import {mapState, mapGetters} from 'vuex'
 import {authGetters, authActions} from '@/store/modules/auth'
 import LangSwitcher from '@/components/LangSwitcher.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
+import PdNotifications from '@/components/PdNotifications.vue'
 import PdPopup from '@/components/popups/PdPopup.vue'
 import UserIcon from '@/components/ui/UserIcon.vue'
 import FadeTransition from '@/components/animations/FadeTransition.vue'
@@ -188,7 +185,8 @@ export default {
     UserIcon,
     FadeTransition,
     PdPopup,
-    SlideRightTransition
+    SlideRightTransition,
+    PdNotifications
   },
   data() {
     return {
@@ -328,8 +326,8 @@ export default {
 
   &__logo {
     font-family: 'Titillium Web', sans-serif;
-    font-size: 2rem;
-    padding-top: 0rem;
+    font-size: 30px;
+    padding-top: 0;
     margin-right: 46px;
     color: var(--accent);
     text-decoration: none;
