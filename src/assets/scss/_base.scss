@@ -47,6 +47,7 @@ a {
   &__main {
     flex: auto;
     min-height: 100vh;
+    position: relative;
     & > div:first-child {
       min-height: 100vh;
     }
@@ -61,11 +62,12 @@ a {
     z-index: 100;
   }
   &__zPlayer {
-    position: sticky;
+    position: fixed;
     bottom: 12px;
     left: 0;
     right: 0;
     z-index: 97;
+    padding: 0 10px;
   }
 }
 

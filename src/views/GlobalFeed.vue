@@ -16,16 +16,16 @@ export default {
   components: {PdFeed},
   data() {
     return {
-      apiUrl: '/articles',
+      apiUrl: '/articles'
     }
-  },
+  }
 }
 </script>
-
 
 <style lang="scss">
 .feed-container {
   display: flex;
+  flex-wrap: wrap;
   max-width: 1128px;
   width: 100%;
   margin: 0 auto;

@@ -3,7 +3,20 @@
     <div class="header__wrapper container">
       <div class="header__left" v-click-outside="closeMenu">
         <a href="#" class="header__burger" @click="toggleMenu">
-          <svg-icon :name="isMenuActive ? 'close' : 'menu'" />
+          <fade-transition>
+            <svg-icon
+              style="position: absolute"
+              v-if="!isMenuActive"
+              name="menu"
+            />
+          </fade-transition>
+          <fade-transition>
+            <svg-icon
+              style="position: absolute"
+              v-if="isMenuActive"
+              name="close"
+            />
+          </fade-transition>
         </a>
 
         <router-link
@@ -284,6 +297,7 @@ export default {
       position: absolute;
       z-index: 99999;
       padding: 12px 16px 8px 0;
+      width: 24px;
     }
 
     .icon {
