@@ -178,7 +178,7 @@ export default {
     &:after {
       content: '\A';
       position: absolute;
-      background: var(--color-header-bg);
+      background: var(--color-header-bg-submenu);
       transform: rotate(45deg);
       width: 12px;
       height: 12px;
