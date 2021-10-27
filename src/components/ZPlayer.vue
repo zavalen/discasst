@@ -1,4 +1,3 @@
-
 <template>
   <slide-up-transition>
     <div
@@ -14,7 +13,7 @@
               :style="{
                 width: zPlayer.time
                   ? (zPlayer.time * 100) / zPlayer.duration + '%'
-                  : '0%',
+                  : '0%'
               }"
             ></div>
             <div
@@ -42,7 +41,7 @@
               :style="{
                 width: zPlayer.time
                   ? (zPlayer.time * 100) / zPlayer.buffered + '%'
-                  : '0%',
+                  : '0%'
               }"
             ></div>
             <div
@@ -52,7 +51,7 @@
                 left:
                   zPlayer.mouseOverTimePx > 100
                     ? zPlayer.mouseOverTimePx - 50 + 'px'
-                    : zPlayer.mouseOverTimePx + 20 + 'px',
+                    : zPlayer.mouseOverTimePx + 20 + 'px'
               }"
             >
               {{ toHHMMSS(zPlayer.mouseOverTime) }}
@@ -69,7 +68,7 @@
             <div
               class="zPlayer__next"
               :class="{
-                disabled: playlistActive && playlist.length <= 1,
+                disabled: playlistActive && playlist.length <= 1
               }"
               @click="zPlayerNextTrack"
             >
@@ -107,7 +106,7 @@
               <div
                 class="zPlayer__volume"
                 :style="{
-                  width: zPlayer.volume * 100 + '%',
+                  width: zPlayer.volume * 100 + '%'
                 }"
               ></div>
 
@@ -122,7 +121,7 @@
                 v-if="zPlayer.mouseOverShow"
                 class="zPlayer__volume-overflow-persentage"
                 :style="{
-                  left: zPlayer.mouseOverTimePx + 'px',
+                  left: zPlayer.mouseOverTimePx + 'px'
                 }"
               ></div>
 
@@ -150,12 +149,12 @@
 </template>
 
 <script>
-import SlideUpTransition from '@/components/ui/SlideUpTransition'
+import SlideUpTransition from '@/components/animations/SlideUpTransition'
 
 export default {
   name: 'ZPlayer',
   components: {
-    SlideUpTransition,
+    SlideUpTransition
   },
   mounted() {
     setTimeout(() => {
@@ -179,13 +178,12 @@ export default {
         isLoading: false,
         volume: 0.8,
         speed: 1,
-        buffered: 0,
-      },
+        buffered: 0
+      }
     }
-  },
+  }
 }
 </script>
-
 
 <style lang="scss">
 @import '@/assets/scss/_mixins.scss';

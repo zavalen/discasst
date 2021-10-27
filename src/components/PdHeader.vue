@@ -1,39 +1,51 @@
 <template>
   <header class="header">
     <div class="header__wrapper container">
-      <a href="#" class="header__burger button">
-        <svg-icon name="menu" />
-      </a>
-      <router-link class="header__logo" :to="{name: 'home'}"
-        >Discasst</router-link
-      >
+      <div class="header__left" v-click-outside="closeMenu">
+        <a href="#" class="header__burger" @click="toggleMenu">
+          <svg-icon :name="isMenuActive ? 'close' : 'menu'" />
+        </a>
 
-      <ul class="header__nav nav">
-        <li class="nav__item">
-          <router-link
-            :to="{name: 'feed'}"
-            class="nav__item-link button"
-            active-class="button_active"
-            >{{ $t('header.feed') }}</router-link
+        <router-link
+          @click="closeMenu"
+          class="header__logo"
+          :to="{name: 'home'}"
+          >Discasst</router-link
+        >
+        <slide-right-transition>
+          <ul
+            class="header__main-nav main-nav"
+            :class="{'main-nav_active': isMenuActive}"
           >
-        </li>
-        <li class="nav__item">
-          <router-link
-            :to="{name: 'register'}"
-            class="nav__item-link button"
-            active-class="button_active"
-            >{{ $t('header.podcasts') }}</router-link
-          >
-        </li>
-      </ul>
-
+            <li class="main-nav__item">
+              <router-link
+                :to="{name: 'feed'}"
+                class="main-nav__item-link button"
+                @click="closeMenu"
+                active-class="button_active"
+                >{{ $t('header.feed') }}</router-link
+              >
+            </li>
+            <li class="main-nav__item">
+              <router-link
+                :to="{name: 'register'}"
+                class="main-nav__item-link button"
+                @click="closeMenu"
+                active-class="button_active"
+                >{{ $t('header.podcasts') }}</router-link
+              >
+            </li>
+          </ul>
+          <div v-if="isMenuActive" class="header__side-menu-bg"></div>
+        </slide-right-transition>
+      </div>
       <ul class="header__user-menu nav">
         <template v-if="isAnonymus">
-          <li class="nav__item">
+          <!-- <li class="nav__item">
             <router-link :to="{name: 'login'}" class="nav__item-link button">{{
               $t('header.login')
             }}</router-link>
-          </li>
+          </li> -->
         </template>
         <template v-if="isLoggedIn">
           <li class="nav__item">
@@ -104,7 +116,7 @@
                     <a
                       class="user-submenu__item-link"
                       href="?auth=logout"
-                      @click="logout"
+                      @click.prevent="logout"
                       >{{ $t('header.logout') }}</a
                     >
                   </li></template
@@ -125,14 +137,6 @@
                       >{{ $t('header.register') }}</router-link
                     >
                   </li>
-                  <!-- <li class="user-submenu__item">
-                  <a
-                    class="user-submenu__item-link"
-                    href="?auth=register"
-                    @click.prevent="openAuthPopup"
-                    >{{ $t('header.register') }}</a
-                  >
-                </li> -->
                 </template>
               </ul>
               <div class="user-submenu__bottom">
@@ -144,16 +148,24 @@
         </li>
       </ul>
     </div>
+    <pd-popup type="confirmation" ref="logoutConfirmation">
+      <template v-slot:header>
+        {{ $t('logout.confirmationHeader') }}
+      </template>
+      {{ $t('logout.confirmation') }}
+    </pd-popup>
   </header>
 </template>
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import {authGetters, authActions, authMutations} from '@/store/modules/auth'
+import {authGetters, authActions} from '@/store/modules/auth'
 import LangSwitcher from '@/components/LangSwitcher.vue'
 import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
+import PdPopup from '@/components/popups/PdPopup.vue'
 import UserIcon from '@/components/ui/UserIcon.vue'
-import FadeTransition from '@/components/ui/FadeTransition.vue'
+import FadeTransition from '@/components/animations/FadeTransition.vue'
+import SlideRightTransition from '@/components/animations/SlideRightTransition.vue'
 
 export default {
   name: 'PdNavbar',
@@ -162,25 +174,24 @@ export default {
     LangSwitcher,
     UserIcon,
     FadeTransition,
+    PdPopup,
+    SlideRightTransition
   },
   data() {
     return {
       userSubMenuVisible: false,
+      isMenuActive: false
     }
   },
-  mounted() {
-    // console.log(this.$router.currentRoute.value.name)
-  },
-
   computed: {
     ...mapState({
-      theme: (state) => state.theme.theme,
+      theme: state => state.theme.theme
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus,
-    }),
+      isAnonymus: authGetters.isAnonymus
+    })
   },
   methods: {
     hideUserSubMenu() {
@@ -189,20 +200,62 @@ export default {
     toggleUserSubMenu() {
       this.userSubMenuVisible = !this.userSubMenuVisible
     },
-    openAuthPopup() {
-      this.userSubMenuVisible = false
-      this.$store.commit(authMutations.openAuthPopup)
+    toggleMenu() {
+      this.isMenuActive = !this.isMenuActive
     },
-    logout() {
+    closeMenu() {
+      this.isMenuActive = false
+    },
+
+    async logout() {
       this.userSubMenuVisible = false
 
-      this.$store.dispatch(authActions.logout)
-    },
-  },
+      const isConfirm = await this.$refs.logoutConfirmation.open()
+
+      if (isConfirm) {
+        this.$store.dispatch(authActions.logout)
+      }
+    }
+  }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+@import '@/assets/scss/_mixins.scss';
+
+.main-nav,
+.nav {
+  height: 100%;
+  display: flex;
+  padding: 0;
+
+  &__item {
+    display: flex;
+    position: relative;
+    margin-right: 4px;
+
+    &-link {
+      height: 100%;
+    }
+  }
+}
+
+.main-nav {
+  &__item {
+    @include _768 {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    &-link {
+      @include _768 {
+        width: 100%;
+        padding: 4px 16px;
+      }
+    }
+  }
+}
+
 .header {
   * {
     transition: 0.2s;
@@ -215,13 +268,36 @@ export default {
     }
   }
 
-  &__burger {
-    height: 100%;
+  &__left {
     display: flex;
     align-items: center;
-    padding-top: 8px;
-    padding-bottom: 12px;
-    margin-right: 10px;
+    height: 100%;
+  }
+
+  &__burger {
+    display: none;
+
+    @include _768 {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      position: absolute;
+      z-index: 99999;
+      padding: 12px 16px 8px 0;
+    }
+
+    .icon {
+      width: 24px;
+    }
+  }
+
+  &__side-menu-bg {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.411);
   }
 
   background: var(--color-header-bg);
@@ -244,12 +320,20 @@ export default {
     color: var(--accent);
     text-decoration: none;
     position: relative;
+    flex: auto;
+    max-width: fit-content;
+    z-index: 9999;
     &:hover {
       text-decoration: none;
     }
 
     &:active {
       bottom: -1px;
+    }
+
+    @include _768 {
+      font-size: 24px;
+      margin-right: 16px;
     }
   }
 
@@ -260,20 +344,32 @@ export default {
   &__user-menu {
     display: flex;
   }
+
+  &__main-nav {
+    flex: auto;
+
+    @include _768 {
+      width: 200px;
+      z-index: 99;
+      flex: auto;
+      flex-direction: column;
+      position: fixed;
+      top: 0px;
+      margin: 0;
+      left: -100%;
+      bottom: 0;
+      background: var(--color-header-bg);
+      padding: 80px 30px;
+      box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+  }
 }
 
-.nav {
-  height: 100%;
-  display: flex;
-  padding: 0;
-  &__item {
-    display: flex;
-    position: relative;
-    margin-right: 4px;
-
-    &-link {
-      height: 100%;
-    }
+.main-nav {
+  &_active {
+    left: 0;
   }
 }
 
@@ -394,10 +490,6 @@ export default {
 
     &:hover {
       background: var(--bg-menu-item-hover);
-    }
-
-    .icon {
-      margin-right: 8px;
     }
   }
 }

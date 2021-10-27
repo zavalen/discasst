@@ -10,7 +10,12 @@
     <form class="auth-wrapper_form auth-form" @submit.prevent="onSubmit">
       <div>
         <div>
-          <input :placeholder="$t('email')" type="email" v-model="email" />
+          <input
+            :placeholder="$t('email')"
+            type="email"
+            v-model="email"
+            ref="firstInput"
+          />
         </div>
 
         <div>
@@ -40,19 +45,20 @@ export default {
   data() {
     return {
       email: '',
-      password: '',
+      password: ''
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: (state) => state.auth.isSubmitting,
-      validationErrors: (state) => state.auth.validationErrors,
-    }),
+      isSubmitting: state => state.auth.isSubmitting,
+      validationErrors: state => state.auth.validationErrors
+    })
   },
   mounted() {
     this.$router.push({query: {auth: 'login'}})
     this.$store.commit(authMutations.resetErrors)
     window.addEventListener('keydown', this.keyController)
+    this.$refs.firstInput.focus()
   },
 
   methods: {
@@ -63,7 +69,7 @@ export default {
       this.$store
         .dispatch(authActions.login, {
           email: this.email,
-          password: this.password,
+          password: this.password
         })
         .then(() => {
           this.$router.push({query: {}})
@@ -73,7 +79,7 @@ export default {
       if (e.key === 'Enter') {
         this.onSubmit()
       }
-    },
-  },
+    }
+  }
 }
 </script>

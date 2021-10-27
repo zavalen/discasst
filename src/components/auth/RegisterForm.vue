@@ -14,6 +14,7 @@
       <div>
         <div class="form-group">
           <input
+            ref="firstInput"
             class="form-control form-control-lg"
             type="text"
             :placeholder="$t('username')"
@@ -59,18 +60,19 @@ export default {
     return {
       username: '',
       email: '',
-      password: '',
+      password: ''
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: (state) => state.auth.isSubmitting,
-      validationErrors: (state) => state.auth.validationErrors,
-    }),
+      isSubmitting: state => state.auth.isSubmitting,
+      validationErrors: state => state.auth.validationErrors
+    })
   },
   mounted() {
     this.$router.push('?auth=register')
     this.$store.commit(authMutations.resetErrors)
+    this.$refs.firstInput.focus()
   },
 
   methods: {
@@ -82,12 +84,12 @@ export default {
         .dispatch(authActions.register, {
           username: this.username,
           email: this.email,
-          password: this.password,
+          password: this.password
         })
         .then(() => {
           this.$router.push('?')
         })
-    },
-  },
+    }
+  }
 }
 </script>

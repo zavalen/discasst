@@ -28,7 +28,16 @@
     "subHeaderLink": "Зарегистрироваться",
     "button": "Войти"
   },
+  "logout": {
+    "confirmation": "Вы уверены, что хотите выйти?",
+    "confirmationHeader": "Подтверждение"
+  },
   "search": {
     "placeholder": "Поиск"
+  },
+  "popup": {
+    "ok": "Да",
+    "cancel": "Отмена"
   }
+
 }

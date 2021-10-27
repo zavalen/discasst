@@ -2,29 +2,74 @@
   <fade-transition>
     <div v-if="isOpen" class="modal">
       <div class="modal__window scrollbar">
-        <div class="modal__close button" @click="close">
+        <div class="modal__close" @click="close">
           <svg-icon name="close" />
         </div>
+        <h2 class="modal__header">
+          <slot name="header"></slot>
+        </h2>
         <slot> </slot>
+        <div v-if="isBtnsEnabled" class="modal__buttons">
+          <button
+            v-if="okBtnText"
+            class="modal__btn button_primary"
+            @click="ok"
+          >
+            {{ okBtnText }}
+          </button>
+          <button
+            v-if="cancelBtnText"
+            class="modal__btn button_secondary"
+            @click="close"
+          >
+            {{ cancelBtnText }}
+          </button>
+        </div>
       </div>
+
       <div class="modal__bg" @click="close"></div>
     </div>
   </fade-transition>
 </template>
 
 <script>
-import FadeTransition from '@/components/ui/FadeTransition'
+import FadeTransition from '@/components/animations/FadeTransition'
 
 export default {
   name: 'PdPopup',
+  props: {
+    type: {
+      type: String,
+      required: false
+    },
+    okBtn: {
+      type: String,
+      required: false
+    },
+    cancelBtn: {
+      type: String,
+      required: false
+    }
+  },
   components: {
-    FadeTransition,
+    FadeTransition
   },
   currentPopupController: null,
 
+  computed: {
+    isBtnsEnabled() {
+      return Boolean(this.okBtn || this.cancelBtn || this.type)
+    },
+    okBtnText() {
+      return this.okBtn || this.$t('popup.ok')
+    },
+    cancelBtnText() {
+      return this.cancelBtn || this.$t('popup.cancel')
+    }
+  },
   data() {
     return {
-      isOpen: false,
+      isOpen: false
     }
   },
   mounted() {
@@ -60,8 +105,8 @@ export default {
       if (e.key === 'Escape') {
         this.close()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -73,7 +118,7 @@ export default {
   right: 0;
   bottom: 0;
   z-index: 9999;
-
+  padding: 20px;
   &__bg {
     position: absolute;
     top: 0;
@@ -88,13 +133,11 @@ export default {
 
   &__window {
     max-width: 460px;
-    width: 100%;
     background: var(--color-header-bg);
     z-index: 9999;
     border-radius: 10px;
-    padding: 20px 50px 40px 30px;
+    padding: 16px 48px 24px 32px;
     box-shadow: 0 0.5rem 0.5rem 0.5rem var(--color-default-shadow);
-
     position: relative;
     margin-left: auto;
     margin-right: auto;
@@ -112,13 +155,26 @@ export default {
     }
   }
 
+  &__buttons {
+    margin-top: 24px;
+  }
+
   &__close {
     position: absolute;
-    right: 0px;
-    top: 0px;
+    right: 2px;
+    top: 2px;
     width: 16px;
     cursor: pointer;
-    padding: 20px;
+    padding: 4px 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: var(--bg-menu-item-hover);
+    }
   }
 }
 </style>

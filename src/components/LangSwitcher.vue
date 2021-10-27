@@ -1,6 +1,6 @@
 <template>
   <a href="#" @click.prevent="switchLang">
-    <svg-icon name="translate" />
+    <svg-icon style="margin-right:8px" name="translate" />
     {{ lang === 'ru' ? 'English' : 'Русский' }}
   </a>
 </template>
@@ -17,7 +17,7 @@ export default {
   computed: {
     lang() {
       return this.$store.state.lang.lang
-    },
+    }
   },
   methods: {
     switchLang() {
@@ -26,7 +26,7 @@ export default {
     },
     setLang() {
       this.$i18n.locale = this.lang
-    },
-  },
+    }
+  }
 }
 </script>

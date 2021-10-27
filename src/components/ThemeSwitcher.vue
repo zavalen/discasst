@@ -1,6 +1,9 @@
 <template>
   <a href="#" @click.prevent="switchTheme">
-    <svg-icon :name="theme === 'light' ? 'moon' : 'sun'" />
+    <svg-icon
+      style="margin-right:8px"
+      :name="theme === 'light' ? 'moon' : 'sun'"
+    />
     {{ theme === 'light' ? $t('header.darkTheme') : $t('header.lightTheme') }}
   </a>
 </template>
@@ -16,7 +19,7 @@ export default {
   computed: {
     theme() {
       return this.$store.state.theme.theme
-    },
+    }
   },
   methods: {
     switchTheme() {
@@ -26,7 +29,7 @@ export default {
     setTheme() {
       let html = document.getElementsByTagName('html')[0]
       html.setAttribute('data-theme', this.theme)
-    },
-  },
+    }
+  }
 }
 </script>

@@ -28,9 +28,16 @@ a {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  max-width: 100%;
+  overflow: hidden;
 
   &__header {
     position: sticky;
+
+    @include _768 {
+      position: fixed;
+    }
+
     top: 0;
     left: 0;
     right: 0;
@@ -42,6 +49,10 @@ a {
     min-height: 100vh;
     & > div:first-child {
       min-height: 100vh;
+    }
+
+    @include _768 {
+      margin-top: 56px;
     }
   }
   &__footer {
@@ -60,7 +71,6 @@ a {
 
 .container {
   max-width: 1240px;
-  width: 100%;
   padding: 0 20px;
   margin: 0 auto;
 }
@@ -71,13 +81,27 @@ button {
     color: var(--color-btn-text);
     border-radius: 8px;
     padding: 10px 20px;
-
+    margin-right: 8px;
     &:hover,
     &:active,
     &_active {
       background: var(--color-primary);
       color: var(--color-btn-text);
       filter: grayscale(0.3);
+    }
+  }
+  &_secondary {
+    background: var(--color-secondary);
+    color: var(--color-btn-text);
+    border-radius: 8px;
+    padding: 10px 20px;
+
+    &:hover,
+    &:active,
+    &_active {
+      background: var(--color-secondary);
+      color: var(--color-btn-text);
+      filter: brightness(0.8);
     }
   }
 

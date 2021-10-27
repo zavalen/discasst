@@ -14,7 +14,7 @@ export default {}
 .slideup-enter-from {
   transform: translateY(100%);
 }
-.slideup-leave-from {
+.slideup-leave-to {
   transform: translateY(-100%);
 }
 </style>
