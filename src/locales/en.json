@@ -7,13 +7,14 @@
     "home": "Home",
     "feed": "Feed",
     "podcasts": "Podcasts",
-    "register": "Registration",
+    "register": "Register",
     "login": "Login",
     "logout": "Log out",
     "createArticle": "Create Article",
     "settings": "Settings",
-    "darkTheme": "Dark mode",
-    "lightTheme": "Light mode"
+    "darkTheme": "Dark theme",
+    "lightTheme": "Light theme",
+    "anonymus": "You are not logged in"
   },
   "register": {
     "header": "Registration",
@@ -26,5 +27,21 @@
     "subHeader": "Don't have an account?",
     "subHeaderLink": "Register",
     "button": "Login"
+  },
+  "logout": {
+    "confirmation": "Are you sure you want to quit?",
+    "confirmationHeader": "Confirmation"
+  },
+  "search": {
+    "placeholder": "Search"
+  },
+  "popup": {
+    "ok": "Yes",
+    "cancel": "Cancel"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "zero": "No notifications",
+    "clear": "Clear"
   }
 }

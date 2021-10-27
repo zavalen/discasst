@@ -180,23 +180,29 @@ export default {
     FadeTransition,
     PdPopup,
     SlideRightTransition,
-    PdNotifications
+    PdNotifications,
   },
   data() {
     return {
       userSubMenuVisible: false,
-      isMenuActive: false
+      isMenuActive: false,
     }
+  },
+  mounted() {
+    document.addEventListener('swiped-right', (e) => {
+      if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
+        this.toggleMenu()
+    })
   },
   computed: {
     ...mapState({
-      theme: state => state.theme.theme
+      theme: (state) => state.theme.theme,
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+    }),
   },
   methods: {
     hideUserSubMenu() {
@@ -211,6 +217,9 @@ export default {
     closeMenu() {
       this.isMenuActive = false
     },
+    openMenu() {
+      this.isMenuActive = true
+    },
 
     async logout() {
       this.userSubMenuVisible = false
@@ -220,8 +229,8 @@ export default {
       if (isConfirm) {
         this.$store.dispatch(authActions.logout)
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

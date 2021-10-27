@@ -6,7 +6,11 @@
       @click="toggleNotifications"
     >
       <svg-icon name="notification" />
-      <span class="notifications-counter">1</span>
+      <fade-transition>
+        <span v-if="notWatchedNotifications" class="notifications-counter">{{
+          notWatchedNotifications > 9 ? '9+' : notWatchedNotifications
+        }}</span>
+      </fade-transition>
     </a>
     <fade-transition>
       <div
@@ -14,18 +18,28 @@
         ref="notifications"
         class="notifications"
       >
-        <div v-if="isAnonymus" class="notifications__top">
-          {{ $t('header.anonymus') }}
+        <div class="notifications__top">
+          <h3>{{ $t('notifications.title') }}</h3>
+          <button
+            v-if="isLoggedIn && notifications.length"
+            @click="clearNotifications"
+            class="notifications__clear"
+          >
+            {{ $t('notifications.clear') }}
+          </button>
         </div>
-        <div
-          v-if="isLoggedIn"
-          class="notifications__top"
-          :class="{notifications__top_logged: isLoggedIn}"
-        >
-          <user-icon />
-          {{ currentUser.username }}
-          <router-link class="notifications__profile-link" :to="{name: 'home'}">
-          </router-link>
+        <div class="notifications__main scrollbar">
+          <div class="notifications__zero" v-if="!notifications.length">
+            {{ $t('notifications.zero') }}
+          </div>
+          <template
+            v-for="notification in notifications"
+            :key="notification.id"
+          >
+            <router-link :to="notification.link" class="notification">
+              {{ notification.message }}
+            </router-link>
+          </template>
         </div>
       </div>
     </fade-transition>
@@ -33,121 +47,162 @@
 </template>
 
 <script>
-import {mapState, mapGetters} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import {authGetters} from '@/store/modules/auth'
-import UserIcon from '@/components/ui/UserIcon.vue'
+import {
+  notificationsActions,
+  notificationsMutations,
+} from '@/store/modules/notifications'
 import FadeTransition from '@/components/animations/FadeTransition.vue'
 
 export default {
   name: 'PdNavbar',
   components: {
-    UserIcon,
-    FadeTransition
+    FadeTransition,
   },
   data() {
     return {
       isNotificationsOpen: false,
-      isMenuActive: false
+      notifications: [],
     }
   },
   computed: {
     ...mapState({
-      theme: state => state.theme.theme
+      notificationsData: (state) => state.notifications.notifications,
     }),
     ...mapGetters({
-      currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+    }),
+    notWatchedNotifications() {
+      return this.notifications.filter((x) => x.watched === false).length
+    },
   },
   methods: {
+    async getNotifications() {
+      this.notifications = await this.$store.dispatch(
+        notificationsActions.getNotifications
+      )
+    },
     hideNotifications() {
       this.isNotificationsOpen = false
     },
     toggleNotifications() {
       this.isNotificationsOpen = !this.isNotificationsOpen
-    }
-  }
+    },
+    clearNotifications() {
+      console.log(notificationsMutations.clear)
+      this.notifications = []
+      this.$store.commit(notificationsMutations.clear)
+    },
+  },
+  watch: {
+    isAnonymus(newVal) {
+      if (newVal) {
+        setTimeout(() => {
+          this.notifications.unshift({
+            id: 0,
+            message:
+              'Зарегистрируйтесь или войдите, чтобы оставлять комментарии',
+            link: '?auth=login',
+            watched: false,
+          })
+        }, 4000)
+      }
+    },
+    isNotificationsOpen(newVal) {
+      if (newVal) {
+        this.notifications.forEach((item) => {
+          item.watched = true
+        })
+      }
+    },
+    isLoggedIn(newVal) {
+      if (newVal) {
+        this.getNotifications()
+      }
+    },
+  },
 }
 </script>
 
 <style lang="scss">
+@import '@/assets/scss/_mixins.scss';
+
 .notifications {
   position: absolute;
   background: var(--color-header-bg-submenu);
   border: 1px solid var(--color-border);
   border-top: 0;
-  max-width: 400px;
-  width: 290px;
-  right: 10px;
+  width: 440px;
+  right: 0;
   top: calc(100% + 24px);
   display: flex;
   flex-direction: column;
   border-radius: 10px;
 
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-  a {
-    color: var(--color-text-secondary);
-    text-decoration: none;
+
+  @include _768 {
+    right: -100%;
+    width: calc(100vw - 48px);
+  }
+
+  &__clear {
+    background: transparent;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+
+    &:hover {
+      background: transparent;
+    }
   }
 
   &__top {
     border-bottom: 1px solid var(--color-border);
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    height: 56px;
-    padding: 0 32px;
+    padding: 16px 24px;
+    font-size: 16px;
     font-weight: 600;
-    position: relative;
-    // &:before,
+    position: sticky;
+
+    h3 {
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+    }
+
     &:after {
       content: '\A';
       position: absolute;
-      background: var(--color-header-bg-submenu);
+      background: var(--color-header-bg);
       transform: rotate(45deg);
       width: 12px;
       height: 12px;
-      right: 8px;
+      right: 18px;
       top: -6px;
       transition: 0.2s;
     }
-    &:before {
-      // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-      z-index: -1;
-    }
-
-    .user-icon {
-      width: 30px;
-      margin-right: 10px;
-    }
-
-    &_logged {
-      padding: 0 24px;
-
-      &:hover {
-        background: var(--bg-menu-item-hover);
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        &:after {
-          background: var(--bg-menu-item-hover);
-        }
+    @include _768 {
+      &:after {
+        right: 20%;
       }
     }
-  }
-
-  &__profile-link {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
-
-  &__profile {
-    font-size: 12px;
   }
 
   &__main {
     flex: auto;
     padding: 0;
+    min-height: 64px;
+    max-height: calc(100vh - 240px);
+    overflow: auto;
+
+    @include _768 {
+      max-height: calc(100vh - 280px);
+    }
   }
 
   &__item {
@@ -170,42 +225,37 @@ export default {
     overflow: hidden;
   }
 
-  &__theme {
-    border-right: 1px solid var(--color-border);
-  }
-
-  &__theme,
-  &__lang {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
+  &__zero {
+    padding: 24px 24px;
     color: var(--color-text-secondary);
-    text-decoration: none;
-    padding: 8px 14px;
-    flex: auto;
-    text-align: center;
-    font-size: 14px;
-
-    &:hover {
-      background: var(--bg-menu-item-hover);
-    }
   }
 }
 
 .notifications-counter {
   position: absolute;
-  background: red;
-  color: #fff;
+  background: var(--color-notifications-bg);
+  color: var(--color-notifications-text);
   border-radius: 50%;
   font-size: 10px;
   bottom: 1px;
   right: 1px;
   height: 16px;
-  width: 16px;
+  min-width: 16px;
+  padding: 1px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 2px 2px var(--color-light-shadow);
+}
+
+.notification {
+  display: block;
+
+  padding: 16px 24px;
+  background: rgba(231, 242, 255, 0.315);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+  color: var(--color-text);
+  text-decoration: none;
 }
 </style>
