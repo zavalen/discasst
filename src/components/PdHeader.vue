@@ -42,7 +42,7 @@
               </li>
               <li class="main-nav__item">
                 <router-link
-                  :to="{name: 'register'}"
+                  :to="{name: 'podcasts'}"
                   class="main-nav__item-link button"
                   @click="closeMenu"
                   active-class="button_active"
@@ -104,7 +104,8 @@
                 {{ currentUser.username }}
                 <router-link
                   class="user-submenu__profile-link"
-                  :to="{name: 'home'}"
+                  @click="closeUserSubMenu"
+                  :to="{name: 'profile'}"
                 >
                 </router-link>
               </div>
@@ -114,7 +115,8 @@
                   <li class="user-submenu__item">
                     <router-link
                       class="user-submenu__item-link"
-                      :to="{name: 'home'}"
+                      @click="closeUserSubMenu"
+                      :to="{name: 'settings'}"
                       >{{ $t('header.settings') }}</router-link
                     >
                   </li>
@@ -214,6 +216,9 @@ export default {
     toggleUserSubMenu() {
       this.userSubMenuVisible = !this.userSubMenuVisible
     },
+    closeUserSubMenu() {
+      this.userSubMenuVisible = false
+    },
     toggleMenu() {
       this.isMenuActive = !this.isMenuActive
     },
@@ -231,6 +236,8 @@ export default {
 
       if (isConfirm) {
         this.$store.dispatch(authActions.logout)
+
+        this.$router.push({name: 'home'})
       }
     }
   }
@@ -329,13 +336,6 @@ export default {
     transition: 0.2s;
   }
 
-  a {
-    position: relative;
-    &:active {
-      bottom: -1px;
-    }
-  }
-
   &__left {
     display: flex;
     align-items: center;
@@ -418,6 +418,13 @@ export default {
   &__main-nav {
     flex: auto;
   }
+
+  a:not(.user-submenu__profile-link) {
+    position: relative;
+    &:active {
+      bottom: -1px;
+    }
+  }
 }
 
 .main-nav {
@@ -493,6 +500,7 @@ export default {
     position: absolute;
     width: 100%;
     height: 100%;
+    z-index: 10;
   }
 
   &__profile {

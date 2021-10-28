@@ -41,6 +41,7 @@
             </router-link>
           </template>
         </div>
+        <div class="notifications__bottom"></div>
       </div>
     </fade-transition>
   </li>
@@ -223,6 +224,7 @@ export default {
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
     overflow: hidden;
+    height: 16px;
   }
 
   &__zero {

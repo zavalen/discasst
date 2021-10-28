@@ -57,8 +57,9 @@ a {
     }
   }
   &__footer {
-    background: #383838;
-    min-height: 100px;
+    background: var(--color-footer-bg);
+    color: var(--color-footer-text);
+    min-height: 300px;
     z-index: 100;
   }
   &__zPlayer {
@@ -68,6 +69,7 @@ a {
     right: 0;
     z-index: 97;
     padding: 0 10px;
+    margin: 0 auto 24px auto;
   }
 }
 

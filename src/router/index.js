@@ -24,6 +24,21 @@ const routes = [
     component: () => import('@/views/Search')
   },
   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/Profile')
+  },
+  {
+    path: '/podcasts',
+    name: 'podcasts',
+    component: () => import('@/views/Podcasts')
+  },
+  {
+    path: '/settings',
+    name: 'settings',
+    component: () => import('@/views/Settings')
+  },
+  {
     path: '/feed',
     name: 'feed',
     component: () => import('@/views/GlobalFeed')
