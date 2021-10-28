@@ -4,9 +4,18 @@
     <div v-if="errors">Something goes wrong...</div>
 
     <template v-if="feed">
-      <div class="feed-post" v-for="article in feed" :key="article.createdAt">
-        <h2>{{ article.title }}</h2>
-        <h4>{{ article.description }}</h4>
+      <div class="feed-post" v-for="episode in feed" :key="episode.createdAt">
+        <h2>{{ episode.title }}</h2>
+        <h4>{{ episode.description }}</h4>
+        {{ episode }}
+        <router-link
+          :to="{
+            name: 'episode',
+            params: {podcast: episode.podcast.slug, slug: episode.slug},
+          }"
+        >
+          GO TO EPISODE
+        </router-link>
       </div>
     </template>
   </div>

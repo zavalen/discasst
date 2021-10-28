@@ -1,5 +1,5 @@
 <template>
-  <header class="header">
+  <header class="header" :class="{hide: isHeaderVisible}">
     <div class="header__wrapper container">
       <div class="header__left" v-click-outside="closeMenu">
         <a href="#" class="header__burger" @click="toggleMenu">
@@ -185,29 +185,33 @@ export default {
     FadeTransition,
     PdPopup,
     SlideRightTransition,
-    PdNotifications
+    PdNotifications,
   },
   data() {
     return {
       userSubMenuVisible: false,
-      isMenuActive: false
+      isMenuActive: false,
     }
   },
   mounted() {
-    document.addEventListener('swiped-right', e => {
+    document.addEventListener('swiped-right', (e) => {
       if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
         this.toggleMenu()
     })
+    setTimeout(() => {
+      this.isHeaderVisible = false
+    }, 2000)
   },
   computed: {
     ...mapState({
-      theme: state => state.theme.theme
+      theme: (state) => state.theme.theme,
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+      isHeaderVisible: true,
+    }),
   },
   methods: {
     hideUserSubMenu() {
@@ -239,8 +243,8 @@ export default {
 
         this.$router.push({name: 'home'})
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -332,6 +336,8 @@ export default {
 }
 
 .header {
+  transition: 0.4s;
+
   * {
     transition: 0.2s;
   }
@@ -553,5 +559,9 @@ export default {
       background: var(--bg-menu-item-hover);
     }
   }
+}
+
+.hide {
+  top: -100%;
 }
 </style>

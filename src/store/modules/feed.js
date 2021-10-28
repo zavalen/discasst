@@ -39,8 +39,8 @@ const actions = {
       feed
         .getFeed(apiUrl)
         .then(response => {
-          context.commit(feedMutations.getFeedSuccess, response.data.articles)
-          resolve(response.data.articles)
+          context.commit(feedMutations.getFeedSuccess, response.data.episodes)
+          resolve(response.data.episodes)
         })
         .catch(result => {
           context.commit(feedMutations.getFeedFailure, result.response.data)

@@ -1,33 +1,28 @@
 <template>
   <a href="#" @click.prevent="switchTheme">
-    <rotate-transition>
-      <!-- <svg-icon
+    <!-- <svg-icon
         style="margin-right:8px"
         :name="theme === 'light' ? 'moon' : 'sun'"
       /> -->
-      <svg-icon style="margin-right:8px" v-if="theme === 'light'" name="moon" />
-      <svg-icon style="margin-right:8px" v-if="theme !== 'light'" name="sun" />
-    </rotate-transition>
+    <svg-icon style="margin-right: 8px" v-if="theme === 'light'" name="moon" />
+    <svg-icon style="margin-right: 8px" v-if="theme !== 'light'" name="sun" />
     {{ theme === 'light' ? $t('header.darkTheme') : $t('header.lightTheme') }}
   </a>
 </template>
 
 <script>
 import {themeActions} from '@/store/modules/theme'
-import RotateTransition from '@/components/animations/RotateTransition.vue'
 
 export default {
   name: 'ThemeSwitcher',
-  components: {
-    RotateTransition
-  },
+  components: {},
   beforeMount() {
     this.setTheme()
   },
   computed: {
     theme() {
       return this.$store.state.theme.theme
-    }
+    },
   },
   methods: {
     switchTheme() {
@@ -37,7 +32,7 @@ export default {
     setTheme() {
       let html = document.getElementsByTagName('html')[0]
       html.setAttribute('data-theme', this.theme)
-    }
-  }
+    },
+  },
 }
 </script>

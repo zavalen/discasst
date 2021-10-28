@@ -42,6 +42,16 @@ const routes = [
     path: '/feed',
     name: 'feed',
     component: () => import('@/views/GlobalFeed')
+  },
+  {
+    path: '/@:podcast/:slug',
+    name: 'episode',
+    component: () => import('@/views/Episode')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: '404',
+    component: () => import('@/views/NotFound')
   }
 ]
 
