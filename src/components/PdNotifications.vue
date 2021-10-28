@@ -51,32 +51,32 @@ import {mapGetters, mapState} from 'vuex'
 import {authGetters} from '@/store/modules/auth'
 import {
   notificationsActions,
-  notificationsMutations,
+  notificationsMutations
 } from '@/store/modules/notifications'
 import FadeTransition from '@/components/animations/FadeTransition.vue'
 
 export default {
   name: 'PdNavbar',
   components: {
-    FadeTransition,
+    FadeTransition
   },
   data() {
     return {
       isNotificationsOpen: false,
-      notifications: [],
+      notifications: []
     }
   },
   computed: {
     ...mapState({
-      notificationsData: (state) => state.notifications.notifications,
+      notificationsData: state => state.notifications.notifications
     }),
     ...mapGetters({
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus,
+      isAnonymus: authGetters.isAnonymus
     }),
     notWatchedNotifications() {
-      return this.notifications.filter((x) => x.watched === false).length
-    },
+      return this.notifications.filter(x => x.watched === false).length
+    }
   },
   methods: {
     async getNotifications() {
@@ -94,7 +94,7 @@ export default {
       console.log(notificationsMutations.clear)
       this.notifications = []
       this.$store.commit(notificationsMutations.clear)
-    },
+    }
   },
   watch: {
     isAnonymus(newVal) {
@@ -105,14 +105,14 @@ export default {
             message:
               'Зарегистрируйтесь или войдите, чтобы оставлять комментарии',
             link: '?auth=login',
-            watched: false,
+            watched: false
           })
         }, 4000)
       }
     },
     isNotificationsOpen(newVal) {
       if (newVal) {
-        this.notifications.forEach((item) => {
+        this.notifications.forEach(item => {
           item.watched = true
         })
       }
@@ -121,8 +121,8 @@ export default {
       if (newVal) {
         this.getNotifications()
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -150,7 +150,7 @@ export default {
 
   &__clear {
     background: transparent;
-    font-size: 14px;
+    font-size: 12px;
     padding: 0;
     margin: 0;
 

@@ -1,6 +1,9 @@
 import authApi from '@/api/auth.js'
 import {setItem} from '@/helpers/persistenceStorage.js'
 import {getItem} from '@/helpers/persistenceStorage'
+import {useToast} from 'vue-toastification'
+const toast = useToast()
+import i18n from '@/i18n'
 
 const state = {
   isSubmitting: false,
@@ -115,6 +118,8 @@ const actions = {
         .then(response => {
           context.commit(authMutations.registerSuccess, response.data.user)
           setItem('accessToken', response.data.user.token)
+          toast.success(i18n.global.t('toastifications.registerSuccess'))
+
           resolve(response.data.user)
         })
         .catch(result => {
@@ -134,14 +139,12 @@ const actions = {
         .then(response => {
           context.commit(authMutations.loginSuccess, response.data.user)
           setItem('accessToken', response.data.user.token)
+          toast.success(i18n.global.t('toastifications.loginSuccess'))
           resolve(response.data.user)
         })
         .catch(result => {
-          console.log('Error: ', result.response.data.errors)
-          context.commit(
-            authMutations.loginFailure,
-            result.response.data.errors
-          )
+          console.log('Error: ', result)
+          context.commit(authMutations.loginFailure, result)
         })
     })
   },

@@ -33,10 +33,12 @@ function getBrowserLang() {
   return 'en'
 }
 
-export default createI18n({
+const i18n = createI18n({
   legacy: false,
   locale: 'ru',
   fallbackLocale: getBrowserLang(),
   globalInjection: true,
   messages: loadLocaleMessages()
 })
+
+export default i18n

@@ -43,5 +43,9 @@
     "title": "Notifications",
     "zero": "No notifications",
     "clear": "Clear"
+  },
+  "toastifications": {
+    "loginSuccess": "Вы вошли",
+    "offline": "Проверьте подключение к интернету."
   }
 }

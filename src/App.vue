@@ -14,23 +14,27 @@ import {authActions, authGetters} from '@/store/modules/auth'
 import AuthPopup from '@/components/popups/AuthPopup'
 import {mapGetters} from 'vuex'
 import ZPlayer from '@/components/ZPlayer'
+import {useToast} from 'vue-toastification'
+const toast = useToast()
 
 export default {
   name: 'app',
-
   components: {
     PdHeader,
     AuthPopup,
-    ZPlayer,
+    ZPlayer
   },
   computed: {
     ...mapGetters({
-      isAnonymus: authGetters.isAnonymus,
-    }),
+      isAnonymus: authGetters.isAnonymus
+    })
   },
   mounted() {
     this.$store.dispatch(authActions.getCurrentUser)
-  },
+    window.addEventListener('offline', () =>
+      toast.error(this.$t('toastifications.offline'), {timeout: false})
+    )
+  }
 }
 </script>
 
