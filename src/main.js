@@ -8,6 +8,15 @@ import vClickOutside from 'click-outside-vue3'
 
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+const toastOptions = {
+  transition: 'Vue-Toastification__bounce',
+  maxToasts: 10,
+  newestOnTop: true,
+  position: 'bottom-left',
+  draggable: true,
+  closeOnClick: true,
+  timeout: 4000
+}
 
 createApp(App)
   .use(i18n)
@@ -15,13 +24,5 @@ createApp(App)
   .use(router)
   .use(vClickOutside)
   .component('SvgIcon', SvgIcon)
-  .use(Toast, {
-    transition: 'Vue-Toastification__bounce',
-    maxToasts: 10,
-    newestOnTop: true,
-    position: 'bottom-left',
-    draggable: true,
-    closeOnClick: true,
-    timeout: 4000
-  })
+  .use(Toast, toastOptions)
   .mount('#app')

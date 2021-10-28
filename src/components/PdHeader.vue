@@ -30,40 +30,43 @@
             class="header__main-nav main-nav"
             :class="{'main-nav_active': isMenuActive}"
           >
-            <li class="main-nav__item">
-              <router-link
-                :to="{name: 'feed'}"
-                class="main-nav__item-link button"
-                @click="closeMenu"
-                active-class="button_active"
-                >{{ $t('header.feed') }}</router-link
-              >
-            </li>
-            <li class="main-nav__item">
-              <router-link
-                :to="{name: 'register'}"
-                class="main-nav__item-link button"
-                @click="closeMenu"
-                active-class="button_active"
-                >{{ $t('header.podcasts') }}</router-link
-              >
-            </li>
+            <div class="main-nav__left">
+              <li class="main-nav__item">
+                <router-link
+                  :to="{name: 'feed'}"
+                  class="main-nav__item-link button"
+                  @click="closeMenu"
+                  active-class="button_active"
+                  >{{ $t('header.feed') }}</router-link
+                >
+              </li>
+              <li class="main-nav__item">
+                <router-link
+                  :to="{name: 'register'}"
+                  class="main-nav__item-link button"
+                  @click="closeMenu"
+                  active-class="button_active"
+                  >{{ $t('header.podcasts') }}</router-link
+                >
+              </li>
+            </div>
+            <div class="main-nav__right">
+              <li class="main-nav__item">
+                <router-link
+                  :to="{name: 'home'}"
+                  class="main-nav__item-link button"
+                  active-class="button_active"
+                  >{{ $t('header.createArticle') }}</router-link
+                >
+              </li>
+            </div>
           </ul>
           <div v-if="isMenuActive" class="header__side-menu-bg"></div>
         </slide-right-transition>
       </div>
       <ul class="header__user-menu nav">
         <template v-if="isAnonymus"> </template>
-        <template v-if="isLoggedIn">
-          <li class="nav__item">
-            <router-link
-              :to="{name: 'home'}"
-              class="nav__item-link button"
-              active-class="button_active"
-              >{{ $t('header.createArticle') }}</router-link
-            >
-          </li>
-        </template>
+        <template v-if="isLoggedIn"> </template>
         <li class="nav__item">
           <router-link
             :to="{name: 'search'}"
@@ -180,29 +183,29 @@ export default {
     FadeTransition,
     PdPopup,
     SlideRightTransition,
-    PdNotifications,
+    PdNotifications
   },
   data() {
     return {
       userSubMenuVisible: false,
-      isMenuActive: false,
+      isMenuActive: false
     }
   },
   mounted() {
-    document.addEventListener('swiped-right', (e) => {
+    document.addEventListener('swiped-right', e => {
       if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
         this.toggleMenu()
     })
   },
   computed: {
     ...mapState({
-      theme: (state) => state.theme.theme,
+      theme: state => state.theme.theme
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus,
-    }),
+      isAnonymus: authGetters.isAnonymus
+    })
   },
   methods: {
     hideUserSubMenu() {
@@ -229,8 +232,8 @@ export default {
       if (isConfirm) {
         this.$store.dispatch(authActions.logout)
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -255,10 +258,42 @@ export default {
 }
 
 .main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__left,
+  &__right {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    @include _768 {
+      flex-direction: column;
+      align-items: flex-start;
+      height: auto;
+      width: 100%;
+    }
+  }
+  &__left {
+    @include _768 {
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+    }
+  }
+  &__right {
+    margin-right: 8px;
+    @include _768 {
+      margin-right: 0;
+    }
+  }
+
   &__item {
+    height: 100%;
     @include _768 {
       width: 100%;
       margin-bottom: 16px;
+      height: 36px;
     }
 
     &-link {
@@ -267,6 +302,25 @@ export default {
         padding: 4px 16px;
       }
     }
+  }
+
+  @include _768 {
+    width: 200px;
+    z-index: 99;
+    flex: auto;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    position: fixed;
+    top: 0px;
+    margin: 0;
+    left: -100%;
+    bottom: 0;
+    background: var(--color-header-bg);
+    padding: 80px 30px;
+    box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
   }
 }
 
@@ -286,6 +340,7 @@ export default {
     display: flex;
     align-items: center;
     height: 100%;
+    flex: auto;
   }
 
   &__burger {
@@ -362,23 +417,6 @@ export default {
 
   &__main-nav {
     flex: auto;
-
-    @include _768 {
-      width: 200px;
-      z-index: 99;
-      flex: auto;
-      flex-direction: column;
-      position: fixed;
-      top: 0px;
-      margin: 0;
-      left: -100%;
-      bottom: 0;
-      background: var(--color-header-bg);
-      padding: 80px 30px;
-      box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-      border-top-right-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
   }
 }
 
