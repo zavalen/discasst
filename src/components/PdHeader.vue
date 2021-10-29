@@ -1,5 +1,5 @@
 <template>
-  <header class="header" :class="{hide: isHeaderVisible}">
+  <header class="header" :class="{hide: !isHeaderVisible}">
     <div class="header__wrapper container">
       <div class="header__left" v-click-outside="closeMenu">
         <a href="#" class="header__burger" @click="toggleMenu">
@@ -80,7 +80,9 @@
         <li class="nav__item" v-click-outside="hideUserSubMenu">
           <a
             class="nav__item-link button"
-            :class="{button_active: userSubMenuVisible}"
+            :class="{
+              button_active: userSubMenuVisible
+            }"
             href="#"
             @click.prevent="toggleUserSubMenu"
           >
@@ -101,16 +103,21 @@
                 :class="{'user-submenu__top_logged': isLoggedIn}"
               >
                 <user-icon />
-                {{ currentUser.username }}
+                {{ cutString(currentUser.username, 21) }}
                 <router-link
                   class="user-submenu__profile-link"
                   @click="closeUserSubMenu"
                   :to="{name: 'profile'}"
                 >
                 </router-link>
+                <span class="user-submenu__arrow-right"
+                  ><svg-icon name="arrow-right"
+                /></span>
               </div>
 
               <ul class="user-submenu__main">
+                <pd-loader v-if="isLoading" />
+
                 <template v-if="isLoggedIn">
                   <li class="user-submenu__item">
                     <router-link
@@ -175,7 +182,8 @@ import PdPopup from '@/components/popups/PdPopup.vue'
 import UserIcon from '@/components/ui/UserIcon.vue'
 import FadeTransition from '@/components/animations/FadeTransition.vue'
 import SlideRightTransition from '@/components/animations/SlideRightTransition.vue'
-
+import PdLoader from '@/components/ui/PdLoader'
+import SvgIcon from './SvgIcon.vue'
 export default {
   name: 'PdNavbar',
   components: {
@@ -186,34 +194,51 @@ export default {
     PdPopup,
     SlideRightTransition,
     PdNotifications,
+    PdLoader,
+    SvgIcon
   },
   data() {
     return {
       userSubMenuVisible: false,
       isMenuActive: false,
+      isHeaderVisible: true,
+      scrollBefore: 0
     }
   },
   mounted() {
-    document.addEventListener('swiped-right', (e) => {
+    document.addEventListener('swiped-right', e => {
       if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
         this.toggleMenu()
     })
-    setTimeout(() => {
-      this.isHeaderVisible = false
-    }, 2000)
+
+    document.addEventListener('mousewheel', this.wheelHandler)
+  },
+  unmounted() {
+    document.removeEventListener('mousewheel', this.wheelHandler)
   },
   computed: {
     ...mapState({
-      theme: (state) => state.theme.theme,
+      theme: state => state.theme.theme,
+      isLoading: state => state.auth.isLoading
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus,
-      isHeaderVisible: true,
+      isAnonymus: authGetters.isAnonymus
     }),
+    shortName() {
+      return 55
+    }
   },
   methods: {
+    cutString(string, lettersNumber) {
+      if (string.length > lettersNumber) {
+        return string.slice(0, lettersNumber) + '...'
+      }
+
+      return string
+    },
+
     hideUserSubMenu() {
       this.userSubMenuVisible = false
     },
@@ -232,6 +257,16 @@ export default {
     openMenu() {
       this.isMenuActive = true
     },
+    wheelHandler(event) {
+      if (event && event.wheelDelta) {
+        if (event.wheelDelta >= 0) {
+          this.isHeaderVisible = true
+        }
+        if (event.wheelDelta < 0) {
+          this.isHeaderVisible = false
+        }
+      }
+    },
 
     async logout() {
       this.userSubMenuVisible = false
@@ -243,8 +278,8 @@ export default {
 
         this.$router.push({name: 'home'})
       }
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -464,8 +499,10 @@ export default {
     align-items: center;
     height: 56px;
     padding: 0 32px;
+    white-space: nowrap;
     font-weight: 600;
     position: relative;
+    overflow: hidden;
     // &:before,
     &:after {
       content: '\A';
@@ -485,12 +522,12 @@ export default {
 
     .user-icon {
       width: 30px;
-      margin-right: 10px;
+      margin-right: 16px;
     }
 
     &_logged {
-      padding: 0 24px;
-
+      padding: 0 32px 0 16px;
+      white-space: nowrap;
       &:hover {
         background: var(--bg-menu-item-hover);
         border-top-left-radius: 10px;
@@ -502,10 +539,19 @@ export default {
     }
   }
 
+  &__arrow-right {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
   &__profile-link {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 10;
   }
 
@@ -562,6 +608,6 @@ export default {
 }
 
 .hide {
-  top: -100%;
+  top: -56px;
 }
 </style>

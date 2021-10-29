@@ -1,4 +1,5 @@
-const dotenv = require('dotenv').config()
+const dotenv = require('dotenv')
+dotenv.config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
@@ -61,7 +62,9 @@ User.belongsToMany(User, {
 User.belongsToMany(Article, {through: 'Favourites', timestamps: false})
 Article.belongsToMany(User, {through: 'Favourites', timestamps: false})
 
-const sync = async () => await sequelize.sync({alter: true})
+const sync = async () => await sequelize.sync({force: true})
+// const sync = async () => await sequelize.sync({alter: true})
+// const sync = async () => await sequelize.sync()
 sync()
 
 app.use(express.json())

@@ -3,7 +3,7 @@ import {setItem} from '@/helpers/persistenceStorage.js'
 import {getItem} from '@/helpers/persistenceStorage'
 import {useToast} from 'vue-toastification'
 const toast = useToast()
-import i18n from '@/i18n'
+import {global as i18n} from '@/i18n'
 
 const state = {
   isSubmitting: false,
@@ -118,7 +118,7 @@ const actions = {
         .then(response => {
           context.commit(authMutations.registerSuccess, response.data.user)
           setItem('accessToken', response.data.user.token)
-          toast.success(i18n.global.t('toastifications.registerSuccess'))
+          toast.success(i18n.t('toastifications.registerSuccess'))
 
           resolve(response.data.user)
         })
@@ -138,8 +138,10 @@ const actions = {
         .login(credentials)
         .then(response => {
           context.commit(authMutations.loginSuccess, response.data.user)
+          console.log(response.data)
+
           setItem('accessToken', response.data.user.token)
-          toast.success(i18n.global.t('toastifications.loginSuccess'))
+          toast.success(i18n.t('toastifications.loginSuccess'))
           resolve(response.data.user)
         })
         .catch(result => {

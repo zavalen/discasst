@@ -9,14 +9,17 @@ module.exports.createUser = async (req, res) => {
     if (!req.body.user.email) throw new Error('Email is Required')
     if (!req.body.user.password) throw new Error('Password is Required')
 
-    const existingUser = await User.findByPk(req.body.user.email)
+    const existingUser = await User.findOne(req.body.user.email)
     if (existingUser) throw new Error('User aldready exists with this email id')
 
     const password = await hashPassword(req.body.user.password)
+    console.log(req.body.user)
     const user = await User.create({
       username: req.body.user.username,
       password: password,
-      email: req.body.user.email
+      email: req.body.user.email,
+      theme: req.body.user.theme,
+      lang: req.body.user.lang
     })
 
     if (user) {
@@ -38,7 +41,7 @@ module.exports.loginUser = async (req, res) => {
     if (!req.body.user.email) throw new Error('Email is Required')
     if (!req.body.user.password) throw new Error('Password is Required')
 
-    const user = await User.findByPk(req.body.user.email)
+    const user = await User.findOne(req.body.user.email)
 
     if (!user) {
       res.status(401)
@@ -73,7 +76,25 @@ module.exports.loginUser = async (req, res) => {
 
 module.exports.getUserByEmail = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.email)
+    const user = await User.findOne(req.user.email)
+    console.log(user)
+
+    if (!user) {
+      throw new Error('No such user found')
+    }
+    delete user.dataValues.password
+    user.dataValues.token = req.header('Authorization').split(' ')[1]
+    return res.status(200).json({user})
+  } catch (e) {
+    return res.status(404).json({
+      errors: {body: [e.message]}
+    })
+  }
+}
+
+module.exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id)
     if (!user) {
       throw new Error('No such user found')
     }
@@ -89,7 +110,7 @@ module.exports.getUserByEmail = async (req, res) => {
 
 module.exports.updateUserDetails = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.email)
+    const user = await User.findOne(req.user.email)
 
     if (!user) {
       res.status(401)

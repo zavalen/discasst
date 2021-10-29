@@ -239,8 +239,8 @@ export default {
   color: var(--color-notifications-text);
   border-radius: 50%;
   font-size: 10px;
-  bottom: 1px;
-  right: 1px;
+  bottom: 2px;
+  right: 2px;
   height: 16px;
   min-width: 16px;
   padding: 1px;

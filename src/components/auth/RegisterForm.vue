@@ -66,7 +66,9 @@ export default {
   computed: {
     ...mapState({
       isSubmitting: state => state.auth.isSubmitting,
-      validationErrors: state => state.auth.validationErrors
+      validationErrors: state => state.auth.validationErrors,
+      theme: state => state.theme.theme,
+      lang: state => state.lang.lang
     })
   },
   mounted() {
@@ -84,7 +86,9 @@ export default {
         .dispatch(authActions.register, {
           username: this.username,
           email: this.email,
-          password: this.password
+          password: this.password,
+          theme: this.theme,
+          lang: this.lang
         })
         .then(() => {
           this.$router.push('?')
