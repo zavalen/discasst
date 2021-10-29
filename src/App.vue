@@ -1,5 +1,6 @@
 <template>
   <pd-header class="app__header"> </pd-header>
+  {{ user }}
   <main class="app__main">
     <router-view />
     <ZPlayer class="app__zPlayer" />
@@ -29,8 +30,13 @@ export default {
       isAnonymus: authGetters.isAnonymus
     })
   },
-  mounted() {
-    this.$store.dispatch(authActions.getCurrentUser)
+  data() {
+    return {
+      user: null
+    }
+  },
+  async mounted() {
+    this.user = await this.$store.dispatch(authActions.getCurrentUser)
     window.addEventListener('offline', () =>
       toast.error(this.$t('toastifications.offline'), {timeout: false})
     )
