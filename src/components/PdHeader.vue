@@ -33,6 +33,7 @@
             <div class="main-nav__left">
               <li class="main-nav__item">
                 <router-link
+                  v-ripple
                   :to="{name: 'feed'}"
                   class="main-nav__item-link button"
                   @click="closeMenu"
@@ -42,6 +43,7 @@
               </li>
               <li class="main-nav__item">
                 <router-link
+                  v-ripple
                   :to="{name: 'podcasts'}"
                   class="main-nav__item-link button"
                   @click="closeMenu"
@@ -69,6 +71,7 @@
         <template v-if="isLoggedIn"> </template>
         <li class="nav__item">
           <router-link
+            v-ripple
             :to="{name: 'search'}"
             active-class="button_active"
             class="nav__item-link button"
@@ -77,11 +80,13 @@
           </router-link>
         </li>
         <pd-notifications class="nav__item" />
+
         <li class="nav__item" v-click-outside="hideUserSubMenu">
           <a
+            v-ripple
             class="nav__item-link button"
             :class="{
-              button_active: userSubMenuVisible
+              button_active: userSubMenuVisible,
             }"
             href="#"
             @click.prevent="toggleUserSubMenu"
@@ -110,7 +115,7 @@
                   :to="{name: 'profile'}"
                 >
                 </router-link>
-                <span class="user-submenu__arrow-right"
+                <span class="user-submenu__arrow-right" v-ripple
                   ><svg-icon name="arrow-right"
                 /></span>
               </div>
@@ -195,18 +200,18 @@ export default {
     SlideRightTransition,
     PdNotifications,
     PdLoader,
-    SvgIcon
+    SvgIcon,
   },
   data() {
     return {
       userSubMenuVisible: false,
       isMenuActive: false,
       isHeaderVisible: true,
-      scrollBefore: 0
+      scrollBefore: 0,
     }
   },
   mounted() {
-    document.addEventListener('swiped-right', e => {
+    document.addEventListener('swiped-right', (e) => {
       if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
         this.toggleMenu()
     })
@@ -218,17 +223,17 @@ export default {
   },
   computed: {
     ...mapState({
-      theme: state => state.theme.theme,
-      isLoading: state => state.auth.isLoading
+      theme: (state) => state.theme.theme,
+      isLoading: (state) => state.auth.isLoading,
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus
+      isAnonymus: authGetters.isAnonymus,
     }),
     shortName() {
       return 55
-    }
+    },
   },
   methods: {
     cutString(string, lettersNumber) {
@@ -278,8 +283,8 @@ export default {
 
         this.$router.push({name: 'home'})
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

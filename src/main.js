@@ -5,7 +5,12 @@ import store from './store'
 import i18n from './i18n'
 import SvgIcon from '@/components/SvgIcon'
 import vClickOutside from 'click-outside-vue3'
+import Ripple from '@/directives/ripple/ripple'
+import '@/directives/ripple/ripple.css'
 
+import VTooltip from 'v-tooltip'
+
+import 'v-tooltip/dist/v-tooltip.css'
 import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
 const toastOptions = {
@@ -23,6 +28,9 @@ createApp(App)
   .use(store)
   .use(router)
   .use(vClickOutside)
+  .use(VTooltip)
   .component('SvgIcon', SvgIcon)
+  .directive('ripple', Ripple)
+
   .use(Toast, toastOptions)
   .mount('#app')

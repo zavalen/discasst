@@ -5,28 +5,29 @@ const {sign, decode} = require('../utils/jwt')
 
 module.exports.createUser = async (req, res) => {
   try {
-    if (!req.body.user.username) throw new Error('Username is Required')
-    if (!req.body.user.email) throw new Error('Email is Required')
-    if (!req.body.user.password) throw new Error('Password is Required')
+    const userToCreate = req.body.user
+    console.log(req)
+    if (!userToCreate) throw new Error('Something wrong with request (no user)')
+    if (!userToCreate.username) throw new Error('Username is Required')
+    if (!userToCreate.email) throw new Error('Email is Required')
+    if (!userToCreate.password) throw new Error('Password is Required')
 
-    const existingUser = await User.findOne(req.body.user.email)
+    const existingUser = await User.findOne({
+      where: {email: userToCreate.email}
+    })
     if (existingUser) throw new Error('User aldready exists with this email id')
 
-    const password = await hashPassword(req.body.user.password)
-    console.log(req.body.user)
-    const user = await User.create({
-      username: req.body.user.username,
-      password: password,
-      email: req.body.user.email,
-      theme: req.body.user.theme,
-      lang: req.body.user.lang
-    })
+    const password = await hashPassword(userToCreate.password)
+
+    userToCreate.password = password
+    const user = await User.create(userToCreate)
 
     if (user) {
       if (user.dataValues.password) delete user.dataValues.password
       user.dataValues.token = await sign(user)
-      user.dataValues.bio = null
-      user.dataValues.image = null
+
+      console.log(user)
+
       res.status(201).json({user})
     }
   } catch (e) {
@@ -41,8 +42,7 @@ module.exports.loginUser = async (req, res) => {
     if (!req.body.user.email) throw new Error('Email is Required')
     if (!req.body.user.password) throw new Error('Password is Required')
 
-    const user = await User.findOne(req.body.user.email)
-
+    const user = await User.findOne({where: {email: req.body.user.email}})
     if (!user) {
       res.status(401)
       throw new Error('No User with this email id')
@@ -56,13 +56,15 @@ module.exports.loginUser = async (req, res) => {
 
     if (!passwordMatch) {
       res.status(401)
-      throw new Error('Invalid password or email id')
+      throw new Error('Invalid password or email')
     }
 
     delete user.dataValues.password
     user.dataValues.token = await sign({
+      id: user.dataValues.id,
       email: user.dataValues.email,
-      username: user.dataValues.username
+      username: user.dataValues.username,
+      role: user.dataValues.role
     })
 
     res.status(200).json({user})
@@ -76,9 +78,10 @@ module.exports.loginUser = async (req, res) => {
 
 module.exports.getUserByEmail = async (req, res) => {
   try {
-    const user = await User.findOne(req.user.email)
-    console.log(user)
+    const UserEmail = req.body.user.email || req.user.emain
+    console.log(UserEmail)
 
+    const user = await User.findOne({where: {email: UserEmail}})
     if (!user) {
       throw new Error('No such user found')
     }
@@ -95,6 +98,7 @@ module.exports.getUserByEmail = async (req, res) => {
 module.exports.getUserById = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id)
+
     if (!user) {
       throw new Error('No such user found')
     }
@@ -110,7 +114,8 @@ module.exports.getUserById = async (req, res) => {
 
 module.exports.updateUserDetails = async (req, res) => {
   try {
-    const user = await User.findOne(req.user.email)
+    // const user = await User.findByPK(req.user.email)
+    const user = await User.findOne({where: {email: req.body.user.email}})
 
     if (!user) {
       res.status(401)

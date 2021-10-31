@@ -3,7 +3,8 @@ import {setItem} from '@/helpers/persistenceStorage.js'
 import {getItem} from '@/helpers/persistenceStorage'
 import {useToast} from 'vue-toastification'
 const toast = useToast()
-import {global as i18n} from '@/i18n'
+import translate from '@/i18n'
+const i18n = translate.global
 
 const state = {
   isSubmitting: false,

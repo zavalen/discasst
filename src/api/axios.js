@@ -8,7 +8,7 @@ axios.defaults.baseURL = 'http://localhost:8081/api'
 axios.interceptors.request.use(config => {
   const token = getItem('accessToken')
   const authtorisationToken = token ? `Token ${token}` : ''
-  config.headers.authorization = authtorisationToken
+  config.headers.Authorization = authtorisationToken
   return config
 })
 

@@ -51,7 +51,7 @@ module.exports.createArticle = async (req, res) => {
     if (!data.description) throw new Error('Article description is required')
 
     //Find out author object
-    const user = await User.findOne(req.user.email)
+    const user = await User.findByPK(req.user.email)
     if (!user) throw new Error('User does not exist')
     const slug = slugify(data.title)
     let article = await Article.create({
@@ -88,8 +88,6 @@ module.exports.createArticle = async (req, res) => {
 module.exports.getSingleArticleBySlug = async (req, res) => {
   try {
     const {slug} = req.params
-    console.log('HEllo')
-    console.log(slug)
     let article = await Article.findByPk(slug, {include: Tag})
 
     const user = await article.getUser()
@@ -116,7 +114,7 @@ module.exports.updateArticle = async (req, res) => {
       throw new Error('Article not found')
     }
 
-    const user = await User.findOne(req.user.email)
+    const user = await User.findByPK(req.user.email)
 
     if (user.email != article.UserEmail) {
       res.status(403)
@@ -157,7 +155,7 @@ module.exports.deleteArticle = async (req, res) => {
       throw new Error('Article not found')
     }
 
-    const user = await User.findOne(req.user.email)
+    const user = await User.findByPK(req.user.email)
 
     if (user.email != article.UserEmail) {
       res.status(403)

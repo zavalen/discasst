@@ -1,7 +1,7 @@
 const {Sequelize} = require('sequelize')
 
 //LOCAL CONNECTION
-const sequelize = new Sequelize('discasst', 'root', '', {
+const sequelize = new Sequelize('discasst', 'root', 'root', {
   dialect: 'mysql',
   host: 'localhost',
   logging: false

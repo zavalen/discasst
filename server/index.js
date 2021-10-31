@@ -3,11 +3,13 @@ dotenv.config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+var bodyParser = require('body-parser')
 
 const {notFound, errorHandler} = require('./middleware/errorHandler')
 const sequelize = require('./dbConnection')
 
 const User = require('./models/User')
+const Roles = require('./models/Roles')
 const Article = require('./models/Article')
 const Tag = require('./models/Tag')
 const Comment = require('./models/Comments')
@@ -18,7 +20,6 @@ const commentRoute = require('./routes/comments')
 const tagRoute = require('./routes/tags')
 const profileRoute = require('./routes/profile')
 const favouriteRoute = require('./routes/favourites')
-
 const app = express()
 
 //CORS
@@ -62,11 +63,28 @@ User.belongsToMany(User, {
 User.belongsToMany(Article, {through: 'Favourites', timestamps: false})
 Article.belongsToMany(User, {through: 'Favourites', timestamps: false})
 
+// const createDefaultRoles = async () => {
+//   const defaultRoles = [{role: 'user'}, {role: 'admin'}, {role: 'author'}]
+
+//   defaultRoles.forEach(async role => {
+//     const newRole = await Roles.findOrCreate({where: role})
+//     console.log(newRole)
+//   })
+// }
+// createDefaultRoles()
+
 const sync = async () => await sequelize.sync({force: true})
+
 // const sync = async () => await sequelize.sync({alter: true})
 // const sync = async () => await sequelize.sync()
 sync()
 
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+)
+app.use(bodyParser.json())
 app.use(express.json())
 app.use(morgan('tiny'))
 

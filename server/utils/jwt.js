@@ -1,30 +1,33 @@
 const jwt = require('jsonwebtoken')
+const JWT_SECRET = 'qemsaslvjd-33r3:9i9vis3.'
 
-module.exports.sign = async (user) => {
-    const JWT_SECRET = 'qemsaslvjd-33r3:9i9vis3.'
-    return new Promise((resolve,reject) => {
-        jwt.sign({
-            username:user.username,
-            email: user.email
-        },JWT_SECRET,(err,token) => {
-            if(err)
-                return reject(err)
-            return resolve(token)
-        })
-    })
-    
+module.exports.sign = async user => {
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      },
+      //   user,
+      JWT_SECRET,
+      (err, token) => {
+        if (err) return reject(err)
+        return resolve(token)
+      }
+    )
+  })
 }
 
-module.exports.decode = async (token) => {
-    const JWT_SECRET = 'qemsaslvjd-33r3:9i9vis3.'
-    return new Promise((resolve,reject) => {
-        jwt.verify(token,JWT_SECRET,(err,decoded) => {
-            if(err)
-                return reject(err)
+module.exports.decode = async token => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+      if (err) return reject(err)
 
-            return resolve(decoded)
-        })
+      return resolve(decoded)
     })
+  })
 }
 
 //TESTING

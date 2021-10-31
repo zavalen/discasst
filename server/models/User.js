@@ -8,27 +8,33 @@ const User = sequelize.define(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      unique: true
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     username: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true,
+      unique: true
     },
     bio: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: null
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: null
     },
     gender: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: null
     },
     password: {
       type: DataTypes.STRING,
@@ -36,11 +42,13 @@ const User = sequelize.define(
     },
     theme: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: 'light'
     },
     lang: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: 'ru'
     },
     role: {
       type: DataTypes.STRING,
@@ -49,13 +57,16 @@ const User = sequelize.define(
     },
     subscriptions: {
       type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'user'
+      allowNull: true
     },
     register_date: {
       type: DataTypes.DATE,
       allowNull: false,
       defaultValue: DataTypes.NOW
+    },
+    email_confirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   },
   {

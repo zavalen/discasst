@@ -1,6 +1,8 @@
 <template>
   <div class="container">
     <div class="feed-container">
+      <!-- <div class="sidebar-left"></div> -->
+
       <div class="feed">
         <pd-feed :api-url="apiUrl" />
       </div>
@@ -16,16 +18,16 @@ export default {
   components: {PdFeed},
   data() {
     return {
-      apiUrl: '/articles'
+      apiUrl: '/articles',
     }
-  }
+  },
 }
 </script>
 
 <style lang="scss">
 .feed-container {
   display: flex;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   max-width: 1128px;
   width: 100%;
   margin: 0 auto;
@@ -35,10 +37,20 @@ export default {
   width: 768px;
 }
 .sidebar {
-  margin-left: 60px;
+  margin-left: 36px;
   margin-top: 20px;
   border-radius: 10px;
-  width: 300px;
+  width: 348px;
+  background: var(--color-header-bg);
+  box-shadow: 0 2px 2px var(--color-light-shadow);
+  margin-bottom: 32px;
+  height: 600px;
+}
+.sidebar-left {
+  margin-right: 36px;
+  margin-top: 20px;
+  border-radius: 10px;
+  width: 100px;
   background: var(--color-header-bg);
   box-shadow: 0 2px 2px var(--color-light-shadow);
   margin-bottom: 32px;
