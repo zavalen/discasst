@@ -18,7 +18,7 @@ export default {
   components: {PdFeed},
   data() {
     return {
-      apiUrl: '/articles',
+      apiUrl: '/episodes',
     }
   },
 }

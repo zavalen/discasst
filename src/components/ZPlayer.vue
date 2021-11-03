@@ -1,19 +1,15 @@
 <template>
   <slide-up-transition>
-    <div
-      v-if="isReady"
-      class="player player-container"
-      :class="isMobile ? 'player-mobile' : ''"
-    >
+    <div v-if="isPlayerReady" class="player player-container">
+      <pd-queue v-if="isQueueOpen" v-click-outside="closeQueue" />
+
       <div class="zPlayer">
         <div class="zPlayer__progress-block">
           <div class="zPlayer__progress-line">
             <div
               class="zPlayer__progress-time"
               :style="{
-                width: zPlayer.time
-                  ? (zPlayer.time * 100) / zPlayer.duration + '%'
-                  : '0%'
+                width: time ? (time * 100) / duration + '%' : '0%',
               }"
             ></div>
             <div
@@ -25,59 +21,69 @@
               @mouseleave="hideProgressMouseOver"
             ></div>
             <div class="zPlayer__time unselectable">
-              {{
-                zPlayer.time && zPlayer.time > 0 ? toHHMMSS(zPlayer.time) : ''
-              }}
+              {{ time && time > 0 ? toHHMMSS(time) : '' }}
             </div>
             <div class="zPlayer__duration unselectable">
-              {{
-                zPlayer.duration && zPlayer.duration > 0
-                  ? toHHMMSS(zPlayer.duration)
-                  : ''
-              }}
+              {{ duration && duration > 0 ? toHHMMSS(duration) : '' }}
             </div>
             <div
               class="zPlayer__buffered"
               :style="{
-                width: zPlayer.time
-                  ? (zPlayer.time * 100) / zPlayer.buffered + '%'
-                  : '0%'
+                width: time ? (time * 100) / buffered + '%' : '0%',
               }"
             ></div>
             <div
-              v-if="zPlayer.mouseOverShow"
+              v-if="mouseOverShow"
               class="zPlayer__progress-overflow-time"
               :style="{
                 left:
-                  zPlayer.mouseOverTimePx > 100
-                    ? zPlayer.mouseOverTimePx - 50 + 'px'
-                    : zPlayer.mouseOverTimePx + 20 + 'px'
+                  mouseOverTimePx > 100
+                    ? mouseOverTimePx - 50 + 'px'
+                    : mouseOverTimePx + 20 + 'px',
               }"
             >
-              {{ toHHMMSS(zPlayer.mouseOverTime) }}
+              {{ toHHMMSS(mouseOverTime) }}
             </div>
           </div>
         </div>
         <div class="zPlayer__main-block">
           <div class="zPlayer__main-left">
-            <div class="zPlayer__play" @click="zPlayerToggle">
-              <svg-icon name="play" v-if="!this.zPlayer.isPlaying" />
-              <svg-icon name="pause" v-if="this.zPlayer.isPlaying" />
+            <div
+              class="zPlayer__previous"
+              :class="{
+                disabled: playlistActive && playlist.length <= 1,
+              }"
+              @click="previous"
+            >
+              <svg-icon name="previous" />
+            </div>
+            <div class="zPlayer__play" @click="togglePlay">
+              <svg-icon name="play" v-if="!isPlaying" />
+              <svg-icon name="pause" v-if="isPlaying" />
             </div>
 
             <div
               class="zPlayer__next"
               :class="{
-                disabled: playlistActive && playlist.length <= 1
+                disabled: playlistActive && playlist.length <= 1,
               }"
-              @click="zPlayerNextTrack"
+              @click="next"
             >
-              <svg-icon name="next-track" />
+              <svg-icon name="next" />
             </div>
-
+            <div class="zPlayer__image">
+              <img
+                :src="
+                  currentEpisode
+                    ? currentEpisode.Podcast.imageURL
+                    : './images/headphones.png'
+                "
+                alt=""
+              />
+            </div>
             <div
               class="zPlayer__loading"
-              :class="zPlayer.isLoading ? 'show' : ''"
+              :class="isEpisodeLoading ? 'show' : ''"
             >
               <div class="lds-ring">
                 <div></div>
@@ -86,27 +92,26 @@
                 <div></div>
               </div>
             </div>
-            <div class="zPlayer__title">
-              {{ this.zPlayer.title }}
+            <div class="zPlayer__credits">
+              <div class="zPlayer__title">
+                {{ currentEpisode ? currentEpisode.title : 'No track' }}
+              </div>
+              <div class="zPlayer__podcast">
+                {{ currentEpisode ? currentEpisode.Podcast.title : 'No track' }}
+              </div>
             </div>
-            <div
-              v-if="this.zPlayer.id"
-              class="zPlayer__open"
-              @click="showSharedTrack(this.zPlayer.id)"
-            >
+            <div class="zPlayer__open">
               <svg-icon name="open" />
             </div>
           </div>
           <div class="zPlayer__main-right">
-            <div class="zPlayer__speed" @click="zPlayerChangeSpeed">
-              x{{ zPlayer.speed }}
-            </div>
+            <div class="zPlayer__speed" @click="changeSpeed">x{{ speed }}</div>
 
             <div class="zPlayer__volume-line">
               <div
                 class="zPlayer__volume"
                 :style="{
-                  width: zPlayer.volume * 100 + '%'
+                  width: volume * 100 + '%',
                 }"
               ></div>
 
@@ -118,70 +123,280 @@
                 @mouseleave="volumeMouseLeave"
               ></div>
               <div
-                v-if="zPlayer.mouseOverShow"
+                v-if="mouseOverShow"
                 class="zPlayer__volume-overflow-persentage"
                 :style="{
-                  left: zPlayer.mouseOverTimePx + 'px'
+                  left: mouseOverTimePx + 'px',
                 }"
               ></div>
 
               <svg-icon
                 name="nosound"
                 iconClass="zPlayer__nosound"
-                v-if="zPlayer.volume == 0"
+                v-if="volume == 0"
               />
             </div>
 
-            <div
-              v-if="playlistActive && isMobile"
-              class="zPlayer__playlist"
-              @click="togglePlaylistVisibility"
-              ref="zplaylist"
-            >
+            <div class="zPlayer__playlist" @click="toggleQueue" ref="zplaylist">
               <svg-icon name="playlist" />
             </div>
           </div>
         </div>
       </div>
-      <div id="player"></div>
     </div>
   </slide-up-transition>
 </template>
 
 <script>
 import SlideUpTransition from '@/components/animations/SlideUpTransition'
+import {mapState} from 'vuex'
+import {zPlayerMutations} from '@/store/modules/zPlayer'
+import PdQueue from '@/components/PdQueue'
 
 export default {
   name: 'ZPlayer',
   components: {
-    SlideUpTransition
+    SlideUpTransition,
+    PdQueue,
   },
   mounted() {
-    setTimeout(() => {
-      this.isReady = true
-    }, 2000)
+    this.addPlayerJS()
   },
   data() {
     return {
-      isReady: false,
-      zPlayer: {
-        id: null,
-        title: null,
-        duration: null,
-        time: null,
-        progress: (this.time * 100) / this.duration,
-        mouseOverShow: false,
-        mouseOverTime: null,
-        mouseOverPx: null,
-        clientX: null,
-        isPlaying: false,
-        isLoading: false,
-        volume: 0.8,
-        speed: 1,
-        buffered: 0
-      }
+      playerJs: null,
+      playerJsNode: null,
+      isPlayerReady: false,
+      time: 0,
+      duration: 0,
+      buffered: 0,
+      isEpisodeLoading: false,
+      speed: 1,
+      mouseOverShow: false,
+      mouseOverTime: null,
+      mouseOverPx: null,
+      clientX: null,
+      volume: 0.8,
+      isQueueOpen: false,
     }
-  }
+  },
+  computed: {
+    progress() {
+      return (this.time * 100) / this.duration
+    },
+    ...mapState({
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      episodeToPlay: (state) => state.zPlayer.episodeToPlay,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+      queue: (state) => state.zPlayer.queue,
+    }),
+  },
+  watch: {
+    episodeToPlay(newEpisode) {
+      this.playerJs.api('play', 'id:' + newEpisode.id)
+      console.log('wathc episodeToPlay')
+    },
+    queue: {
+      handler() {
+        console.log('current playlist changed')
+        this.playerJs.api('file', this.getQueue())
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    addPlayerJS() {
+      const script = document.createElement('script')
+      script.async = true
+      script.src = './js/playerjs.js'
+      document.head.appendChild(script)
+
+      script.addEventListener('load', () => {
+        this.initPlayerJS()
+      })
+    },
+    initPlayerJS() {
+      this.playerJs = new window.Playerjs({
+        id: 'playerjs',
+        file: this.getQueue(),
+      })
+      this.playerJsNode = document.getElementById('playerjs')
+
+      this.playerJsNode.removeAttribute('style')
+      this.playerJsNode.innerHTML = ''
+      this.isPlayerReady = true
+
+      this.addEventsHandlers()
+    },
+    addEventsHandlers() {
+      this.playerJsNode.addEventListener('new', () => {
+        console.log(this.time)
+        if (this.currentEpisode) {
+          const previousEpisode = JSON.parse(
+            JSON.stringify(this.currentEpisode)
+          )
+          previousEpisode.listened = this.time
+          previousEpisode.progress = this.progress
+          previousEpisode.playedAt = new Date().getTime()
+        }
+        this.setCurrentEpisode()
+        console.log('new event')
+      })
+      this.playerJsNode.addEventListener('play', () => {
+        this.$store.commit(zPlayerMutations.play)
+      })
+      this.playerJsNode.addEventListener('pause', () => {
+        this.$store.commit(zPlayerMutations.pause)
+      })
+      this.playerJsNode.addEventListener('time', () => {
+        if (!this.mousepress) {
+          this.time = this.playerJs.api('time')
+          // if (Math.floor(this.time) != 0) {
+          //   this.listenedEpisodes[this.id] = this.time
+          // }
+        }
+        this.time = this.playerJs.api('time')
+
+        this.isEpisodeLoading = false
+
+        this.buffered = this.playerJs.api('buffered')
+      })
+
+      this.playerJsNode.addEventListener('duration', (e) => {
+        this.duration = e.info
+      })
+
+      this.playerJsNode.addEventListener('waiting', () => {
+        this.isEpisodeLoading = true
+      })
+      this.playerJs.api('playlistloop', 1)
+    },
+    togglePlay() {
+      this.playerJs.api('toggle')
+      console.log(this.playerJs.api('playlist_folders'))
+    },
+    next() {
+      this.playerJs.api('next')
+    },
+    previous() {
+      this.playerJs.api('prev')
+    },
+    setCurrentEpisode() {
+      const id = this.playerJs.api('playlist_id')
+      const episode = this.getEpisodeById(id)
+      this.$store.commit(zPlayerMutations.setCurrentEpisode, episode)
+    },
+    getEpisodeById(id) {
+      const episode = this.queue.find((ep) => ep.id == id)
+      return episode
+    },
+    getQueue() {
+      const playlist = Array.from(JSON.parse(JSON.stringify(this.queue)))
+      return playlist
+    },
+    changeSpeed() {
+      if (this.speed == 1.0) {
+        this.speed = 1.5
+        this.playerJs.api('speed', 5)
+      } else if (this.speed == 1.5) {
+        this.speed = 2
+        this.playerJs.api('speed', 6)
+      } else if (this.speed == 2) {
+        this.playerJs.api('speed', 3)
+        this.speed = 1.0
+      }
+    },
+    toHHMMSS(seconds) {
+      if (!seconds) {
+        return '00:00'
+      }
+
+      var sec_num = parseInt(seconds, 10) // don't forget the second param
+      var hours = Math.floor(sec_num / 3600)
+      var minutes = Math.floor((sec_num - hours * 3600) / 60)
+      seconds = sec_num - hours * 3600 - minutes * 60
+
+      if (hours < 10) {
+        hours = '0' + hours
+      }
+      if (minutes < 10) {
+        minutes = '0' + minutes
+      }
+      if (seconds < 10) {
+        seconds = '0' + seconds
+      }
+
+      if (hours != '00') {
+        return hours + ':' + minutes + ':' + seconds
+      } else {
+        return minutes + ':' + seconds
+      }
+    },
+    hideProgressMouseOver() {
+      this.mouseOverShow = false
+      if (this.mousepress) {
+        this.playerJs.api('seek', this.time)
+        this.mousepress = false
+      }
+    },
+    progressMouseOver(e) {
+      this.mouseOverShow = true
+
+      let rect = e.target.getBoundingClientRect()
+      let x = Math.abs(e.clientX - rect.left) //x position within the element.
+      this.mouseOverTimePx = x
+      let percentage = (x * 100) / rect.width
+      let seconds = (this.duration * percentage) / 100
+      this.mouseOverTime = seconds
+
+      if (this.mousepress) {
+        this.time = seconds
+      }
+    },
+    closeMousepress() {
+      this.mousepress = false
+      this.playerJs.api('seek', this.time)
+    },
+    moveTo(e) {
+      this.mousepress = true
+      this.clientX = e.clientX
+      let rect = e.target.getBoundingClientRect()
+      // let rect = this.$refs.progressOverflow.getBoundingClientRect();
+      let x = Math.abs(this.clientX - rect.left) //x position within the element.
+      let percentage = (x * 100) / rect.width
+      let seconds = (this.duration * percentage) / 100
+
+      this.time = seconds
+    },
+    volumeTo(e) {
+      this.mousepressVolume = true
+      let rect = e.target.getBoundingClientRect()
+      let x = Math.abs(e.clientX - rect.left) //x position within the element.
+      let volume = x / rect.width
+      this.volume = volume > 0.1 ? volume : 0
+    },
+    volumeMouseOver(e) {
+      if (this.mousepressVolume) {
+        let rect = e.target.getBoundingClientRect()
+        let x = Math.abs(e.clientX - rect.left) //x position within the element.
+        let volume = x / rect.width
+        this.volume = volume > 0.1 ? volume : 0
+      }
+    },
+    volumeMouseLeave() {
+      if (this.mousepressVolume) {
+        this.playerJs.api('volume', this.volume)
+        this.mousepressVolume = false
+      }
+    },
+    toggleQueue() {
+      this.isQueueOpen = !this.isQueueOpen
+    },
+    closeQueue() {
+      this.isQueueOpen = false
+      console.log('close queue')
+    },
+  },
 }
 </script>
 
@@ -195,9 +410,9 @@ export default {
   border-radius: 10px;
   border: 1px solid var(--color-border);
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-  overflow: hidden;
-  height: 64px;
   margin: 0 auto;
+  line-height: 1;
+  overflow: hidden;
 
   &__progress-block {
     width: 100%;
@@ -221,8 +436,9 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 22px;
+    padding: 2px 24px 4px 12px;
     box-sizing: border-box;
+    height: 56px;
     @media (max-width: 768px) {
       padding: 12px 15px 12px;
     }
@@ -232,26 +448,51 @@ export default {
     align-items: center;
     flex: auto;
     position: relative;
+    height: 100%;
   }
   &__main-right {
     display: flex;
     align-items: center;
+    height: 100%;
   }
 
+  &__image {
+    width: 42px;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+  }
+
+  &__previous,
   &__play,
   &__next {
     cursor: pointer;
-    width: 35px;
-    margin-right: 6px;
+    width: 32px;
+    margin-right: 4px;
     z-index: 20;
-
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     @include button-effect;
 
-    svg {
-      fill: #fff;
-      width: 30px;
-      height: 30px;
+    .icon {
+      width: 20px;
+      height: 20px;
     }
+  }
+  &__play {
+    .icon {
+      width: 38px;
+      height: 38px;
+    }
+  }
+
+  &__next {
+    margin-right: 16px;
   }
 
   &__loading {
@@ -294,13 +535,14 @@ export default {
   }
 
   &__title {
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     margin-bottom: 1px;
     cursor: default;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    margin-bottom: 4px;
     @media (max-width: 768px) {
       font-size: 13px;
       margin-bottom: 0;
@@ -310,6 +552,10 @@ export default {
       -webkit-line-clamp: 1;
       white-space: break-spaces;
     }
+  }
+
+  &__podcast {
+    font-size: 12px;
   }
 
   &__progress-line {
@@ -448,21 +694,21 @@ export default {
     }
   }
 
-  &__playlist {
-    margin-left: 15px;
-    cursor: pointer;
-    @include button-effect;
-    svg {
-      height: 20px;
-      width: 20px;
-      margin-bottom: 3px;
-      path {
-        fill: #fff;
-      }
-    }
-  }
+  // &__playlist {
+  //   margin-left: 15px;
+  //   cursor: pointer;
+  //   @include button-effect;
+  //   svg {
+  //     height: 20px;
+  //     width: 20px;
+  //     margin-bottom: 3px;
+  //     path {
+  //       fill: #fff;
+  //     }
+  //   }
+  // }
   &__speed {
-    font-weight: 900;
+    font-weight: 600;
     font-size: 20px;
     margin-left: 15px;
     text-align: right;

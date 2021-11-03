@@ -7,27 +7,28 @@
       <div
         class="feed-episode"
         v-for="episode in feed"
-        :key="episode.createdAt"
+        :key="episode.id"
+        :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
         <div v-tooltip="'You have new messages.'" class="feed-episode__left">
-          <img :src="episode.image || episode.podcast.image" alt="" srcset="" />
-          <div class="feed-episode__play">
+          <img :src="episode.Podcast.imageURL" alt="" srcset="" />
+          <div class="feed-episode__play" @click="playEpisode(episode)">
             <svg-icon name="play" />
           </div>
         </div>
 
         <div class="feed-episode__right">
           <h2>{{ episode.title }}</h2>
-          <p>{{ episode.podcast.title }}</p>
+          <p>{{ episode.Podcast.title }}</p>
         </div>
-        <router-link
+        <!-- <router-link
           class="feed-episode__link"
           :to="{
             name: 'episode',
             params: {podcast: episode.podcast.slug, slug: episode.slug},
           }"
         >
-        </router-link>
+        </router-link> -->
       </div>
     </template>
   </div>
@@ -39,6 +40,8 @@
 import {feedActions} from '@/store/modules/feed'
 import {mapState} from 'vuex'
 import PdLoader from '@/components/ui/PdLoader'
+
+import {zPlayerActions} from '@/store/modules/zPlayer'
 
 export default {
   name: 'PdFeed',
@@ -56,10 +59,17 @@ export default {
       feed: (state) => state.feed.data,
       isLoading: (state) => state.feed.isLoading,
       errors: (state) => state.feed.errors,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+      isPlaying: (state) => state.zPlayer.isPlaying,
     }),
   },
   mounted() {
     this.$store.dispatch(feedActions.getFeed, this.apiUrl)
+  },
+  methods: {
+    playEpisode(episode) {
+      this.$store.dispatch(zPlayerActions.playEpisode, episode)
+    },
   },
 }
 </script>
@@ -145,5 +155,9 @@ export default {
   &:hover {
     box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   }
+}
+
+.playing {
+  background: rgb(153, 153, 153);
 }
 </style>

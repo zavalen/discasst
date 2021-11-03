@@ -3,88 +3,36 @@ dotenv.config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-var bodyParser = require('body-parser')
 
 const {notFound, errorHandler} = require('./middleware/errorHandler')
 const sequelize = require('./dbConnection')
 
 const User = require('./models/User')
-const Roles = require('./models/Roles')
-const Article = require('./models/Article')
-const Tag = require('./models/Tag')
-const Comment = require('./models/Comments')
+const Podcast = require('./models/Podcast')
+const Episode = require('./models/Episode')
 
 const userRoute = require('./routes/users')
-const articleRoute = require('./routes/articles')
-const commentRoute = require('./routes/comments')
-const tagRoute = require('./routes/tags')
-const profileRoute = require('./routes/profile')
-const favouriteRoute = require('./routes/favourites')
+const podcastRoute = require('./routes/podcasts')
+const episodeRoute = require('./routes/episodes')
 const app = express()
 
 //CORS
 app.use(cors({credentials: true, origin: true}))
 
-//RELATIONS:
-//1 to many relation between user and article
-User.hasMany(Article, {
-  onDelete: 'CASCADE'
-})
-Article.belongsTo(User)
+Podcast.hasMany(Episode)
+Episode.belongsTo(Podcast)
 
-//many to many relation between article and taglist
-Article.belongsToMany(Tag, {
-  through: 'TagList',
-  uniqueKey: false,
-  timestamps: false
-})
-Tag.belongsToMany(Article, {
-  through: 'TagList',
-  uniqueKey: false,
-  timestamps: false
-})
+// const sync = async () => await sequelize.sync({force: true})
 
-//One to many relation between Article and Comments
-Article.hasMany(Comment, {onDelete: 'CASCADE'})
-Comment.belongsTo(Article)
-
-//One to many relation between User and Comments
-User.hasMany(Comment, {onDelete: 'CASCADE'})
-Comment.belongsTo(User)
-
-//Many to many relation between User and User
-User.belongsToMany(User, {
-  through: 'Followers',
-  as: 'followers',
-  timestamps: false
-})
-
-//favourite Many to many relation between User and article
-User.belongsToMany(Article, {through: 'Favourites', timestamps: false})
-Article.belongsToMany(User, {through: 'Favourites', timestamps: false})
-
-// const createDefaultRoles = async () => {
-//   const defaultRoles = [{role: 'user'}, {role: 'admin'}, {role: 'author'}]
-
-//   defaultRoles.forEach(async role => {
-//     const newRole = await Roles.findOrCreate({where: role})
-//     console.log(newRole)
-//   })
-// }
-// createDefaultRoles()
-
-const sync = async () => await sequelize.sync({force: true})
-
-// const sync = async () => await sequelize.sync({alter: true})
+const sync = async () => await sequelize.sync({alter: true})
 // const sync = async () => await sequelize.sync()
 sync()
 
 app.use(
-  bodyParser.urlencoded({
+  express.urlencoded({
     extended: true
   })
 )
-app.use(bodyParser.json())
 app.use(express.json())
 app.use(morgan('tiny'))
 
@@ -92,11 +40,8 @@ app.get('/', (req, res) => {
   res.json({status: 'API is running'})
 })
 app.use('/api', userRoute)
-app.use('/api/articles', articleRoute)
-app.use('/api/articles', commentRoute)
-app.use('/api/tags', tagRoute)
-app.use('/api/profiles', profileRoute)
-app.use('/api/articles', favouriteRoute)
+app.use('/api/podcasts', podcastRoute)
+app.use('/api/episodes', episodeRoute)
 app.use(notFound)
 app.use(errorHandler)
 

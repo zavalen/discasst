@@ -12,7 +12,7 @@ var Ripple = {
       rippler(event, el, binding.value)
     })
 
-    var bg = binding.value || Ripple.color || 'rgba(0, 0, 0, 0.1)'
+    var bg = binding.value || Ripple.color || 'var(--ripple-effect)'
     var zIndex = Ripple.zIndex || '9999'
 
     function rippler(event, el) {

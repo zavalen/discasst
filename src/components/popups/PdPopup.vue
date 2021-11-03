@@ -40,19 +40,19 @@ export default {
   props: {
     type: {
       type: String,
-      required: false
+      required: false,
     },
     okBtn: {
       type: String,
-      required: false
+      required: false,
     },
     cancelBtn: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   components: {
-    FadeTransition
+    FadeTransition,
   },
   currentPopupController: null,
 
@@ -65,11 +65,11 @@ export default {
     },
     cancelBtnText() {
       return this.cancelBtn || this.$t('popup.cancel')
-    }
+    },
   },
   data() {
     return {
-      isOpen: false
+      isOpen: false,
     }
   },
   mounted() {
@@ -105,8 +105,8 @@ export default {
       if (e.key === 'Escape') {
         this.close()
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

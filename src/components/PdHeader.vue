@@ -110,6 +110,7 @@
                 <user-icon />
                 {{ cutString(currentUser.username, 21) }}
                 <router-link
+                  v-ripple
                   class="user-submenu__profile-link"
                   @click="closeUserSubMenu"
                   :to="{name: 'profile'}"
@@ -160,8 +161,8 @@
                 </template>
               </ul>
               <div class="user-submenu__bottom">
-                <theme-switcher class="user-submenu__theme" />
-                <lang-switcher class="user-submenu__lang" />
+                <theme-switcher v-ripple class="user-submenu__theme" />
+                <lang-switcher v-ripple class="user-submenu__lang" />
               </div>
             </div>
           </fade-transition>
@@ -231,9 +232,6 @@ export default {
       isLoggedIn: authGetters.isLoggedIn,
       isAnonymus: authGetters.isAnonymus,
     }),
-    shortName() {
-      return 55
-    },
   },
   methods: {
     cutString(string, lettersNumber) {
@@ -605,7 +603,7 @@ export default {
     flex: auto;
     text-align: center;
     font-size: 14px;
-
+    width: 50%;
     &:hover {
       background: var(--bg-menu-item-hover);
     }

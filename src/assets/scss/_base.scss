@@ -17,9 +17,13 @@ a {
   }
 }
 
-// * {
-//   transition: 0.2s;
-// }
+img {
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 .app {
   //   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -34,9 +38,9 @@ a {
   &__header {
     position: sticky;
 
-    @include _768 {
-      position: fixed;
-    }
+    // @include _768 {
+    //   position: fixed;
+    // }
 
     top: 0;
     left: 0;
