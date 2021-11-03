@@ -136,7 +136,7 @@ module.exports.getEpisodes = async (req, res) => {
 
     // const {tag, author, limit = 20, offset = 0} = req.query
     const {limit = 20, offset = 0} = req.query
-    let article
+    // let article
     // if (!author && tag) {
     //   article = await Podcast.findAll({
     //     include: [
@@ -190,7 +190,7 @@ module.exports.getEpisodes = async (req, res) => {
     const episodes = await Episode.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
-      order: [['pubDate', 'DESC']],
+      // order: '"pubDate" DESC',
       include: [
         {
           model: Podcast

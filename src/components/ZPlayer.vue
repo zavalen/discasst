@@ -1,7 +1,9 @@
 <template>
   <slide-up-transition>
     <div v-if="isPlayerReady" class="player player-container">
-      <pd-queue v-if="isQueueOpen" v-click-outside="closeQueue" />
+      <slide-up-transition>
+        <pd-queue v-if="isQueueOpen" v-click-outside="closeQueue" />
+      </slide-up-transition>
 
       <div class="zPlayer">
         <div class="zPlayer__progress-block">
@@ -48,13 +50,7 @@
         </div>
         <div class="zPlayer__main-block">
           <div class="zPlayer__main-left">
-            <div
-              class="zPlayer__previous"
-              :class="{
-                disabled: playlistActive && playlist.length <= 1,
-              }"
-              @click="previous"
-            >
+            <div class="zPlayer__previous" @click="previous">
               <svg-icon name="previous" />
             </div>
             <div class="zPlayer__play" @click="togglePlay">
@@ -65,7 +61,7 @@
             <div
               class="zPlayer__next"
               :class="{
-                disabled: playlistActive && playlist.length <= 1,
+                disabled: queue.length <= 1,
               }"
               @click="next"
             >
@@ -106,35 +102,37 @@
           </div>
           <div class="zPlayer__main-right">
             <div class="zPlayer__speed" @click="changeSpeed">x{{ speed }}</div>
-
-            <div class="zPlayer__volume-line">
-              <div
-                class="zPlayer__volume"
-                :style="{
-                  width: volume * 100 + '%',
-                }"
-              ></div>
-
-              <div
-                class="zPlayer__volume-overflow"
-                @mousedown="volumeTo"
-                @mouseup="volumeMouseLeave"
-                @mousemove="volumeMouseOver"
-                @mouseleave="volumeMouseLeave"
-              ></div>
-              <div
-                v-if="mouseOverShow"
-                class="zPlayer__volume-overflow-persentage"
-                :style="{
-                  left: mouseOverTimePx + 'px',
-                }"
-              ></div>
-
+            <div class="zPlayer__volume-block">
+              <svg-icon @click="toggleVolume" v-if="volume > 0" name="volume" />
               <svg-icon
-                name="nosound"
-                iconClass="zPlayer__nosound"
+                @click="toggleVolume"
                 v-if="volume == 0"
+                name="volume-zero"
               />
+
+              <div class="zPlayer__volume-line">
+                <div
+                  class="zPlayer__volume"
+                  :style="{
+                    height: volume * 100 + '%',
+                  }"
+                ></div>
+
+                <div
+                  class="zPlayer__volume-overflow"
+                  @mousedown="volumeTo"
+                  @mouseup="volumeMouseLeave"
+                  @mousemove="volumeMouseOver"
+                  @mouseleave="volumeMouseLeave"
+                ></div>
+                <div
+                  v-if="mouseOverShow"
+                  class="zPlayer__volume-overflow-persentage"
+                  :style="{
+                    left: mouseOverTimePx + 'px',
+                  }"
+                ></div>
+              </div>
             </div>
 
             <div class="zPlayer__playlist" @click="toggleQueue" ref="zplaylist">
@@ -368,18 +366,26 @@ export default {
 
       this.time = seconds
     },
+    toggleVolume() {
+      if (this.volume) {
+        this.volume = 0
+      } else {
+        this.volume = 0.8
+      }
+      this.playerJs.api('volume', this.volume)
+    },
     volumeTo(e) {
       this.mousepressVolume = true
       let rect = e.target.getBoundingClientRect()
-      let x = Math.abs(e.clientX - rect.left) //x position within the element.
-      let volume = x / rect.width
+      let x = Math.abs(e.clientY - rect.bottom) //x position within the element.
+      let volume = x / rect.height
       this.volume = volume > 0.1 ? volume : 0
     },
     volumeMouseOver(e) {
       if (this.mousepressVolume) {
         let rect = e.target.getBoundingClientRect()
-        let x = Math.abs(e.clientX - rect.left) //x position within the element.
-        let volume = x / rect.width
+        let x = Math.abs(e.clientY - rect.bottom) //x position within the element.
+        let volume = x / rect.height
         this.volume = volume > 0.1 ? volume : 0
       }
     },
@@ -412,7 +418,6 @@ export default {
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   margin: 0 auto;
   line-height: 1;
-  overflow: hidden;
 
   &__progress-block {
     width: 100%;
@@ -422,15 +427,15 @@ export default {
 
     @include button-effect;
 
-    &:hover {
-      height: 20px;
+    // &:hover {
+    //   // height: 20px;
 
-      .zPlayer__duration,
-      .zPlayer__time {
-        font-size: 12px;
-        top: 1px;
-      }
-    }
+    //   .zPlayer__duration,
+    //   .zPlayer__time {
+    //     font-size: 12px;
+    //     top: 1px;
+    //   }
+    // }
   }
   &__main-block {
     display: flex;
@@ -492,7 +497,7 @@ export default {
   }
 
   &__next {
-    margin-right: 16px;
+    margin-right: 12px;
   }
 
   &__loading {
@@ -561,27 +566,29 @@ export default {
   &__progress-line {
     width: 100%;
     height: 100%;
-    background: rgb(51, 51, 51);
+    background: var(--color-secondary);
     position: relative;
-    border-top-left-radius: var(--block-border-radius);
-    border-top-right-radius: var(--block-border-radius);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    overflow: hidden;
   }
 
   &__duration {
     position: absolute;
     right: 15px;
-    top: -2px;
-    font-size: 10px;
-    color: #e2e2e2;
+    top: 0;
+    font-size: 12px;
+    color: var(--color-text);
     font-weight: 600;
     transition: 0.3s;
+    z-index: 9999;
   }
   &__time {
     position: absolute;
     left: 15px;
-    top: -2px;
-    font-size: 10px;
-    color: #e2e2e2;
+    top: 0;
+    font-size: 12px;
+    color: var(--color-text);
     font-weight: 600;
     transition: 0.3s;
     @include unselectable;
@@ -627,12 +634,23 @@ export default {
   }
 
   &__volume-line {
-    width: 60px;
-    height: 20px;
-    margin-left: 15px;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    transition: 0.3s;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 100px;
+    border-radius: 4px;
+    padding: 8px 4px;
+    overflow: hidden;
+    box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
 
-    background: rgb(51, 51, 51);
-    position: relative;
+    background: var(--color-zplayer-bg);
+
+    border: 1px solid var(--color-border);
     display: flex;
     flex-direction: column-reverse;
 
@@ -642,6 +660,19 @@ export default {
       display: none;
     }
   }
+
+  &__volume-block {
+    position: relative;
+    cursor: pointer;
+    margin-left: 12px;
+    @include button-effect;
+
+    &:hover .zPlayer__volume-line {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
   &__volume {
     background: #5e5d5d;
     height: 100%;
@@ -655,26 +686,6 @@ export default {
     left: 0;
     z-index: 99;
     cursor: pointer;
-  }
-
-  &__nosound {
-    position: absolute;
-    opacity: 0.5;
-    svg {
-      height: 24px;
-      width: 24px;
-      // margin-bottom: 3px;
-      fill: #fff;
-      // polygon,
-      // line,
-      path {
-        // stroke: #fff;
-        fill: #fff;
-      }
-    }
-  }
-
-  &__volume-overflow-persentage {
   }
 
   &__open {
@@ -694,19 +705,11 @@ export default {
     }
   }
 
-  // &__playlist {
-  //   margin-left: 15px;
-  //   cursor: pointer;
-  //   @include button-effect;
-  //   svg {
-  //     height: 20px;
-  //     width: 20px;
-  //     margin-bottom: 3px;
-  //     path {
-  //       fill: #fff;
-  //     }
-  //   }
-  // }
+  &__playlist {
+    margin-left: 24px;
+    cursor: pointer;
+    @include button-effect;
+  }
   &__speed {
     font-weight: 600;
     font-size: 20px;

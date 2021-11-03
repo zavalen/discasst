@@ -1,5 +1,13 @@
 <template>
   <div class="queue scrollbar">
+    <div class="queue_top">
+      <button>Очередь</button>
+      <button>История</button>
+      <form>
+        <input type="text" name="" id="" />
+        <button type="submit"><svg-icon name="search" /></button>
+      </form>
+    </div>
     <div v-for="episode in queue" :key="episode.id">
       <div>{{ episode.title }}</div>
     </div>
@@ -11,6 +19,11 @@ import {mapState} from 'vuex'
 
 export default {
   name: 'zQueue',
+  props: {
+    isOpen: {
+      type: Boolean,
+    },
+  },
 
   computed: {
     ...mapState({
@@ -30,7 +43,9 @@ export default {
   max-width: 1240px;
   margin: 16px auto;
   height: calc(100vh - 168px);
-  background: azure;
+  background: var(--color-zplayer-bg);
+  backdrop-filter: blur(10px);
+
   border-radius: 10px;
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   padding: 32px;

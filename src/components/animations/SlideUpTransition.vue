@@ -15,6 +15,6 @@ export default {}
   transform: translateY(100%);
 }
 .slideup-leave-to {
-  transform: translateY(-100%);
+  transform: translateY(160%);
 }
 </style>
