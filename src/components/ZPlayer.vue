@@ -15,7 +15,7 @@
             <div
               class="zPlayer__progress-time"
               :style="{
-                width: time ? (time * 100) / duration + '%' : '0%',
+                width: progress ? progress + '%' : '0%',
               }"
             ></div>
             <div
@@ -54,7 +54,13 @@
         </div>
         <div class="zPlayer__main-block">
           <div class="zPlayer__main-left">
-            <div class="zPlayer__previous" @click="previous">
+            <div
+              class="zPlayer__previous"
+              :class="{
+                disabled: !history.length,
+              }"
+              @click="previous"
+            >
               <svg-icon name="previous" />
             </div>
             <div class="zPlayer__play" @click="togglePlay">
@@ -65,7 +71,7 @@
             <div
               class="zPlayer__next"
               :class="{
-                disabled: queue.length <= 1,
+                disabled: !queue.length,
               }"
               @click="next"
             >
@@ -154,6 +160,7 @@ import SlideUpTransition from '@/components/animations/SlideUpTransition'
 import {mapState} from 'vuex'
 import {zPlayerMutations, zPlayerActions} from '@/store/modules/zPlayer'
 import PdQueue from '@/components/PdQueue'
+import moment from 'moment'
 
 export default {
   name: 'ZPlayer',
@@ -171,16 +178,16 @@ export default {
       playerJsNode: null,
       isPlayerReady: false,
       playerJsPlaylist: [],
-      time: 0,
       reallyListened: new Set(),
       duration: 0,
       buffered: 0,
       isEpisodeLoading: false,
       speed: 1,
+      mousepress: false,
       mouseOverShow: false,
       mouseOverTime: null,
       mouseOverPx: null,
-      clientX: null,
+      mousepressVolume: false,
       volume: 0.8,
       isQueueOpen: false,
       previousIndex: 0,
@@ -195,6 +202,7 @@ export default {
       currentUser: (state) => state.auth.currentUser,
       isPlaying: (state) => state.zPlayer.isPlaying,
       currentEpisode: (state) => state.zPlayer.currentEpisode,
+      time: (state) => state.zPlayer.currentEpisodeTime,
       queue: (state) => state.zPlayer.queue,
       history: (state) => state.zPlayer.history,
     }),
@@ -260,7 +268,12 @@ export default {
         this.$store.commit(zPlayerMutations.pause)
       })
       this.playerJsNode.addEventListener('time', () => {
-        this.time = this.playerJs.api('time')
+        if (!this.mousepress) {
+          this.$store.dispatch(
+            zPlayerActions.setCurrentEpisodeTime,
+            this.playerJs.api('time')
+          )
+        }
         this.reallyListened.add(Math.floor(this.time))
 
         this.isEpisodeLoading = false
@@ -301,11 +314,12 @@ export default {
     },
     previous() {
       if (this.history[this.previousIndex]) {
+        console.log('next')
         this.$store.dispatch(
           zPlayerActions.playEpisode,
           this.history[this.previousIndex]
         )
-        this.previousIndex++
+        this.previousIndex += 2
       }
     },
     changeSpeed() {
@@ -321,30 +335,10 @@ export default {
       }
     },
     toHHMMSS(seconds) {
-      if (!seconds) {
-        return '00:00'
-      }
-
-      var sec_num = parseInt(seconds, 10) // don't forget the second param
-      var hours = Math.floor(sec_num / 3600)
-      var minutes = Math.floor((sec_num - hours * 3600) / 60)
-      seconds = sec_num - hours * 3600 - minutes * 60
-
-      if (hours < 10) {
-        hours = '0' + hours
-      }
-      if (minutes < 10) {
-        minutes = '0' + minutes
-      }
-      if (seconds < 10) {
-        seconds = '0' + seconds
-      }
-
-      if (hours != '00') {
-        return hours + ':' + minutes + ':' + seconds
-      } else {
-        return minutes + ':' + seconds
-      }
+      return moment
+        .utc(seconds * 1000)
+        .format('HH:mm:ss', {trim: true})
+        .replace(/^0(?:0:0?)?/, '')
     },
     hideProgressMouseOver() {
       this.mouseOverShow = false
@@ -360,11 +354,12 @@ export default {
       let x = Math.abs(e.clientX - rect.left) //x position within the element.
       this.mouseOverTimePx = x
       let percentage = (x * 100) / rect.width
-      let seconds = (this.duration * percentage) / 100
+      let seconds = (this.currentEpisode.duration * percentage) / 100
       this.mouseOverTime = seconds
 
       if (this.mousepress) {
-        this.time = seconds
+        // this.time = seconds
+        this.$store.dispatch(zPlayerActions.setCurrentEpisodeTime, seconds)
       }
     },
     closeMousepress() {
@@ -373,14 +368,13 @@ export default {
     },
     moveTo(e) {
       this.mousepress = true
-      this.clientX = e.clientX
       let rect = e.target.getBoundingClientRect()
-      // let rect = this.$refs.progressOverflow.getBoundingClientRect();
-      let x = Math.abs(this.clientX - rect.left) //x position within the element.
+      let x = Math.abs(e.clientX - rect.left) //x position within the element.
       let percentage = (x * 100) / rect.width
-      let seconds = (this.duration * percentage) / 100
+      let seconds = (this.currentEpisode.duration * percentage) / 100
 
-      this.time = seconds
+      // this.time = seconds
+      this.$store.dispatch(zPlayerActions.setCurrentEpisodeTime, seconds)
     },
     toggleVolume() {
       if (this.volume) {
@@ -653,7 +647,7 @@ export default {
 
   &__buffered {
     position: absolute;
-    background: rgba(0, 0, 0, 0.685);
+    background: rgba(0, 0, 0, 0.274);
 
     font-size: 10px;
     top: 0%;
@@ -752,5 +746,9 @@ export default {
       margin-left: 8px;
     }
   }
+}
+
+.disabled {
+  opacity: 0.3;
 }
 </style>

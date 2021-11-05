@@ -47,14 +47,7 @@
           {{ toHHMMSS(episode.duration) }}
         </div>
 
-        <!-- <router-link
-          class="feed-episode__link"
-          :to="{
-            name: 'episode',
-            params: {podcast: episode.podcast.slug, slug: episode.slug},
-          }"
-        >
-        </router-link> -->
+        <div class="feed-episode__progress"></div>
       </div>
 
       <button @click="loadFeed">LOAD MORE</button>
@@ -228,6 +221,14 @@ export default {
   transition: 0.5s;
   &:hover {
     box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+  }
+  &__progress {
+    position: absolute;
+    bottom: 0;
+    height: 4px;
+    background: red;
+    // width: 50%;
+    z-index: 5;
   }
 }
 

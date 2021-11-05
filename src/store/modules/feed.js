@@ -38,8 +38,10 @@ const actions = {
       context.commit(feedMutations.getFeedStart)
       feed
         .getFeed(payload)
+        // .then(response => response.json())
         .then(response => {
           context.commit(feedMutations.getFeedSuccess, response.data.episodes)
+          console.log(response.data.episodes)
           resolve(response.data.episodes)
         })
         .catch(result => {
