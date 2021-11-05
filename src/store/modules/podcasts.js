@@ -33,13 +33,12 @@ const mutations = {
 }
 
 const actions = {
-  [podcastsActions.getPodcasts](context, credentials = {}) {
+  [podcastsActions.getPodcasts](context) {
     return new Promise(resolve => {
       context.commit(podcastsMutations.getPodcastsStart)
       podcasts
-        .getPodcasts(credentials)
+        .getPodcasts()
         .then(response => {
-          console.log(response.data.podcasts)
           context.commit(
             podcastsMutations.getPodcastsSuccess,
             response.data.podcasts

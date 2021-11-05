@@ -1,7 +1,9 @@
 import axios from '@/api/axios'
 
-const getFeed = apiUrl => {
-  return axios.get(apiUrl)
+const getFeed = payload => {
+  return axios.get(payload.apiUrl, {
+    params: payload.params
+  })
 }
 
 export default {

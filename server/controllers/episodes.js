@@ -130,7 +130,7 @@ module.exports.deleteArticle = async (req, res) => {
   }
 }
 
-module.exports.getEpisodes = async (req, res) => {
+module.exports.getFeed = async (req, res) => {
   try {
     //Get all articles:
 
@@ -190,7 +190,7 @@ module.exports.getEpisodes = async (req, res) => {
     const episodes = await Episode.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
-      // order: '"pubDate" DESC',
+      order: [['pubDate', 'DESC']],
       include: [
         {
           model: Podcast
@@ -211,42 +211,42 @@ module.exports.getEpisodes = async (req, res) => {
   }
 }
 
-module.exports.getFeed = async (req, res) => {
-  try {
-    const query = `
-            SELECT UserEmail
-            FROM followers
-            WHERE followerEmail = "${req.user.email}"`
-    const followingUsers = await sequelize.query(query)
-    if (followingUsers[0].length == 0) {
-      return res.json({articles: []})
-    }
-    let followingUserEmail = []
-    for (let t of followingUsers[0]) {
-      followingUserEmail.push(t.UserEmail)
-    }
+// module.exports.getFeed = async (req, res) => {
+//   try {
+//     const query = `
+//             SELECT UserEmail
+//             FROM followers
+//             WHERE followerEmail = "${req.user.email}"`
+//     const followingUsers = await sequelize.query(query)
+//     if (followingUsers[0].length == 0) {
+//       return res.json({articles: []})
+//     }
+//     let followingUserEmail = []
+//     for (let t of followingUsers[0]) {
+//       followingUserEmail.push(t.UserEmail)
+//     }
 
-    let article = await Podcast.findAll({
-      where: {
-        UserEmail: followingUserEmail
-      },
-      include: [Tag, User]
-    })
+//     let article = await Podcast.findAll({
+//       where: {
+//         UserEmail: followingUserEmail
+//       },
+//       include: [Tag, User]
+//     })
 
-    let articles = []
-    for (let t of article) {
-      let addArt = sanitizeOutputMultiple(t)
-      articles.push(addArt)
-    }
+//     let articles = []
+//     for (let t of article) {
+//       let addArt = sanitizeOutputMultiple(t)
+//       articles.push(addArt)
+//     }
 
-    res.json({articles})
-  } catch (e) {
-    const code = res.statusCode ? res.statusCode : 422
-    return res.status(code).json({
-      errors: {body: ['Could not get feed ', e.message]}
-    })
-  }
-}
+//     res.json({articles})
+//   } catch (e) {
+//     const code = res.statusCode ? res.statusCode : 422
+//     return res.status(code).json({
+//       errors: {body: ['Could not get feed ', e.message]}
+//     })
+//   }
+// }
 
 async function getPodcastFromRss(url) {
   const podcast = await getPodcastJson(url)

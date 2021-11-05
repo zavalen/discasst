@@ -8,8 +8,20 @@
         <button type="submit"><svg-icon name="search" /></button>
       </form>
     </div>
+    Сейчас играет:
+    <h3>{{ currentEpisode ? currentEpisode.title : '----' }}</h3>
+    <hr />
+    <h2>Очередь</h2>
     <div v-for="episode in queue" :key="episode.id">
       <div>{{ episode.title }}</div>
+    </div>
+    <hr />
+
+    <h2>История</h2>
+    <div v-for="episode in history" :key="episode.id">
+      <div :class="{strong: currentEpisode && currentEpisode.id == episode.id}">
+        {{ episode.title }}
+      </div>
     </div>
   </div>
 </template>
@@ -28,7 +40,6 @@ export default {
   computed: {
     ...mapState({
       isPlaying: (state) => state.zPlayer.isPlaying,
-      episodeToPlay: (state) => state.zPlayer.episodeToPlay,
       currentEpisode: (state) => state.zPlayer.currentEpisode,
       queue: (state) => state.zPlayer.queue,
       history: (state) => state.zPlayer.history,
@@ -49,5 +60,9 @@ export default {
   border-radius: 10px;
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   padding: 32px;
+}
+
+.strong {
+  background: rgb(153, 153, 153);
 }
 </style>

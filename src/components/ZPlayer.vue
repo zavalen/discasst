@@ -1,8 +1,12 @@
 <template>
   <slide-up-transition>
-    <div v-if="isPlayerReady" class="player player-container">
+    <div
+      v-if="isPlayerReady"
+      v-click-outside="closeQueue"
+      class="player player-container"
+    >
       <slide-up-transition>
-        <pd-queue v-if="isQueueOpen" v-click-outside="closeQueue" />
+        <pd-queue v-if="isQueueOpen" />
       </slide-up-transition>
 
       <div class="zPlayer">
@@ -148,7 +152,7 @@
 <script>
 import SlideUpTransition from '@/components/animations/SlideUpTransition'
 import {mapState} from 'vuex'
-import {zPlayerMutations} from '@/store/modules/zPlayer'
+import {zPlayerMutations, zPlayerActions} from '@/store/modules/zPlayer'
 import PdQueue from '@/components/PdQueue'
 
 export default {
@@ -157,15 +161,18 @@ export default {
     SlideUpTransition,
     PdQueue,
   },
-  mounted() {
+  created() {
     this.addPlayerJS()
   },
+
   data() {
     return {
       playerJs: null,
       playerJsNode: null,
       isPlayerReady: false,
+      playerJsPlaylist: [],
       time: 0,
+      reallyListened: new Set(),
       duration: 0,
       buffered: 0,
       isEpisodeLoading: false,
@@ -176,6 +183,8 @@ export default {
       clientX: null,
       volume: 0.8,
       isQueueOpen: false,
+      previousIndex: 0,
+      userInfo: null,
     }
   },
   computed: {
@@ -183,23 +192,35 @@ export default {
       return (this.time * 100) / this.duration
     },
     ...mapState({
+      currentUser: (state) => state.auth.currentUser,
       isPlaying: (state) => state.zPlayer.isPlaying,
-      episodeToPlay: (state) => state.zPlayer.episodeToPlay,
       currentEpisode: (state) => state.zPlayer.currentEpisode,
       queue: (state) => state.zPlayer.queue,
+      history: (state) => state.zPlayer.history,
     }),
+    episodeStatistics() {
+      return {
+        PodcastId: this.currentEpisode ? this.currentEpisode.Podcast.id : null,
+        EpisodeId: this.currentEpisode ? this.currentEpisode.id : null,
+        UserId: this.currentUser ? this.currentUser.id : null,
+        lastPoint: this.time,
+        reallyListenedSeconds: this.reallyListened.size,
+        reallyListenedTimeline: this.reallyListened,
+        userAgent: window.navigator.userAgent,
+        userInfo: this.userInfo,
+      }
+    },
   },
   watch: {
-    episodeToPlay(newEpisode) {
-      this.playerJs.api('play', 'id:' + newEpisode.id)
-      console.log('wathc episodeToPlay')
+    currentEpisode(newEpisode) {
+      this.playerJs.api('play', newEpisode.file)
     },
-    queue: {
-      handler() {
-        console.log('current playlist changed')
-        this.playerJs.api('file', this.getQueue())
-      },
-      deep: true,
+    isPlaying(newVal) {
+      if (newVal) {
+        this.playerJs.api('play')
+      } else {
+        this.playerJs.api('pause')
+      }
     },
   },
   methods: {
@@ -208,7 +229,6 @@ export default {
       script.async = true
       script.src = './js/playerjs.js'
       document.head.appendChild(script)
-
       script.addEventListener('load', () => {
         this.initPlayerJS()
       })
@@ -216,29 +236,22 @@ export default {
     initPlayerJS() {
       this.playerJs = new window.Playerjs({
         id: 'playerjs',
-        file: this.getQueue(),
+        file: this.currentEpisode ? this.currentEpisode.file : '',
       })
       this.playerJsNode = document.getElementById('playerjs')
 
       this.playerJsNode.removeAttribute('style')
       this.playerJsNode.innerHTML = ''
-      this.isPlayerReady = true
-
       this.addEventsHandlers()
+      this.isPlayerReady = true
     },
     addEventsHandlers() {
       this.playerJsNode.addEventListener('new', () => {
-        console.log(this.time)
-        if (this.currentEpisode) {
-          const previousEpisode = JSON.parse(
-            JSON.stringify(this.currentEpisode)
-          )
-          previousEpisode.listened = this.time
-          previousEpisode.progress = this.progress
-          previousEpisode.playedAt = new Date().getTime()
-        }
-        this.setCurrentEpisode()
         console.log('new event')
+      })
+      this.playerJsNode.addEventListener('end', () => {
+        this.next()
+        console.log('end event')
       })
       this.playerJsNode.addEventListener('play', () => {
         this.$store.commit(zPlayerMutations.play)
@@ -247,13 +260,8 @@ export default {
         this.$store.commit(zPlayerMutations.pause)
       })
       this.playerJsNode.addEventListener('time', () => {
-        if (!this.mousepress) {
-          this.time = this.playerJs.api('time')
-          // if (Math.floor(this.time) != 0) {
-          //   this.listenedEpisodes[this.id] = this.time
-          // }
-        }
         this.time = this.playerJs.api('time')
+        this.reallyListened.add(Math.floor(this.time))
 
         this.isEpisodeLoading = false
 
@@ -270,27 +278,35 @@ export default {
       this.playerJs.api('playlistloop', 1)
     },
     togglePlay() {
-      this.playerJs.api('toggle')
-      console.log(this.playerJs.api('playlist_folders'))
+      console.log(this.statistics)
+      if (this.currentEpisode) {
+        this.playerJs.api('toggle')
+      } else {
+        this.next()
+      }
     },
     next() {
-      this.playerJs.api('next')
+      if (this.previousIndex) {
+        this.previousIndex--
+        this.$store.dispatch(
+          zPlayerActions.playEpisode,
+          this.history[this.previousIndex]
+        )
+        return
+      }
+
+      if (this.queue[0]) {
+        this.$store.dispatch(zPlayerActions.playEpisode, this.queue[0])
+      }
     },
     previous() {
-      this.playerJs.api('prev')
-    },
-    setCurrentEpisode() {
-      const id = this.playerJs.api('playlist_id')
-      const episode = this.getEpisodeById(id)
-      this.$store.commit(zPlayerMutations.setCurrentEpisode, episode)
-    },
-    getEpisodeById(id) {
-      const episode = this.queue.find((ep) => ep.id == id)
-      return episode
-    },
-    getQueue() {
-      const playlist = Array.from(JSON.parse(JSON.stringify(this.queue)))
-      return playlist
+      if (this.history[this.previousIndex]) {
+        this.$store.dispatch(
+          zPlayerActions.playEpisode,
+          this.history[this.previousIndex]
+        )
+        this.previousIndex++
+      }
     },
     changeSpeed() {
       if (this.speed == 1.0) {
@@ -400,7 +416,20 @@ export default {
     },
     closeQueue() {
       this.isQueueOpen = false
-      console.log('close queue')
+    },
+    getEpisodeFromHistoryById(id) {
+      return this.history.find((historyEp) => historyEp.id == id)
+    },
+    getEpisodeFromQueueById(id) {
+      return this.queue.find((ep) => ep.id == id)
+    },
+    addEpisodeToHistory(episode) {
+      if (episode) {
+        episode.listened = this.time
+        episode.progress = this.progress
+        episode.playedAt = new Date().getTime()
+        this.$store.dispatch(zPlayerActions.addToHistory, episode)
+      }
     },
   },
 }
@@ -410,7 +439,7 @@ export default {
 @import '@/assets/scss/_mixins.scss';
 
 .zPlayer {
-  max-width: 1240px;
+  // max-width: 1240px;
   backdrop-filter: blur(10px);
   background: var(--color-zplayer-bg);
   border-radius: 10px;

@@ -65,9 +65,9 @@ module.exports.createPodcast = async (req, res) => {
     for (let i = 0; i < episodes.length; i++) {
       const episode = episodes[i]
       episode.PodcastId = newPodcast.id
-      episode.pudDate = new Date(episode.pudDate).getTime()
+      // episode.pudDate = new Date(episode.pudDate).getTime()
+
       episode.file = episode.enclosure.url
-      // console.log(episode)
       await Episode.create(episode)
     }
 
@@ -169,9 +169,11 @@ module.exports.deleteArticle = async (req, res) => {
 module.exports.getAllPodcasts = async (req, res) => {
   try {
     //Get all articles:
-
     // const {tag, author, limit = 20, offset = 0} = req.query
-    const {limit = 20, offset = 0} = req.query
+    const {limit = 21, offset = 0} = req.query
+    console.log(limit)
+    console.log(offset)
+
     // let article
     // if (!author && tag) {
     //   article = await Podcast.findAll({

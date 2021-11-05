@@ -7,7 +7,17 @@ import feed from '@/store/modules/feed'
 import podcasts from '@/store/modules/podcasts'
 import notifications from '@/store/modules/notifications'
 import zPlayer from '@/store/modules/zPlayer'
+import statistics from '@/store/modules/statistics'
 
 export default createStore({
-  modules: {auth, theme, lang, feed, notifications, podcasts, zPlayer}
+  modules: {
+    auth,
+    theme,
+    lang,
+    feed,
+    notifications,
+    podcasts,
+    zPlayer,
+    statistics
+  }
 })

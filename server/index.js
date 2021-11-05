@@ -24,8 +24,8 @@ Episode.belongsTo(Podcast)
 
 // const sync = async () => await sequelize.sync({force: true})
 
-const sync = async () => await sequelize.sync({alter: true})
-// const sync = async () => await sequelize.sync()
+// const sync = async () => await sequelize.sync({alter: true})
+const sync = async () => await sequelize.sync()
 sync()
 
 app.use(

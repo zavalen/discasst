@@ -30,6 +30,7 @@
             class="header__main-nav main-nav"
             :class="{'main-nav_active': isMenuActive}"
           >
+            <!-- <div v-if="isMenuActive" class="header__side-menu-bg"></div> -->
             <div class="main-nav__left">
               <li class="main-nav__item">
                 <router-link
@@ -63,7 +64,6 @@
               </li>
             </div>
           </ul>
-          <div v-if="isMenuActive" class="header__side-menu-bg"></div>
         </slide-right-transition>
       </div>
       <ul class="header__user-menu nav">
@@ -354,7 +354,7 @@ export default {
   }
 
   @include _768 {
-    width: 200px;
+    width: 280px;
     z-index: 99;
     flex: auto;
     flex-direction: column;
@@ -405,14 +405,16 @@ export default {
     }
   }
 
-  &__side-menu-bg {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.411);
-  }
+  // &__side-menu-bg {
+  //   position: fixed;
+  //   top: 0;
+  //   bottom: 0;
+  //   left: 280px;
+  //   right: 0;
+  //   background: rgba(0, 0, 0, 0.411);
+  //   z-index: -1;
+  //   transition: 0.6s;
+  // }
 
   background: var(--color-header-bg);
   padding-top: 8px;

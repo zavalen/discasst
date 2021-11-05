@@ -1,6 +1,5 @@
 <template>
   <pd-header class="app__header"> </pd-header>
-  {{ user }}
   <main class="app__main">
     <router-view />
     <ZPlayer class="app__zPlayer" />
@@ -23,16 +22,16 @@ export default {
   components: {
     PdHeader,
     AuthPopup,
-    ZPlayer
+    ZPlayer,
   },
   computed: {
     ...mapGetters({
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+    }),
   },
   data() {
     return {
-      user: null
+      user: null,
     }
   },
   async mounted() {
@@ -40,7 +39,14 @@ export default {
     window.addEventListener('offline', () =>
       toast.error(this.$t('toastifications.offline'), {timeout: false})
     )
-  }
+  },
+  methods: {
+    async getStatisctics() {
+      this.userInfo = await fetch('http://ip-api.com/json').then((response) =>
+        response.json()
+      )
+    },
+  },
 }
 </script>
 

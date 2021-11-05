@@ -1,26 +1,52 @@
 <template>
-  <div style="min-height: 200px">
+  <div class="feed">
     <pd-loader v-if="isLoading" />
     <div v-if="errors">Something goes wrong...</div>
 
-    <template v-if="feed">
+    <template v-if="episodes.length">
       <div
         class="feed-episode"
-        v-for="episode in feed"
+        v-for="episode in episodes"
         :key="episode.id"
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
         <div v-tooltip="'You have new messages.'" class="feed-episode__left">
           <img :src="episode.Podcast.imageURL" alt="" srcset="" />
           <div class="feed-episode__play" @click="playEpisode(episode)">
-            <svg-icon name="play" />
+            <svg-icon
+              v-if="
+                !isPlaying ||
+                (currentEpisode && currentEpisode.id != episode.id)
+              "
+              name="play"
+            />
+            <svg-icon
+              v-if="
+                currentEpisode && currentEpisode.id == episode.id && isPlaying
+              "
+              name="pause"
+            />
           </div>
         </div>
 
         <div class="feed-episode__right">
           <h2>{{ episode.title }}</h2>
           <p>{{ episode.Podcast.title }}</p>
+          <template v-if="!currentEpisode || currentEpisode.id != episode.id">
+            <button @click="toggleInQueue(episode)">
+              {{
+                isEpisodeInQueue(episode.id)
+                  ? 'Убрать из очереди'
+                  : 'Добавить в очередь'
+              }}
+            </button>
+          </template>
+          <template v-if="currentEpisode && currentEpisode.id == episode.id">
+            <button>Сейчас играет</button>
+          </template>
+          {{ toHHMMSS(episode.duration) }}
         </div>
+
         <!-- <router-link
           class="feed-episode__link"
           :to="{
@@ -30,6 +56,8 @@
         >
         </router-link> -->
       </div>
+
+      <button @click="loadFeed">LOAD MORE</button>
     </template>
   </div>
 </template>
@@ -40,8 +68,8 @@
 import {feedActions} from '@/store/modules/feed'
 import {mapState} from 'vuex'
 import PdLoader from '@/components/ui/PdLoader'
-
 import {zPlayerActions} from '@/store/modules/zPlayer'
+import moment from 'moment'
 
 export default {
   name: 'PdFeed',
@@ -53,28 +81,74 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      page: 1,
+      episodesPerPage: 4,
+    }
+  },
 
   computed: {
     ...mapState({
-      feed: (state) => state.feed.data,
+      episodes: (state) => state.feed.episodes,
       isLoading: (state) => state.feed.isLoading,
       errors: (state) => state.feed.errors,
       currentEpisode: (state) => state.zPlayer.currentEpisode,
       isPlaying: (state) => state.zPlayer.isPlaying,
+      queue: (state) => state.zPlayer.queue,
     }),
+    payload() {
+      return {
+        apiUrl: this.apiUrl,
+        params: {
+          offset: (this.page - 1) * this.episodesPerPage,
+          limit: this.episodesPerPage,
+        },
+      }
+    },
   },
   mounted() {
-    this.$store.dispatch(feedActions.getFeed, this.apiUrl)
+    this.loadFeed()
   },
   methods: {
     playEpisode(episode) {
-      this.$store.dispatch(zPlayerActions.playEpisode, episode)
+      if (this.currentEpisode && episode.id == this.currentEpisode.id) {
+        this.$store.dispatch(zPlayerActions.toggle)
+      } else {
+        this.$store.dispatch(zPlayerActions.playEpisode, episode)
+      }
+    },
+    loadFeed() {
+      this.$store.dispatch(feedActions.getFeed, this.payload)
+      this.page++
+    },
+    toggleInQueue(episode) {
+      if (this.isEpisodeInQueue(episode.id)) {
+        this.$store.dispatch(zPlayerActions.removeFromQueue, episode)
+      } else {
+        this.$store.dispatch(zPlayerActions.addToQueue, episode)
+      }
+    },
+    isEpisodeInQueue(id) {
+      return this.queue.some((ep) => {
+        return ep.id == id
+      })
+    },
+    toHHMMSS(seconds) {
+      return moment
+        .utc(seconds * 1000)
+        .format('HH:mm:ss', {trim: true})
+        .replace(/^0(?:0:0?)?/, '')
     },
   },
 }
 </script>
 
 <style lang="scss">
+.feed {
+  margin-bottom: 16px;
+}
+
 .feed-episode {
   background: var(--color-post-bg);
   border-radius: 10px;

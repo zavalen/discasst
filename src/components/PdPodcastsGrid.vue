@@ -46,7 +46,7 @@ export default {
     }),
   },
   mounted() {
-    this.$store.dispatch(podcastsActions.getPodcasts)
+    this.$store.dispatch(podcastsActions.getPodcasts, {offset: 21, limit: 50})
   },
 }
 </script>

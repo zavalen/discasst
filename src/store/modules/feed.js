@@ -1,7 +1,7 @@
 import feed from '@/api/feed'
 
 const state = {
-  data: null,
+  episodes: [],
   isLoading: false,
   errors: null
 }
@@ -23,7 +23,7 @@ const mutations = {
   },
   [feedMutations.getFeedSuccess](state, payload) {
     state.isLoading = false
-    state.data = payload
+    state.episodes = state.episodes.concat(payload)
     state.errors = null
   },
   [feedMutations.getFeedFailure](state, payload) {
@@ -33,11 +33,11 @@ const mutations = {
 }
 
 const actions = {
-  [feedActions.getFeed](context, apiUrl) {
+  [feedActions.getFeed](context, payload) {
     return new Promise(resolve => {
       context.commit(feedMutations.getFeedStart)
       feed
-        .getFeed(apiUrl)
+        .getFeed(payload)
         .then(response => {
           context.commit(feedMutations.getFeedSuccess, response.data.episodes)
           resolve(response.data.episodes)
@@ -49,10 +49,8 @@ const actions = {
   }
 }
 
-const getters = {}
 export default {
   state,
   mutations,
-  getters,
   actions
 }

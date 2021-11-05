@@ -78,8 +78,8 @@ module.exports.loginUser = async (req, res) => {
 
 module.exports.getUserByEmail = async (req, res) => {
   try {
+    console.log(req)
     const UserEmail = req.body.user.email || req.user.emain
-    console.log(UserEmail)
 
     const user = await User.findOne({where: {email: UserEmail}})
     if (!user) {

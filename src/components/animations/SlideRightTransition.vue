@@ -4,7 +4,9 @@
   </transition>
 </template>
 <script>
-export default {}
+export default {
+  name: 'slideright',
+}
 </script>
 <style>
 .slideright-leave-active,
