@@ -477,6 +477,7 @@ export default {
     flex: auto;
     position: relative;
     height: 100%;
+    overflow: hidden;
   }
   &__main-right {
     display: flex;
@@ -562,6 +563,9 @@ export default {
     }
   }
 
+  &__credits {
+    overflow: hidden;
+  }
   &__title {
     font-size: 14px;
     font-weight: 600;

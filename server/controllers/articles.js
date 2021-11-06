@@ -1,7 +1,7 @@
 const Article = require('../models/Article')
 const User = require('../models/User')
 const Tag = require('../models/Tag')
-const {slugify} = require('../utils/stringUtil')
+const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
 
 function sanitizeOutput(article, user) {

@@ -1,7 +1,7 @@
 const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
 const User = require('../models/User')
-const {slugify} = require('../utils/stringUtil')
+const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
 const podcastFeedParser = require('podcast-feed-parser')
 

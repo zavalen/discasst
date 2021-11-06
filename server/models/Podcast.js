@@ -13,16 +13,21 @@ const Podcast = sequelize.define('Podcast', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  slug: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
   description: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   subtitle: {
     type: DataTypes.TEXT
   },
   imageURL: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   link: {
     type: DataTypes.STRING,
@@ -30,27 +35,31 @@ const Podcast = sequelize.define('Podcast', {
   },
   language: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
-  author: {
+  authorName: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   summary: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true
   },
   categories: {
     type: DataTypes.JSON,
     allowNull: true
   },
-  owner: {
-    type: DataTypes.JSON,
-    allowNull: false
+  ownerName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  ownerEmail: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
   explicit: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   rss: {
     type: DataTypes.STRING,

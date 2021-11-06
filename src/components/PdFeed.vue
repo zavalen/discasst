@@ -10,7 +10,7 @@
         :key="episode.id"
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
-        <div v-tooltip="'You have new messages.'" class="feed-episode__left">
+        <div v-tooltip="'Play'" class="feed-episode__left">
           <img :src="episode.Podcast.imageURL" alt="" srcset="" />
           <div class="feed-episode__play" @click="playEpisode(episode)">
             <svg-icon
@@ -30,8 +30,17 @@
         </div>
 
         <div class="feed-episode__right">
-          <h2>{{ episode.title }}</h2>
-          <p>{{ episode.Podcast.title }}</p>
+          <h2
+            :style="{fontSize: episode.title.length > 80 ? '18px' : ''}"
+            v-tooltip="episode.title.length > 142 ? episode.title : ''"
+          >
+            {{ episode.title }}
+          </h2>
+          <router-link
+            :to="{name: 'podcast-page', params: {slug: episode.Podcast.slug}}"
+            :episode-id="episode.id"
+            >{{ episode.Podcast.title }}</router-link
+          >
           <template v-if="!currentEpisode || currentEpisode.id != episode.id">
             <button @click="toggleInQueue(episode)">
               {{
@@ -211,9 +220,9 @@ export default {
       display: -moz-box;
       -moz-box-orient: vertical;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
-      line-clamp: 2;
+      line-clamp: 3;
       box-orient: vertical;
     }
   }

@@ -1,9 +1,13 @@
 const Podcast = require('../models/Podcast')
+const PodcastsManagers = require('../models/PodcastsManagers')
 const Episode = require('../models/Episode')
 const User = require('../models/User')
-const {slugify} = require('../utils/stringUtil')
 const sequelize = require('../dbConnection')
 const podcastFeedParser = require('podcast-feed-parser')
+const {slugify, isAcceptablePodcastSlug} = require('../utils/slugUtils')
+const {jsonToHtml} = require('../utils/stringUtils')
+const sanitizeHtml = require('sanitize-html')
+const validator = require('validator')
 
 function sanitizeOutput(article, user) {
   const newTagList = []
@@ -46,28 +50,72 @@ function sanitizeOutputMultiple(article) {
 module.exports.createPodcast = async (req, res) => {
   try {
     if (!req.body.rss) throw new Error('No RSS')
+    if (!validator.isURL(req.body.rss)) throw new Error('It is not URL')
 
     const rssUrl = req.body.rss
 
     const existingPodcast = await Podcast.findOne({
       where: {rss: rssUrl}
     })
-    if (existingPodcast) throw new Error('This podcast exists')
+    if (existingPodcast) res.status(201).json(existingPodcast)
 
     const fullPodcast = await getPodcastFromRss(rssUrl)
+    if (!fullPodcast) throw new Error('Something wrong while parsing')
 
     const podcast = fullPodcast.meta
     podcast.rss = rssUrl
+    if (
+      podcast.description.includes('\n') ||
+      podcast.description.includes('\r')
+    ) {
+      podcast.description = jsonToHtml(podcast.description)
+    }
+    // CREATE SLUG
+    let slug = slugify(podcast.title)
+
+    if (!(await isAcceptablePodcastSlug(slug))) {
+      slug = slug + '-' + Math.floor(Math.random() * 1000)
+    }
+    podcast.slug = slug
+
+    podcast.ownerName = podcast.owner.name
+    podcast.ownerEmail = podcast.owner.email
+
+    for (let key in podcast) {
+      podcast[key] = sanitizeHtml(podcast[key])
+    }
+
     const newPodcast = await Podcast.create(podcast)
+
+    // FIND OWNER
+    const existingUser = await User.findOne({
+      where: {email: newPodcast.ownerEmail}
+    })
+    if (existingUser) {
+      PodcastsManagers.create({
+        role: 'owner',
+        PodcastId: newPodcast.id,
+        UserId: existingUser.id
+      })
+    }
 
     const episodes = fullPodcast.episodes
 
     for (let i = 0; i < episodes.length; i++) {
       const episode = episodes[i]
+      if (
+        episode.description.includes('\n') ||
+        episode.description.includes('\r')
+      ) {
+        episode.description = jsonToHtml(episode.description)
+      }
       episode.PodcastId = newPodcast.id
-      // episode.pudDate = new Date(episode.pudDate).getTime()
-
       episode.file = episode.enclosure.url
+
+      for (let key in episode) {
+        episode[key] = sanitizeHtml(episode[key])
+      }
+
       await Episode.create(episode)
     }
 
@@ -75,6 +123,24 @@ module.exports.createPodcast = async (req, res) => {
   } catch (e) {
     return res.status(422).json({
       errors: {body: ['Could not create podcast', e.message]}
+    })
+  }
+}
+
+module.exports.getPodcastBySlug = async (req, res) => {
+  try {
+    const {slug} = req.params
+
+    const podcast = await Podcast.findOne({
+      where: {slug: slug}
+    })
+
+    if (!podcast) throw new Error('No podcast with this slug')
+
+    res.status(200).json({podcast})
+  } catch (e) {
+    return res.status(422).json({
+      errors: {body: ['Could not get podcast', e.message]}
     })
   }
 }

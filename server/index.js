@@ -10,6 +10,7 @@ const sequelize = require('./dbConnection')
 const User = require('./models/User')
 const Podcast = require('./models/Podcast')
 const Episode = require('./models/Episode')
+const PodcastsManagers = require('./models/PodcastsManagers')
 
 const userRoute = require('./routes/users')
 const podcastRoute = require('./routes/podcasts')
@@ -21,11 +22,16 @@ app.use(cors({credentials: true, origin: true}))
 
 Podcast.hasMany(Episode)
 Episode.belongsTo(Podcast)
+Podcast.belongsToMany(User, {through: PodcastsManagers})
 
-// const sync = async () => await sequelize.sync({force: true})
+const sync = async () => {
+  await sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
+  await sequelize.sync({force: true})
+  await sequelize.query('SET FOREIGN_KEY_CHECKS = 1') // setting the flag back for security
+}
 
 // const sync = async () => await sequelize.sync({alter: true})
-const sync = async () => await sequelize.sync()
+// const sync = async () => await sequelize.sync()
 sync()
 
 app.use(

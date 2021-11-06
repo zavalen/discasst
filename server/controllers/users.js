@@ -1,16 +1,27 @@
-const {databaseVersion} = require('../dbConnection')
 const User = require('../models/User')
+const PodcastsManagers = require('../models/PodcastsManagers')
+const Podcast = require('../models/Podcast')
+const validator = require('validator')
+
 const {hashPassword, matchPassword} = require('../utils/password')
 const {sign, decode} = require('../utils/jwt')
 
 module.exports.createUser = async (req, res) => {
   try {
     const userToCreate = req.body.user
-    console.log(req)
     if (!userToCreate) throw new Error('Something wrong with request (no user)')
     if (!userToCreate.username) throw new Error('Username is Required')
+    if (userToCreate.username.length <= 3) {
+      throw new Error('Username is too short')
+    }
     if (!userToCreate.email) throw new Error('Email is Required')
+    if (!validator.isEmail(userToCreate.email)) {
+      throw new Error('Email is wrong')
+    }
     if (!userToCreate.password) throw new Error('Password is Required')
+    if (userToCreate.password.length < 8) {
+      throw new Error('Password is shorter than 8')
+    }
 
     const existingUser = await User.findOne({
       where: {email: userToCreate.email}
@@ -21,6 +32,17 @@ module.exports.createUser = async (req, res) => {
 
     userToCreate.password = password
     const user = await User.create(userToCreate)
+
+    const podcastUserOwner = await Podcast.findOne({
+      where: {ownerEmail: user.email}
+    })
+    if (podcastUserOwner) {
+      PodcastsManagers.create({
+        role: 'owner',
+        PodcastId: podcastUserOwner.id,
+        UserId: user.id
+      })
+    }
 
     if (user) {
       if (user.dataValues.password) delete user.dataValues.password

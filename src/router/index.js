@@ -44,8 +44,13 @@ const routes = [
     component: () => import('@/views/GlobalFeed')
   },
   {
-    path: '/@:podcast/:slug',
+    path: '/:podcast/:slug',
     name: 'episode',
+    component: () => import('@/views/Episode')
+  },
+  {
+    path: '/:slug',
+    name: 'podcast-page',
     component: () => import('@/views/Episode')
   },
   {

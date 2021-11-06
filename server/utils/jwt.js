@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = 'qemsaslvjd-33r3:9i9vis3.'
+const JWT_SECRET_FOR_EMAI_VERIFICATION = 'email213124312rdsfsd'
 
 module.exports.sign = async user => {
   return new Promise((resolve, reject) => {
@@ -30,16 +31,29 @@ module.exports.decode = async token => {
   })
 }
 
-//TESTING
-/* const test = async () => {
-    const data = {
-        username: 'Varun',
-        email:' varun'
-    }
-    const token = await sign(data)
-    console.log("token is:",token);
-    const decoded = await decode(token)
-    console.log("DEcoded:",decoded);
+module.exports.signEmail = async user => {
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        emailToken: user.emailToken
+      },
+      JWT_SECRET_FOR_EMAI_VERIFICATION,
+      (err, token) => {
+        if (err) return reject(err)
+        return resolve(token)
+      }
+    )
+  })
 }
 
-test() */
+module.exports.decodeEmailToken = async token => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, JWT_SECRET_FOR_EMAI_VERIFICATION, (err, decoded) => {
+      if (err) return reject(err)
+
+      return resolve(decoded)
+    })
+  })
+}
