@@ -57,7 +57,10 @@ module.exports.createPodcast = async (req, res) => {
     const existingPodcast = await Podcast.findOne({
       where: {rss: rssUrl}
     })
-    if (existingPodcast) res.status(201).json(existingPodcast)
+    if (existingPodcast) {
+      res.status(201).json(existingPodcast)
+      return
+    }
 
     const fullPodcast = await getPodcastFromRss(rssUrl)
     if (!fullPodcast) throw new Error('Something wrong while parsing')

@@ -8,7 +8,12 @@ const getEpisodeById = id => {
   return axios.get(`/episodes/`, {params: {id}})
 }
 
+const addPodcast = rss => {
+  return axios.post(`/podcasts`, {rss: rss})
+}
+
 export default {
   getPodcasts,
-  getEpisodeById
+  getEpisodeById,
+  addPodcast
 }

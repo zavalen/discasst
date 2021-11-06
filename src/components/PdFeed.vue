@@ -37,7 +37,7 @@
             {{ episode.title }}
           </h2>
           <router-link
-            :to="{name: 'podcast-page', params: {slug: episode.Podcast.slug}}"
+            :to="{name: 'podcast', params: {slug: episode.Podcast.slug}}"
             :episode-id="episode.id"
             >{{ episode.Podcast.title }}</router-link
           >
@@ -86,7 +86,7 @@ export default {
   data() {
     return {
       page: 1,
-      episodesPerPage: 4,
+      episodesPerPage: 30,
     }
   },
 

@@ -753,6 +753,10 @@ export default {
 }
 
 .disabled {
-  opacity: 0.3;
+  opacity: 0.2;
+  cursor: default;
+  &:hover {
+    opacity: 0.2;
+  }
 }
 </style>

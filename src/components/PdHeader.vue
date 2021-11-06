@@ -56,10 +56,10 @@
             <div class="main-nav__right">
               <li class="main-nav__item">
                 <router-link
-                  :to="{name: 'home'}"
+                  :to="{name: 'add-podcast'}"
                   class="main-nav__item-link button"
                   active-class="button_active"
-                  >{{ $t('header.createArticle') }}</router-link
+                  >{{ $t('header.addPodcast') }}</router-link
                 >
               </li>
             </div>
