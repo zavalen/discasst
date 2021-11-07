@@ -11,6 +11,7 @@
 <script>
 import PdHeader from '@/components/PdHeader'
 import {authActions, authGetters} from '@/store/modules/auth'
+import {statisticsActions, statisticsGetters} from '@/store/modules/statistics'
 import AuthPopup from '@/components/popups/AuthPopup'
 import {mapGetters} from 'vuex'
 import ZPlayer from '@/components/ZPlayer'
@@ -27,6 +28,7 @@ export default {
   computed: {
     ...mapGetters({
       isAnonymus: authGetters.isAnonymus,
+      visitor: statisticsGetters.visitor,
     }),
   },
   data() {
@@ -36,16 +38,14 @@ export default {
   },
   async mounted() {
     this.user = await this.$store.dispatch(authActions.getCurrentUser)
+    await this.$store
+      .dispatch(statisticsActions.getVisitor)
+      .catch((err) => console.log(err))
+    console.log('after visitor')
+    await this.$store.dispatch(statisticsActions.sendVisitor, this.visitor)
     window.addEventListener('offline', () =>
       toast.error(this.$t('toastifications.offline'), {timeout: false})
     )
-  },
-  methods: {
-    async getStatisctics() {
-      this.userInfo = await fetch('http://ip-api.com/json').then((response) =>
-        response.json()
-      )
-    },
   },
 }
 </script>

@@ -31,3 +31,25 @@ module.exports.authByToken = async (req, res, next) => {
     })
   }
 }
+
+module.exports.appendUserByTokenIfExist = async (req, res, next) => {
+  const authHeader = req.header('Authorization')
+    ? req.header('Authorization').split(' ')
+    : null
+
+  if (!authHeader || authHeader[0] !== 'Token') {
+    return next()
+  }
+
+  const token = authHeader[1]
+  try {
+    const user = await decode(token)
+    if (!user) {
+      return next()
+    }
+    req.user = user
+    return next()
+  } catch (e) {
+    return next()
+  }
+}

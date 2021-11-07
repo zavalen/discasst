@@ -1,5 +1,6 @@
 const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
+const EpisodesStatisticts = require('../models/EpisodesStatisticts')
 const User = require('../models/User')
 const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
@@ -132,73 +133,28 @@ module.exports.deleteArticle = async (req, res) => {
 
 module.exports.getFeed = async (req, res) => {
   try {
-    //Get all articles:
+    let {limit = 20, offset = 0} = req.query
+    if (limit > 100) {
+      limit = 100
+    }
 
-    // const {tag, author, limit = 20, offset = 0} = req.query
-    const {limit = 20, offset = 0} = req.query
-    // let article
-    // if (!author && tag) {
-    //   article = await Podcast.findAll({
-    //     include: [
-    //       {
-    //         model: Tag,
-    //         attributes: ['name'],
-    //         where: {name: tag}
-    //       },
-    //       {
-    //         model: User,
-    //         attributes: ['email', 'username', 'bio', 'image']
-    //       }
-    //     ],
-    //     limit: parseInt(limit),
-    //     offset: parseInt(offset)
-    //   })
-    // } else if (author && !tag) {
-    //   article = await Podcast.findAll({
-    //     include: [
-    //       {
-    //         model: Tag,
-    //         attributes: ['name']
-    //       },
-    //       {
-    //         model: User,
-    //         attributes: ['email', 'username', 'bio', 'image'],
-    //         where: {username: author}
-    //       }
-    //     ],
-    //     limit: parseInt(limit),
-    //     offset: parseInt(offset)
-    //   })
-    // } else if (author && tag) {
-    //   article = await Podcast.findAll({
-    //     include: [
-    //       {
-    //         model: Tag,
-    //         attributes: ['name'],
-    //         where: {name: tag}
-    //       },
-    //       {
-    //         model: User,
-    //         attributes: ['email', 'username', 'bio', 'image'],
-    //         where: {username: author}
-    //       }
-    //     ],
-    //     limit: parseInt(limit),
-    //     offset: parseInt(offset)
-    //   })
-    // } else {
+    const modelsToInclude = [
+      {
+        model: Podcast
+      }
+    ]
+
+    if (req.user) {
+      modelsToInclude.push({
+        model: EpisodesStatisticts
+      })
+    }
+
     const episodes = await Episode.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['pubDate', 'DESC']],
-      include: [
-        {
-          model: Podcast
-          // where: {
-          //   id: {$col: 'Episodes.PodcastId'}
-          // }
-        }
-      ]
+      include: modelsToInclude
     })
     // }
 

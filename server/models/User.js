@@ -61,7 +61,7 @@ const User = sequelize.define('User', {
     allowNull: true,
     defaultValue: 'ru'
   },
-  email_confirmed: {
+  emailСonfirmed: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },

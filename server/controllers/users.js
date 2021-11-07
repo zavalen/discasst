@@ -1,7 +1,9 @@
 const User = require('../models/User')
+const Visitor = require('../models/Visitor')
 const PodcastsManagers = require('../models/PodcastsManagers')
 const Podcast = require('../models/Podcast')
 const validator = require('validator')
+var uaParser = require('ua-parser-js')
 
 const {hashPassword, matchPassword} = require('../utils/password')
 const {sign, decode} = require('../utils/jwt')
@@ -162,6 +164,34 @@ module.exports.updateUserDetails = async (req, res) => {
       delete user.dataValues.password
       user.dataValues.token = req.header('Authorization').split(' ')[1]
       res.json(user)
+    }
+  } catch (e) {
+    const status = res.statusCode ? res.statusCode : 500
+    return res.status(status).json({
+      errors: {body: [e.message]}
+    })
+  }
+}
+
+module.exports.createVisitor = async (req, res) => {
+  try {
+    const visitor = req.body.visitor
+    if (visitor) {
+      visitor.userAgent = req.headers['user-agent']
+
+      const ua = uaParser(visitor.userAgent)
+
+      visitor.browser = ua.browser.name + ' ' + ua.browser.version
+
+      visitor.os = ua.os.name + ua.os.version
+      visitor.device = ua.device.type || 'desktop'
+      visitor.deviceModel = ua.device.vendor + ' ' + ua.device.model
+      visitor.cpu = ua.cpu.architecture
+      const newVisitor = await Visitor.create(visitor)
+      console.log(newVisitor)
+      return res.status(200)
+    } else {
+      return res.status(404)
     }
   } catch (e) {
     const status = res.statusCode ? res.statusCode : 500

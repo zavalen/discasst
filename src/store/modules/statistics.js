@@ -1,65 +1,93 @@
 import {setItem, getItem} from '@/helpers/persistenceStorage.js'
+import auth from '@/store/modules/auth'
+import api from '@/api/visitor'
 
 const state = {
-  visitorId: getVisitorId(),
-  visitorInfo: null,
+  visitor: null,
   isLoading: false,
   errors: null
 }
 
-export const statGetters = {
-  visitorInfo: '[statistics] visitorInfo'
+export const statisticsGetters = {
+  visitor: '[statistics] visitor'
 }
 
 const getters = {
-  [statGetters.visitorInfo]: state => {
-    state.visitorInfo.visitorId = state.visitorId
-    return state.visitorInfo
+  [statisticsGetters.visitor]: state => {
+    return state.visitor
   }
 }
 
 export const statisticsMutations = {
-  getVisitorInfoStart: '[statistics] getVisitorInfoStart',
-  getVisitorInfoSuccess: '[statistics] getVisitorInfoSuccess',
-  getVisitorInfoFailure: '[statistics] getVisitorInfoFailure'
+  getVisitorStart: '[statistics] getVisitorStart',
+  getVisitorSuccess: '[statistics] getVisitorSuccess',
+  getVisitorFailure: '[statistics] getVisitorFailure'
 }
 
 export const statisticsActions = {
-  getVisitorinfo: '[statistics] getVisitorinfo'
+  getVisitor: '[statistics] getVisitor',
+  sendVisitor: '[statistics] sendVisitor'
 }
 
 const mutations = {
-  [statisticsMutations.getVisitorInfoStart](state) {
+  [statisticsMutations.getVisitorStart](state) {
     state.isLoading = true
     state.errors = null
   },
-  [statisticsMutations.getVisitorInfoSuccess](state, payload) {
-    state.visitorInfo = payload
+  [statisticsMutations.getVisitorSuccess](state, payload) {
+    state.visitor = payload
     state.isLoading = false
     state.errors = null
   },
-  [statisticsMutations.getVisitorInfoFailure](state, payload) {
+  [statisticsMutations.getVisitorFailure](state, payload) {
     state.isLoading = false
-    state.errors = payload
+    state.errors = payload.errors
+    state.visitor = payload.visitor
   }
 }
 
 const actions = {
-  [statisticsActions.getVisitorinfo](context) {
+  [statisticsActions.getVisitor](context) {
     return new Promise(resolve => {
-      context.commit(statisticsMutations.getVisitorInfoStart)
+      context.commit(statisticsMutations.getVisitorStart)
       fetch('http://ip-api.com/json')
         .then(response => response.json())
         .then(response => {
-          context.commit(statisticsMutations.getVisitorInfoSuccess, response)
-          resolve(response)
+          const visitor = response || {}
+          visitor.visitorId = getVisitorId()
+          visitor.UserId = auth.state.currentUser
+            ? auth.state.currentUser.id
+            : null
+          visitor.ip = response.query
+          context.commit(statisticsMutations.getVisitorSuccess, visitor)
+          resolve(visitor)
         })
         .catch(result => {
           console.log('Error: ', result)
-          context.commit(
-            statisticsMutations.getVisitorInfoFailure,
-            result.response.data.errors
-          )
+          const response = {}
+          const visitor = {}
+          visitor.visitorId = getVisitorId()
+          visitor.UserId = auth.state.currentUser
+            ? auth.state.currentUser.id
+            : null
+          response.visitor = visitor
+          response.errors = result
+          context.commit(statisticsMutations.getVisitorFailure, response)
+          console.log(response)
+          return visitor
+        })
+    })
+  },
+  [statisticsActions.sendVisitor](context, visitor) {
+    return new Promise(resolve => {
+      console.log(visitor)
+      api
+        .sendVisitor(visitor)
+        .then(() => {
+          resolve(true)
+        })
+        .catch(result => {
+          console.log(result)
         })
     })
   }

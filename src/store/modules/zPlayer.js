@@ -77,9 +77,13 @@ const actions = {
   [zPlayerActions.playEpisode](context, episode) {
     context.commit(zPlayerMutations.setCurrentEpisode, episode)
     setItem('currentEpisode', episode)
+    console.log('playEpisode')
   },
   [zPlayerActions.setCurrentEpisodeTime](context, time) {
     context.commit(zPlayerMutations.setCurrentEpisodeTime, time)
+    // io.emit('q', {
+    //   message: time
+    // })
   },
   [zPlayerActions.addToQueue](context, episode) {
     context.commit(zPlayerMutations.addToQueue, episode)

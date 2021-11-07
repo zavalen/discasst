@@ -288,7 +288,12 @@ export default {
       this.playerJsNode.addEventListener('waiting', () => {
         this.isEpisodeLoading = true
       })
-      this.playerJs.api('playlistloop', 1)
+      document.addEventListener('keydown', (event) => {
+        if (event.code === 'Space') {
+          event.preventDefault()
+          this.togglePlay()
+        }
+      })
     },
     togglePlay() {
       console.log(this.statistics)
