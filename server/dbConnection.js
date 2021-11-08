@@ -1,11 +1,17 @@
 const {Sequelize} = require('sequelize')
+require('dotenv').config()
 
 //LOCAL CONNECTION
-const sequelize = new Sequelize('discasst', 'root', 'root', {
-  dialect: 'mysql',
-  host: 'localhost',
-  logging: false
-})
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASS,
+  {
+    dialect: 'mysql',
+    host: process.env.DB_HOST,
+    logging: false
+  }
+)
 
 //AMAZON RDS CONNECTION
 /* const sequelize = new Sequelize('conduit1',process.env.USER_NAME,process.env.PASSWORD,{

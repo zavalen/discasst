@@ -11,6 +11,11 @@ module.exports = {
     'profiles',
     'login',
     'register',
-    'registration'
+    'registration',
+    'add-episode',
+    'episode',
+    'episodes',
+    'podcast',
+    'podcasts'
   ]
 }
