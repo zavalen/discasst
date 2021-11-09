@@ -16,9 +16,10 @@ const sequelize = require('./dbConnection')
 
 const User = require('./models/User')
 const Visitor = require('./models/Visitor')
+const VisitorInfo = require('./models/VisitorInfo')
 const Podcast = require('./models/Podcast')
 const Episode = require('./models/Episode')
-const EpisodesStatisticts = require('./models/EpisodesStatisticts')
+const EpisodesProgress = require('./models/EpisodesProgress')
 const PodcastsManagers = require('./models/PodcastsManagers')
 
 const userRoute = require('./routes/users')
@@ -28,15 +29,21 @@ const episodeRoute = require('./routes/episodes')
 //CORS
 app.use(cors({credentials: true, origin: true}))
 
-User.hasOne(Visitor)
+User.hasMany(VisitorInfo)
 Podcast.hasMany(Episode)
 Episode.belongsTo(Podcast)
+
 Podcast.belongsToMany(User, {through: PodcastsManagers})
-Episode.belongsToMany(User, {through: EpisodesStatisticts})
+
+Visitor.hasMany(VisitorInfo)
+Visitor.hasMany(EpisodesProgress)
+User.hasOne(EpisodesProgress)
+Episode.hasMany(EpisodesProgress)
 
 const sync = async () => {
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-  await sequelize.sync({force: true})
+  // await sequelize.sync({force: true})
+  await sequelize.sync()
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1') // setting the flag back for security
 }
 
@@ -49,7 +56,7 @@ app.use(
 )
 app.use(express.json())
 app.use(morgan('tiny'))
-
+app.set('trust proxy', true)
 app.get('/', (req, res) => {
   res.json({status: 'API is running'})
 })

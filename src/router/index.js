@@ -51,7 +51,7 @@ const routes = [
   {
     path: '/:slug',
     name: 'podcast',
-    component: () => import('@/views/Episode')
+    component: () => import('@/views/Podcast')
   },
   {
     path: '/:pathMatch(.*)*',

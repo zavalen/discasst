@@ -4,7 +4,11 @@ const Episode = require('../models/Episode')
 const User = require('../models/User')
 const sequelize = require('../dbConnection')
 const podcastFeedParser = require('podcast-feed-parser')
-const {slugify, isAcceptablePodcastSlug} = require('../utils/slugUtils')
+const {
+  slugify,
+  isAcceptablePodcastSlug,
+  isAcceptableEpisodeSlug
+} = require('../utils/slugUtils')
 const {jsonToHtml} = require('../utils/stringUtils')
 const sanitizeHtml = require('sanitize-html')
 const validator = require('validator')
@@ -62,9 +66,53 @@ module.exports.createPodcast = async (req, res) => {
       return
     }
 
-    const fullPodcast = await getPodcastFromRss(rssUrl)
-    if (!fullPodcast) throw new Error('Something wrong while parsing')
+    const options = {
+      meta: {
+        title: '',
+        description: '',
+        subtitle: '',
+        imageURL: '',
+        lastUpdated: '',
+        link: '',
+        language: '',
+        editor: '',
+        author: '',
+        summary: '',
+        categories: [],
+        owner: {
+          name: '',
+          email: ''
+        },
+        explicit: true,
+        complete: true,
+        blocked: true
+      },
+      episodes: [
+        {
+          title: '',
+          description: '',
+          imageURL: '',
+          pubDate: '',
+          link: '',
+          language: '',
+          'itunes:season': '',
+          'itunes:episode': '',
+          enclosure: {
+            length: '0',
+            type: '',
+            url: ''
+          },
+          duration: 0,
+          summary: '',
+          blocked: true,
+          explicit: true,
+          order: 1
+        }
+      ]
+    }
 
+    const fullPodcast = await getPodcastFromRss(rssUrl, options)
+    if (!fullPodcast) throw new Error('Something wrong while parsing')
     const podcast = fullPodcast.meta
     podcast.rss = rssUrl
     if (
@@ -75,7 +123,6 @@ module.exports.createPodcast = async (req, res) => {
     }
     // CREATE SLUG
     let slug = slugify(podcast.title)
-
     if (!(await isAcceptablePodcastSlug(slug))) {
       slug = slug + '-' + Math.floor(Math.random() * 1000)
     }
@@ -103,9 +150,11 @@ module.exports.createPodcast = async (req, res) => {
     }
 
     const episodes = fullPodcast.episodes
-
+    console.log(episodes.length)
     for (let i = 0; i < episodes.length; i++) {
       const episode = episodes[i]
+      episode.episode = +episode.episode || episodes.length - i
+
       if (
         episode.description.includes('\n') ||
         episode.description.includes('\r')
@@ -114,11 +163,17 @@ module.exports.createPodcast = async (req, res) => {
       }
       episode.PodcastId = newPodcast.id
       episode.file = episode.enclosure.url
+      episode.enclosure = JSON.stringify(episode.enclosure)
+      let epSlug = slugify(episode.title)
+      // if (!(await isAcceptableEpisodeSlug(slug))) {
+      //   epSlug = epSlug + '-' + Math.floor(Math.random() * 1000)
+      // }
+      episode.slug = epSlug
 
       for (let key in episode) {
         episode[key] = sanitizeHtml(episode[key])
       }
-
+      console.log(episode)
       await Episode.create(episode)
     }
 
@@ -355,12 +410,6 @@ async function getPodcastFromRss(url) {
   // })
 
   return podcast
-}
-
-function formatJsonToHtml(string) {
-  const formattedString = string.split('\n').join('</p><p>')
-
-  return '<p>' + formattedString + '</p>'
 }
 
 async function getPodcastJson(url) {

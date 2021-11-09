@@ -1,26 +1,31 @@
 const {DataTypes} = require('sequelize')
 const sequelize = require('../dbConnection')
 
-const EpisodesStatisticts = sequelize.define('EpisodesStatisticts', {
+const EpisodesProgress = sequelize.define('EpisodesProgress', {
   playingCount: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue: 1
   },
   lastPoint: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue: 0
   },
   duration: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue: 0
   },
   progress: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
+    defaultValue: 0
   },
   reallyListened: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    defaultValue: 0
   },
   reallyListenedArray: {
     type: DataTypes.STRING,
@@ -34,4 +39,4 @@ const EpisodesStatisticts = sequelize.define('EpisodesStatisticts', {
   }
 })
 
-module.exports = EpisodesStatisticts
+module.exports = EpisodesProgress

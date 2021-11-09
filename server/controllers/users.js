@@ -1,5 +1,6 @@
 const User = require('../models/User')
 const Visitor = require('../models/Visitor')
+const VisitorInfo = require('../models/VisitorInfo')
 const PodcastsManagers = require('../models/PodcastsManagers')
 const Podcast = require('../models/Podcast')
 const validator = require('validator')
@@ -175,20 +176,37 @@ module.exports.updateUserDetails = async (req, res) => {
 
 module.exports.createVisitor = async (req, res) => {
   try {
-    const visitor = req.body.visitor
+    let visitor = req.body.visitor
     if (visitor) {
+      const id = req.headers.visitorid || visitor.visitorId || 'none'
+      await Visitor.findOrCreate({where: {id: id}})
+
+      visitor.VisitorId = id
+
+      //if adblock
+      if (visitor.adblock || !visitor.ip) {
+        const ip =
+          req.ip ||
+          req.headers['x-forwarded-for']?.split(',').shift() ||
+          req.socket?.remoteAddress
+
+        visitor = await getVisitorInfoByIp(ip)
+        visitor.adblock = true
+      }
+
+      //userAgent parsing
       visitor.userAgent = req.headers['user-agent']
-
       const ua = uaParser(visitor.userAgent)
-
       visitor.browser = ua.browser.name + ' ' + ua.browser.version
-
-      visitor.os = ua.os.name + ua.os.version
+      visitor.os = ua.os.name + ' ' + ua.os.version
       visitor.device = ua.device.type || 'desktop'
-      visitor.deviceModel = ua.device.vendor + ' ' + ua.device.model
+      visitor.deviceModel =
+        ua.device.vendor || ua.device.model
+          ? ua.device.vendor + ' ' + ua.device.model
+          : null
       visitor.cpu = ua.cpu.architecture
-      const newVisitor = await Visitor.create(visitor)
-      console.log(newVisitor)
+
+      await VisitorInfo.create(visitor)
       return res.status(200)
     } else {
       return res.status(404)
@@ -199,4 +217,19 @@ module.exports.createVisitor = async (req, res) => {
       errors: {body: [e.message]}
     })
   }
+}
+
+function getVisitorInfoByIp(ip) {
+  return new Promise(resolve => {
+    fetch('http://ip-api.com/json/' + ip)
+      .then(response => response.json())
+      .then(response => {
+        const visitor = response || {}
+        visitor.ip = response.query
+        resolve(visitor)
+      })
+      .catch(result => {
+        console.log(result)
+      })
+  })
 }

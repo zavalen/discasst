@@ -1,9 +1,9 @@
-import {setItem, getItem} from '@/helpers/persistenceStorage.js'
 import auth from '@/store/modules/auth'
 import api from '@/api/visitor'
+import {getVisitorId} from '@/api/axios'
 
 const state = {
-  visitor: null,
+  visitor: {},
   isLoading: false,
   errors: null
 }
@@ -21,7 +21,8 @@ const getters = {
 export const statisticsMutations = {
   getVisitorStart: '[statistics] getVisitorStart',
   getVisitorSuccess: '[statistics] getVisitorSuccess',
-  getVisitorFailure: '[statistics] getVisitorFailure'
+  getVisitorFailure: '[statistics] getVisitorFailure',
+  setUserId: '[statistics] setUserId'
 }
 
 export const statisticsActions = {
@@ -43,6 +44,9 @@ const mutations = {
     state.isLoading = false
     state.errors = payload.errors
     state.visitor = payload.visitor
+  },
+  [statisticsMutations.setUserId](state, payload) {
+    state.visitor.UserId = payload
   }
 }
 
@@ -98,21 +102,4 @@ export default {
   mutations,
   actions,
   getters
-}
-
-function getVisitorId() {
-  const idFromLocalStorage = getItem('visitorId')
-  if (idFromLocalStorage) {
-    return idFromLocalStorage
-  }
-
-  const id =
-    'id' +
-    Date.now().toString(36) +
-    Math.random()
-      .toString(36)
-      .substr(2)
-
-  setItem('visitorId', id)
-  return id
 }

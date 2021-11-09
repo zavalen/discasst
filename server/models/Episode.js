@@ -16,6 +16,10 @@ const Episode = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false
     },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     description: {
       type: DataTypes.TEXT,
       allowNull: true
@@ -33,15 +37,23 @@ const Episode = sequelize.define(
     },
     file: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: false
     },
     enclosure: {
-      type: DataTypes.JSON,
+      type: DataTypes.STRING,
       allowNull: true
     },
     duration: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    season: {
+      type: DataTypes.INTEGER,
+      allowNull: true
+    },
+    episode: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     },
     summary: {
       type: DataTypes.TEXT,

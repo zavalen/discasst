@@ -6,16 +6,18 @@
   </main>
   <footer class="app__footer"></footer>
   <auth-popup v-if="isAnonymus" />
+  <visitor-info />
 </template>
 
 <script>
 import PdHeader from '@/components/PdHeader'
+import VisitorInfo from '@/components/VisitorInfo'
 import {authActions, authGetters} from '@/store/modules/auth'
-import {statisticsActions, statisticsGetters} from '@/store/modules/statistics'
 import AuthPopup from '@/components/popups/AuthPopup'
 import {mapGetters} from 'vuex'
 import ZPlayer from '@/components/ZPlayer'
 import {useToast} from 'vue-toastification'
+
 const toast = useToast()
 
 export default {
@@ -24,11 +26,11 @@ export default {
     PdHeader,
     AuthPopup,
     ZPlayer,
+    VisitorInfo,
   },
   computed: {
     ...mapGetters({
       isAnonymus: authGetters.isAnonymus,
-      visitor: statisticsGetters.visitor,
     }),
   },
   data() {
@@ -38,11 +40,7 @@ export default {
   },
   async mounted() {
     this.user = await this.$store.dispatch(authActions.getCurrentUser)
-    await this.$store
-      .dispatch(statisticsActions.getVisitor)
-      .catch((err) => console.log(err))
-    console.log('after visitor')
-    await this.$store.dispatch(statisticsActions.sendVisitor, this.visitor)
+
     window.addEventListener('offline', () =>
       toast.error(this.$t('toastifications.offline'), {timeout: false})
     )

@@ -54,6 +54,18 @@
             <button>Сейчас играет</button>
           </template>
           {{ toHHMMSS(episode.duration) }}
+          <!-- 
+          <router-link
+            :to="{
+              name: 'episode',
+              params: {
+                podcastSlug: episode.Podcast.slug,
+                episodeSlug: episode.slug,
+              },
+            }"
+            :episode-id="episode.id"
+            >К эпизоду</router-link
+          > -->
         </div>
 
         <div class="feed-episode__progress"></div>

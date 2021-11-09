@@ -1,6 +1,6 @@
 import authApi from '@/api/auth.js'
-import {setItem} from '@/helpers/persistenceStorage.js'
-import {getItem} from '@/helpers/persistenceStorage'
+import {setItem, getItem} from '@/helpers/persistenceStorage.js'
+
 import {useToast} from 'vue-toastification'
 const toast = useToast()
 import translate from '@/i18n'
@@ -139,10 +139,10 @@ const actions = {
         .login(credentials)
         .then(response => {
           context.commit(authMutations.loginSuccess, response.data.user)
-          console.log(response.data)
 
           setItem('accessToken', response.data.user.token)
           toast.success(i18n.t('toastifications.loginSuccess'))
+
           resolve(response.data.user)
         })
         .catch(result => {

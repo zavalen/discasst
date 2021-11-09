@@ -31,3 +31,18 @@ module.exports.isAcceptablePodcastSlug = async slug => {
 
   return true
 }
+
+module.exports.isAcceptableEpisodeSlug = async (slug, podcast) => {
+  if (unAcceptableSlugs.includes(slug)) {
+    return false
+  }
+
+  const existingPodcastWithSlug = await Podcast.findOne({
+    where: {slug: slug}
+  })
+  if (existingPodcastWithSlug) {
+    return false
+  }
+
+  return true
+}

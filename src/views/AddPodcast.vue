@@ -5,6 +5,11 @@
         <input placeholder="RSS" type="text" v-model="rss" />
         <button type="submit">Добавить</button>
       </form>
+      https://whyarewestillalive.libsyn.com/rss
+      <br />
+      https://meduza.io/rss2/podcasts/meduza-v-kurse
+      <br />
+      https://podster.fm/rss.xml?pid=48291
       <h2 v-if="isLoading">ЗАГРУЗКА...</h2>
       <div v-if="errors">{{ errors }}</div>
     </div>

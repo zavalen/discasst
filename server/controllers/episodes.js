@@ -1,6 +1,6 @@
 const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
-const EpisodesStatisticts = require('../models/EpisodesStatisticts')
+const EpisodesProgress = require('../models/EpisodesProgress')
 const User = require('../models/User')
 const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
@@ -146,7 +146,7 @@ module.exports.getFeed = async (req, res) => {
 
     if (req.user) {
       modelsToInclude.push({
-        model: EpisodesStatisticts
+        model: EpisodesProgress
       })
     }
 
@@ -204,25 +204,45 @@ module.exports.getFeed = async (req, res) => {
 //   }
 // }
 
-async function getPodcastFromRss(url) {
-  const podcast = await getPodcastJson(url)
-  // podcast.meta.description = formatJsonToHtml(podcast.meta.description)
+module.exports.writeProgress = async (req, res) => {
+  try {
+    const progress = req.body.progress
+    progress.VisitorId = req.headers.visitorid || progress.visitorId
+    progress.UserId = req.user.id
 
-  // podcast.episodes = podcast.episodes.map(ep => {
-  //   ep.description = formatJsonToHtml(ep.description)
-  // })
+    if (!progress) throw new Error('No progress object')
+    if (progress.UserId) {
+      let where = {
+        UserId: progress.UserId,
+        EpisodeId: progress.EpisodeId
+      }
+      updateOrCreate(EpisodesProgress, where, progress)
 
-  return podcast
+      res.status(200)
+    } else {
+      let where = {
+        VisitorId: progress.VisitorId,
+        EpisodeId: progress.EpisodeId
+      }
+      updateOrCreate(EpisodesProgress, where, progress)
+    }
+  } catch (e) {
+    const code = res.statusCode ? res.statusCode : 422
+    return res.status(code).json({
+      errors: {body: ['Could not create article', e.message]}
+    })
+  }
 }
 
-function formatJsonToHtml(string) {
-  const formattedString = string.split('\n').join('</p><p>')
-
-  return '<p>' + formattedString + '</p>'
-}
-
-async function getPodcastJson(url) {
-  const podcast = await podcastFeedParser.getPodcastFromURL(url)
-
-  return podcast
+async function updateOrCreate(model, where, newItem) {
+  // First try to find the record
+  const foundItem = await model.findOne({where})
+  if (!foundItem) {
+    // Item not found, create a new one
+    const item = await model.create(newItem)
+    return {item, created: true}
+  }
+  // Found an item, update it
+  const item = await model.update(newItem, {where})
+  return {item, created: false}
 }
