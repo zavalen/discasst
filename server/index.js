@@ -19,7 +19,7 @@ const Visitor = require('./models/Visitor')
 const VisitorInfo = require('./models/VisitorInfo')
 const Podcast = require('./models/Podcast')
 const Episode = require('./models/Episode')
-const EpisodesProgress = require('./models/EpisodesProgress')
+const EpisodeProgress = require('../models/EpisodeProgress
 const PodcastsManagers = require('./models/PodcastsManagers')
 
 const userRoute = require('./routes/users')
@@ -36,14 +36,16 @@ Episode.belongsTo(Podcast)
 Podcast.belongsToMany(User, {through: PodcastsManagers})
 
 Visitor.hasMany(VisitorInfo)
-Visitor.hasMany(EpisodesProgress)
-User.hasOne(EpisodesProgress)
-Episode.hasMany(EpisodesProgress)
+// Visitor.hasOne(EpisodeProgress)
+// User.hasOne(EpisodeProgress)
+Episode.hasMany(EpisodeProgress)
+EpisodeProgress.belongsTo(Visitor)
+EpisodeProgress.belongsTo(User)
 
 const sync = async () => {
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-  // await sequelize.sync({force: true})
-  await sequelize.sync()
+  await sequelize.sync({force: true})
+  // await sequelize.sync()
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1') // setting the flag back for security
 }
 

@@ -3,11 +3,11 @@
     <pd-loader v-if="isLoading" />
     <div v-if="errors">Something goes wrong...</div>
 
-    <template v-if="episodes.length">
+    <template v-if="episodes.length >= 1">
       <div
         class="feed-episode"
         v-for="episode in episodes"
-        :key="episode.id"
+        :key="episode?.id"
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
         <div v-tooltip="'Play'" class="feed-episode__left">
@@ -16,7 +16,7 @@
             <svg-icon
               v-if="
                 !isPlaying ||
-                (currentEpisode && currentEpisode.id != episode.id)
+                  (currentEpisode && currentEpisode.id != episode.id)
               "
               name="play"
             />
@@ -29,20 +29,30 @@
           </div>
         </div>
 
-        <div class="feed-episode__right">
+        <router-link
+          class="feed-episode__right"
+          :to="{
+            name: 'episode',
+            params: {
+              podcastSlug: episode.Podcast.slug,
+              episodeSlug: episode.slug
+            }
+          }"
+        >
           <h2
+            class="feed-episode__title"
             :style="{fontSize: episode.title.length > 80 ? '18px' : ''}"
             v-tooltip="episode.title.length > 142 ? episode.title : ''"
           >
             {{ episode.title }}
           </h2>
           <router-link
-            :to="{name: 'podcast', params: {slug: episode.Podcast.slug}}"
-            :episode-id="episode.id"
+            class="feed-episode__podcast-link"
+            :to="{name: 'podcast', params: {podcastSlug: episode.Podcast.slug}}"
             >{{ episode.Podcast.title }}</router-link
           >
           <template v-if="!currentEpisode || currentEpisode.id != episode.id">
-            <button @click="toggleInQueue(episode)">
+            <button @click.stop.prevent="toggleInQueue(episode)">
               {{
                 isEpisodeInQueue(episode.id)
                   ? 'Убрать из очереди'
@@ -51,7 +61,7 @@
             </button>
           </template>
           <template v-if="currentEpisode && currentEpisode.id == episode.id">
-            <button>Сейчас играет</button>
+            <button @click.stop>Сейчас играет</button>
           </template>
           {{ toHHMMSS(episode.duration) }}
           <!-- 
@@ -60,13 +70,12 @@
               name: 'episode',
               params: {
                 podcastSlug: episode.Podcast.slug,
-                episodeSlug: episode.slug,
-              },
+                episodeSlug: episode.slug
+              }
             }"
-            :episode-id="episode.id"
-            >К эпизоду</router-link
-          > -->
-        </div>
+            class="feed-episode__link"
+          ></router-link> -->
+        </router-link>
 
         <div class="feed-episode__progress"></div>
       </div>
@@ -75,8 +84,6 @@
     </template>
   </div>
 </template>
-
-
 
 <script>
 import {feedActions} from '@/store/modules/feed'
@@ -92,34 +99,34 @@ export default {
   props: {
     apiUrl: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     return {
       page: 1,
-      episodesPerPage: 30,
+      episodesPerPage: 30
     }
   },
 
   computed: {
     ...mapState({
-      episodes: (state) => state.feed.episodes,
-      isLoading: (state) => state.feed.isLoading,
-      errors: (state) => state.feed.errors,
-      currentEpisode: (state) => state.zPlayer.currentEpisode,
-      isPlaying: (state) => state.zPlayer.isPlaying,
-      queue: (state) => state.zPlayer.queue,
+      episodes: state => state.feed.episodes,
+      isLoading: state => state.feed.isLoading,
+      errors: state => state.feed.errors,
+      currentEpisode: state => state.zPlayer.currentEpisode,
+      isPlaying: state => state.zPlayer.isPlaying,
+      queue: state => state.zPlayer.queue
     }),
     payload() {
       return {
         apiUrl: this.apiUrl,
         params: {
           offset: (this.page - 1) * this.episodesPerPage,
-          limit: this.episodesPerPage,
-        },
+          limit: this.episodesPerPage
+        }
       }
-    },
+    }
   },
   mounted() {
     this.loadFeed()
@@ -144,7 +151,7 @@ export default {
       }
     },
     isEpisodeInQueue(id) {
-      return this.queue.some((ep) => {
+      return this.queue.some(ep => {
         return ep.id == id
       })
     },
@@ -153,8 +160,8 @@ export default {
         .utc(seconds * 1000)
         .format('HH:mm:ss', {trim: true})
         .replace(/^0(?:0:0?)?/, '')
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -184,13 +191,8 @@ export default {
     }
   }
 
-  &__link {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    z-index: 1;
+  &__podcast-link {
+    z-index: 2;
   }
 
   &__play {
@@ -223,20 +225,25 @@ export default {
 
   &__right {
     padding: 12px 36px 24px 24px;
+    flex: auto;
+    position: relative;
+    color: inherit;
+    text-decoration: inherit;
+    display: block;
+  }
 
-    h2 {
-      margin: 0;
-      font-size: 22px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -moz-box;
-      -moz-box-orient: vertical;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      line-clamp: 3;
-      box-orient: vertical;
-    }
+  &__title {
+    margin: 0;
+    font-size: 22px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
+    box-orient: vertical;
   }
 
   transition: 0.5s;

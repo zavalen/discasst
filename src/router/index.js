@@ -44,12 +44,12 @@ const routes = [
     component: () => import('@/views/GlobalFeed')
   },
   {
-    path: '/:podcast/:slug',
+    path: '/:podcastSlug/:episodeSlug',
     name: 'episode',
     component: () => import('@/views/Episode')
   },
   {
-    path: '/:slug',
+    path: '/:podcastSlug',
     name: 'podcast',
     component: () => import('@/views/Podcast')
   },

@@ -4,7 +4,6 @@ import api from '@/api/feed'
 const state = {
   isPlaying: false,
   currentEpisode: getItem('currentEpisode') || null,
-  currentEpisodeStatistics: {},
   currentEpisodeTime: 0,
   currentEpisodeReallyListened: new Set(),
 
@@ -54,7 +53,15 @@ const mutations = {
     }
     state.currentEpisode = payload
     state.queue = state.queue.filter(ep => ep.id != state.currentEpisode.id)
-    state.currentEpisodeReallyListened = new Set()
+
+    if (payload.progress) {
+      state.currentEpisodeReallyListened = new Set(
+        payload.progress.setReallyListenedArray
+      )
+      state.currentEpisodeTime = payload.progress.lastPoint
+    } else {
+      state.currentEpisodeReallyListened = new Set()
+    }
   },
   [zPlayerMutations.setCurrentEpisodeTime](state, payload) {
     state.currentEpisodeTime = payload
@@ -94,7 +101,7 @@ const actions = {
     context.commit(zPlayerMutations.setReallyListened, Math.ceil(time))
 
     window.playerTime ? window.playerTime++ : (window.playerTime = 1)
-    if (window.playerTime % 20 == 0) {
+    if (window.playerTime === 1 || window.playerTime % 20 == 0) {
       const progress = {
         EpisodeId: context.state.currentEpisode
           ? context.state.currentEpisode.id

@@ -1,6 +1,6 @@
 const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
-const EpisodesProgress = require('../models/EpisodesProgress')
+const EpisodeProgress = require('.../models/EpisodeProgress
 const User = require('../models/User')
 const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
@@ -146,7 +146,19 @@ module.exports.getFeed = async (req, res) => {
 
     if (req.user) {
       modelsToInclude.push({
-        model: EpisodesProgress
+        model: EpisodeProgress,
+        required: false,
+        where: {UserId: req.user.id}
+      })
+    }
+
+    const visitorId = req.headers.visitorid
+    if (!req.user && visitorId) {
+      modelsToInclude.push({
+        model: EpisodeProgress,
+        as: 'progress',
+        required: false,
+        where: {VisitorId: visitorId}
       })
     }
 
@@ -156,7 +168,6 @@ module.exports.getFeed = async (req, res) => {
       order: [['pubDate', 'DESC']],
       include: modelsToInclude
     })
-    // }
 
     res.json({episodes})
   } catch (e) {
@@ -167,56 +178,22 @@ module.exports.getFeed = async (req, res) => {
   }
 }
 
-// module.exports.getFeed = async (req, res) => {
-//   try {
-//     const query = `
-//             SELECT UserEmail
-//             FROM followers
-//             WHERE followerEmail = "${req.user.email}"`
-//     const followingUsers = await sequelize.query(query)
-//     if (followingUsers[0].length == 0) {
-//       return res.json({articles: []})
-//     }
-//     let followingUserEmail = []
-//     for (let t of followingUsers[0]) {
-//       followingUserEmail.push(t.UserEmail)
-//     }
-
-//     let article = await Podcast.findAll({
-//       where: {
-//         UserEmail: followingUserEmail
-//       },
-//       include: [Tag, User]
-//     })
-
-//     let articles = []
-//     for (let t of article) {
-//       let addArt = sanitizeOutputMultiple(t)
-//       articles.push(addArt)
-//     }
-
-//     res.json({articles})
-//   } catch (e) {
-//     const code = res.statusCode ? res.statusCode : 422
-//     return res.status(code).json({
-//       errors: {body: ['Could not get feed ', e.message]}
-//     })
-//   }
-// }
-
 module.exports.writeProgress = async (req, res) => {
   try {
     const progress = req.body.progress
-    progress.VisitorId = req.headers.visitorid || progress.visitorId
-    progress.UserId = req.user.id
-
     if (!progress) throw new Error('No progress object')
+
+    progress.VisitorId = req.headers.visitorid || progress.visitorId
+    if (req.user) {
+      progress.UserId = req.user.id
+    }
+
     if (progress.UserId) {
       let where = {
         UserId: progress.UserId,
         EpisodeId: progress.EpisodeId
       }
-      updateOrCreate(EpisodesProgress, where, progress)
+      updateOrCreate(EpisodeProgress, where, progress)
 
       res.status(200)
     } else {
@@ -224,7 +201,7 @@ module.exports.writeProgress = async (req, res) => {
         VisitorId: progress.VisitorId,
         EpisodeId: progress.EpisodeId
       }
-      updateOrCreate(EpisodesProgress, where, progress)
+      updateOrCreate(EpisodeProgress, where, progress)
     }
   } catch (e) {
     const code = res.statusCode ? res.statusCode : 422
@@ -235,14 +212,16 @@ module.exports.writeProgress = async (req, res) => {
 }
 
 async function updateOrCreate(model, where, newItem) {
-  // First try to find the record
-  const foundItem = await model.findOne({where})
-  if (!foundItem) {
-    // Item not found, create a new one
-    const item = await model.create(newItem)
-    return {item, created: true}
+  try {
+    const foundItem = await model.findOne({where})
+    if (!foundItem) {
+      const item = await model.create(newItem)
+      return {item, created: true}
+    }
+
+    const item = await model.update(newItem, {where})
+    return {item, created: false}
+  } catch (e) {
+    return {}
   }
-  // Found an item, update it
-  const item = await model.update(newItem, {where})
-  return {item, created: false}
 }

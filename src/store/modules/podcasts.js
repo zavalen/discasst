@@ -24,6 +24,7 @@ const mutations = {
   [podcastsMutations.getPodcastsSuccess](state, payload) {
     state.isLoading = false
     state.data = payload
+    console.log(payload)
     state.errors = null
   },
   [podcastsMutations.getPodcastsFailure](state, payload) {

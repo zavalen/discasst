@@ -24,7 +24,7 @@ export default {
     return {
       isLoading: false,
       rss: '',
-      errors: null,
+      errors: null
     }
   },
   methods: {
@@ -33,12 +33,15 @@ export default {
 
       const addedPodcast = await podcasts
         .addPodcast(this.rss)
-        .then((response) => response.data)
+        .then(response => response.data)
 
       console.log(addedPodcast)
-      this.$router.push({name: 'podcast', params: {slug: addedPodcast.slug}})
-    },
-  },
+      this.$router.push({
+        name: 'podcast',
+        params: {podcastSlug: addedPodcast.slug}
+      })
+    }
+  }
 }
 </script>
 

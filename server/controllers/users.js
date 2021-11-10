@@ -179,9 +179,9 @@ module.exports.createVisitor = async (req, res) => {
     let visitor = req.body.visitor
     if (visitor) {
       const id = req.headers.visitorid || visitor.visitorId || 'none'
-      await Visitor.findOrCreate({where: {id: id}})
-
       visitor.VisitorId = id
+
+      await Visitor.findOrCreate({where: {id: visitor.VisitorId}})
 
       //if adblock
       if (visitor.adblock || !visitor.ip) {
@@ -191,6 +191,7 @@ module.exports.createVisitor = async (req, res) => {
           req.socket?.remoteAddress
 
         visitor = await getVisitorInfoByIp(ip)
+        visitor.VisitorId = id
         visitor.adblock = true
       }
 
