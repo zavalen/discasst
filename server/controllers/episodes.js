@@ -211,16 +211,17 @@ module.exports.writeProgress = async (req, res) => {
 }
 
 async function updateOrCreate(model, where, newItem) {
-  // try {
-  const foundItem = await model.findOne({where})
-  if (!foundItem) {
-    const item = await model.create(newItem)
-    return {item, created: true}
-  }
+  try {
+    const foundItem = await model.findOne({where})
+    if (!foundItem) {
+      const item = await model.create(newItem)
+      return {item, created: true}
+    }
 
-  const item = await model.update(newItem, {where})
-  return {item, created: false}
-  // } catch (e) {
-  //   return {}
-  // }
+    const item = await model.update(newItem, {where})
+    return {item, created: false}
+  } catch (e) {
+    console.log('error in updateOrCreate')
+    return {}
+  }
 }

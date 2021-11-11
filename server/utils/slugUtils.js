@@ -3,7 +3,7 @@ const Podcast = require('../models/Podcast')
 const {unAcceptableSlugs} = require('./unacceptableSlugs')
 
 module.exports.slugify = string => {
-  string = string.replace(/ё/g, 'е')
+  string = string.replace(/ё/g, 'е').replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '')
 
   let slug = slugifyPlugin(string, {
     replacement: '-', // replace spaces with replacement character, defaults to `-`

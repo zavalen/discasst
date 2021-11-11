@@ -1,12 +1,13 @@
 const {DataTypes} = require('sequelize')
 const sequelize = require('../dbConnection')
+const idGenerator = require('../utils/idGenerator')
 
 const Episode = sequelize.define(
   'Episode',
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING,
+      defaultValue: idGenerator(),
       allowNull: false,
       primaryKey: true,
       unique: true
@@ -36,11 +37,11 @@ const Episode = sequelize.define(
       allowNull: true
     },
     file: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false
     },
     enclosure: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     },
     duration: {

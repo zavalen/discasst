@@ -1,12 +1,13 @@
 const {DataTypes} = require('sequelize')
 const sequelize = require('../dbConnection')
+const idGenerator = require('../utils/idGenerator')
 
 const VisitorInfo = sequelize.define(
   'VisitorInfo',
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.STRING,
+      defaultValue: idGenerator(24),
       allowNull: false,
       primaryKey: true
     },

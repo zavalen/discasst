@@ -1,10 +1,11 @@
 const {DataTypes} = require('sequelize')
 const sequelize = require('../dbConnection')
+const idGenerator = require('../utils/idGenerator')
 
 const User = sequelize.define('User', {
   id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
+    type: DataTypes.STRING,
+    defaultValue: idGenerator(),
     allowNull: false,
     primaryKey: true,
     unique: true

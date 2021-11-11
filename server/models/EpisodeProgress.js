@@ -1,13 +1,14 @@
 const {DataTypes} = require('sequelize')
 const sequelize = require('../dbConnection')
+const idGenerator = require('../utils/idGenerator')
 
 const EpisodeProgress = sequelize.define(
   'EpisodeProgress',
   {
-    playingCount: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      defaultValue: 1
+    id: {
+      type: DataTypes.STRING,
+      defaultValue: idGenerator(24),
+      primaryKey: true
     },
     lastPoint: {
       type: DataTypes.INTEGER,

@@ -48,9 +48,6 @@ const mutations = {
   },
 
   [zPlayerMutations.setCurrentEpisode](state, payload) {
-    // if (state.currentEpisode && payload.id != state.currentEpisode.id) {
-    //   state.history.unshift(state.currentEpisode)
-    // }
     state.currentEpisode = payload
     state.queue = state.queue.filter(ep => ep.id != state.currentEpisode.id)
 
