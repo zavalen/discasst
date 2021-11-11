@@ -13,16 +13,13 @@
     "axios": "^0.23.0",
     "core-js": "^3.6.5",
     "moment": "^2.29.1",
-    "podcast-feed-parser": "^1.0.4",
     "socket.io-client": "^4.3.2",
-    "ua-parser-js": "^1.0.2",
     "v-tooltip": "^4.0.0-alpha.1",
     "vue": "^3.0.0",
     "vue-adblock-detector": "^1.2.4",
     "vue-i18n": "^9.1.0",
     "vue-router": "^4.0.0-0",
     "vue-toastification": "^2.0.0-rc.5",
-    "vuesax": "^4.0.1-alpha.25",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {

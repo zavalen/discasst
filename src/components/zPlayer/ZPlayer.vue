@@ -15,7 +15,7 @@
             <div
               class="zPlayer__progress-time"
               :style="{
-                width: progress ? progress + '%' : '0%'
+                width: progress ? progress + '%' : '0%',
               }"
             ></div>
             <div
@@ -35,7 +35,7 @@
             <div
               class="zPlayer__buffered"
               :style="{
-                width: time ? (time * 100) / buffered + '%' : '0%'
+                width: time ? (time * 100) / buffered + '%' : '0%',
               }"
             ></div>
             <div
@@ -45,7 +45,7 @@
                 left:
                   mouseOverTimePx > 100
                     ? mouseOverTimePx - 50 + 'px'
-                    : mouseOverTimePx + 20 + 'px'
+                    : mouseOverTimePx + 20 + 'px',
               }"
             >
               {{ toHHMMSS(mouseOverTime) }}
@@ -57,7 +57,7 @@
             <div
               class="zPlayer__previous"
               :class="{
-                disabled: !history.length
+                disabled: !history.length,
               }"
               @click="previous"
             >
@@ -71,7 +71,7 @@
             <div
               class="zPlayer__next"
               :class="{
-                disabled: !queue.length
+                disabled: !queue.length,
               }"
               @click="next"
             >
@@ -99,12 +99,33 @@
               </div>
             </div>
             <div class="zPlayer__credits">
-              <div class="zPlayer__title">
+              <router-link
+                :to="{
+                  name: 'episode',
+                  params: {
+                    podcastSlug: currentEpisode
+                      ? currentEpisode.Podcast.slug
+                      : 's',
+                    episodeSlug: currentEpisode ? currentEpisode.slug : 's',
+                  },
+                }"
+                class="zPlayer__title"
+              >
                 {{ currentEpisode ? currentEpisode.title : 'No track' }}
-              </div>
-              <div class="zPlayer__podcast">
+              </router-link>
+              <router-link
+                :to="{
+                  name: 'podcast',
+                  params: {
+                    podcastSlug: currentEpisode
+                      ? currentEpisode.Podcast.slug
+                      : 's',
+                  },
+                }"
+                class="zPlayer__podcast"
+              >
                 {{ currentEpisode ? currentEpisode.Podcast.title : 'No track' }}
-              </div>
+              </router-link>
             </div>
             <div class="zPlayer__open">
               <svg-icon name="open" />
@@ -124,7 +145,7 @@
                 <div
                   class="zPlayer__volume"
                   :style="{
-                    height: volume * 100 + '%'
+                    height: volume * 100 + '%',
                   }"
                 ></div>
 
@@ -139,7 +160,7 @@
                   v-if="mouseOverShow"
                   class="zPlayer__volume-overflow-persentage"
                   :style="{
-                    left: mouseOverTimePx + 'px'
+                    left: mouseOverTimePx + 'px',
                   }"
                 ></div>
               </div>
@@ -166,7 +187,7 @@ export default {
   name: 'ZPlayer',
   components: {
     SlideUpTransition,
-    ZPlayerModal
+    ZPlayerModal,
   },
   created() {
     this.addPlayerJS()
@@ -189,7 +210,7 @@ export default {
       volume: 0.8,
       isModalOpen: false,
       previousIndex: 0,
-      userInfo: null
+      userInfo: null,
     }
   },
   computed: {
@@ -197,13 +218,13 @@ export default {
       return (this.time * 100) / this.duration
     },
     ...mapState({
-      currentUser: state => state.auth.currentUser,
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode,
-      time: state => state.zPlayer.lastPoint,
-      queue: state => state.zPlayer.queue,
-      history: state => state.zPlayer.history
-    })
+      currentUser: (state) => state.auth.currentUser,
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+      time: (state) => state.zPlayer.lastPoint,
+      queue: (state) => state.zPlayer.queue,
+      history: (state) => state.zPlayer.history,
+    }),
   },
   watch: {
     currentEpisode(newEpisode) {
@@ -215,7 +236,7 @@ export default {
       } else {
         this.playerJs.api('pause')
       }
-    }
+    },
   },
   methods: {
     addPlayerJS() {
@@ -230,7 +251,7 @@ export default {
     initPlayerJS() {
       this.playerJs = new window.Playerjs({
         id: 'playerjs',
-        file: this.currentEpisode ? this.currentEpisode.file : ''
+        file: this.currentEpisode ? this.currentEpisode.file : '',
       })
       this.playerJsNode = document.getElementById('playerjs')
 
@@ -267,14 +288,14 @@ export default {
         this.buffered = this.playerJs.api('buffered')
       })
 
-      this.playerJsNode.addEventListener('duration', e => {
+      this.playerJsNode.addEventListener('duration', (e) => {
         this.duration = e.info
       })
 
       this.playerJsNode.addEventListener('waiting', () => {
         this.isEpisodeLoading = true
       })
-      document.addEventListener('keydown', event => {
+      document.addEventListener('keydown', (event) => {
         if (event.code === 'Space') {
           event.preventDefault()
           this.togglePlay()
@@ -403,12 +424,12 @@ export default {
       this.isModalOpen = false
     },
     getEpisodeFromHistoryById(id) {
-      return this.history.find(historyEp => historyEp.id == id)
+      return this.history.find((historyEp) => historyEp.id == id)
     },
     getEpisodeFromQueueById(id) {
-      return this.queue.find(ep => ep.id == id)
-    }
-  }
+      return this.queue.find((ep) => ep.id == id)
+    },
+  },
 }
 </script>
 
@@ -550,14 +571,16 @@ export default {
     overflow: hidden;
   }
   &__title {
+    display: block;
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 1px;
-    cursor: default;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     margin-bottom: 4px;
+    color: inherit;
+    text-decoration: none;
     @media (max-width: 768px) {
       font-size: 13px;
       margin-bottom: 0;
@@ -570,7 +593,11 @@ export default {
   }
 
   &__podcast {
+    display: block;
+
     font-size: 12px;
+    color: inherit;
+    text-decoration: none;
   }
 
   &__progress-line {

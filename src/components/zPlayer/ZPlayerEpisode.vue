@@ -5,8 +5,28 @@
         :name="currentEpisode.id == episode.id && isPlaying ? 'pause' : 'play'"
       />
     </div>
-    <div>
-      {{ episode.title }}
+    <div class="zEpisode__creditials">
+      <router-link
+        :to="{
+          name: 'episode',
+          params: {
+            podcastSlug: episode.Podcast.slug,
+            episodeSlug: episode.slug,
+          },
+        }"
+        class="zEpisode__title"
+        >{{ episode.title }}</router-link
+      >
+      <router-link
+        :to="{
+          name: 'podcast',
+          params: {
+            podcastSlug: episode ? episode.Podcast.slug : 's',
+          },
+        }"
+        class="zEpisode__podcast"
+        >{{ episode.Podcast.title }}</router-link
+      >
     </div>
   </div>
 </template>
@@ -20,8 +40,8 @@ export default {
   props: {
     episode: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
     playEpisode(episode) {
@@ -30,14 +50,14 @@ export default {
       } else {
         this.$store.dispatch(zPlayerActions.playEpisode, episode)
       }
-    }
+    },
   },
   computed: {
     ...mapState({
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode
-    })
-  }
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+    }),
+  },
 }
 </script>
 
@@ -53,6 +73,39 @@ export default {
   &__play {
     margin-right: 16px;
     cursor: pointer;
+  }
+
+  &__credits {
+    overflow: hidden;
+  }
+  &__title {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 4px;
+    color: inherit;
+    text-decoration: none;
+    @media (max-width: 768px) {
+      font-size: 13px;
+      margin-bottom: 0;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
+      white-space: break-spaces;
+    }
+  }
+
+  &__podcast {
+    display: block;
+    font-size: 12px;
+    color: inherit;
+    text-decoration: none;
   }
 }
 </style>

@@ -20,7 +20,7 @@
         <svg-icon name="close" />
       </div>
     </div>
-    <div class="zmodal__content">
+    <div class="zmodal__content scrollbar">
       <component :is="currentTabComponent"></component>
     </div>
   </div>
@@ -36,19 +36,19 @@ export default {
   name: 'zPlayerModal',
   components: {
     ZPlayerHistory,
-    ZPlayerQueue
+    ZPlayerQueue,
   },
   data() {
     return {
-      currentTabComponent: 'ZPlayerQueue'
+      currentTabComponent: 'ZPlayerQueue',
     }
   },
 
   computed: {
     ...mapState({
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode
-    })
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+    }),
   },
 
   methods: {
@@ -57,8 +57,8 @@ export default {
     },
     openhHstory() {
       this.currentTabComponent = 'ZPlayerHistory'
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -71,12 +71,14 @@ export default {
   border-radius: 10px;
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   padding: 0 16px;
+  overflow: hidden;
 
   &__top {
     padding: 0px 24px 0px 0;
-    margin-left: 4px;
+    margin-left: 2px;
     border-bottom: 1px solid var(--color-border);
     position: relative;
+    margin-bottom: 16px;
   }
 
   &__btn {
@@ -114,7 +116,8 @@ export default {
   }
 
   &__content {
-    padding: 24px 16px;
+    padding: 0px 16px;
+    height: 100%;
   }
 }
 
