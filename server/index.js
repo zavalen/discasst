@@ -19,7 +19,7 @@ const Visitor = require('./models/Visitor')
 const VisitorInfo = require('./models/VisitorInfo')
 const Podcast = require('./models/Podcast')
 const Episode = require('./models/Episode')
-const EpisodeProgress = require('../models/EpisodeProgress
+const EpisodeProgress = require('./models/EpisodeProgress')
 const PodcastsManagers = require('./models/PodcastsManagers')
 
 const userRoute = require('./routes/users')
@@ -35,12 +35,12 @@ Episode.belongsTo(Podcast)
 
 Podcast.belongsToMany(User, {through: PodcastsManagers})
 
-Visitor.hasMany(VisitorInfo)
+Visitor.hasMany(VisitorInfo, {onDelete: 'cascade'})
 // Visitor.hasOne(EpisodeProgress)
 // User.hasOne(EpisodeProgress)
-Episode.hasMany(EpisodeProgress)
-EpisodeProgress.belongsTo(Visitor)
-EpisodeProgress.belongsTo(User)
+Episode.hasMany(EpisodeProgress, {onDelete: 'cascade'})
+EpisodeProgress.belongsTo(Visitor, {onDelete: 'cascade'})
+EpisodeProgress.belongsTo(User, {onDelete: 'cascade'})
 
 const sync = async () => {
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0')

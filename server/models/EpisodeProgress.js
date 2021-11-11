@@ -14,17 +14,17 @@ const EpisodeProgress = sequelize.define(
       allowNull: true,
       defaultValue: 0
     },
-    duration: {
+    percentage: {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: 0
     },
-    // progress: {
-    //   type: DataTypes.STRING,
-    //   allowNull: true,
-    //   defaultValue: 0
-    // },
     reallyListened: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0
+    },
+    reallyListenedPercentage: {
       type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: 0
@@ -41,7 +41,8 @@ const EpisodeProgress = sequelize.define(
     }
   },
   {
-    tableName: 'episodes_progress'
+    tableName: 'episodes_progress',
+    freezeTableName: true
   }
 )
 

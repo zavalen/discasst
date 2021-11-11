@@ -4,8 +4,8 @@ import api from '@/api/feed'
 const state = {
   isPlaying: false,
   currentEpisode: getItem('currentEpisode') || null,
-  currentEpisodeTime: 0,
-  currentEpisodeReallyListened: new Set(),
+  lastPoint: 0,
+  reallyListened: new Set(),
 
   queue: getItem('queue') || [],
   history: getItem('history') || [],
@@ -17,7 +17,7 @@ export const zPlayerMutations = {
   play: '[zPlayer] play',
   pause: '[zPlayer] pause',
   setCurrentEpisode: '[zPlayer] setCurrentEpisode',
-  setCurrentEpisodeTime: '[zPlayer] setCurrentEpisodeTime',
+  setLastPoint: '[zPlayer] setLastPoint',
   addToQueue: '[zPlayer] addToQueue',
   removeFromQueue: '[zPlayer] removeFromQueue',
   addToHistory: '[zPlayer] addToHistory',
@@ -28,7 +28,7 @@ export const zPlayerMutations = {
 
 export const zPlayerActions = {
   playEpisode: '[zPlayer] playEpisode',
-  setCurrentEpisodeTime: '[zPlayer] setCurrentEpisodeTime',
+  setLastPoint: '[zPlayer] setLastPoint',
   addToQueue: '[zPlayer] addToQueue',
   removeFromQueue: '[zPlayer] removeFromQueue',
   addToHistory: '[zPlayer] addToHistory',
@@ -48,23 +48,24 @@ const mutations = {
   },
 
   [zPlayerMutations.setCurrentEpisode](state, payload) {
-    if (state.currentEpisode && payload.id != state.currentEpisode.id) {
-      state.history.unshift(state.currentEpisode)
-    }
+    // if (state.currentEpisode && payload.id != state.currentEpisode.id) {
+    //   state.history.unshift(state.currentEpisode)
+    // }
     state.currentEpisode = payload
     state.queue = state.queue.filter(ep => ep.id != state.currentEpisode.id)
 
-    if (payload.progress) {
-      state.currentEpisodeReallyListened = new Set(
-        payload.progress.setReallyListenedArray
+    if (payload.EpisodeProgress && payload.EpisodeProgress.lastPoint) {
+      state.reallyListened = new Set(
+        payload.EpisodeProgress.reallyListenedArray
       )
-      state.currentEpisodeTime = payload.progress.lastPoint
+      state.lastPoint = payload.EpisodeProgress.lastPoint
     } else {
-      state.currentEpisodeReallyListened = new Set()
+      state.reallyListened = new Set()
+      state.lastPoint = 0
     }
   },
-  [zPlayerMutations.setCurrentEpisodeTime](state, payload) {
-    state.currentEpisodeTime = payload
+  [zPlayerMutations.setLastPoint](state, payload) {
+    state.lastPoint = payload
   },
   [zPlayerMutations.addToQueue](state, payload) {
     state.queue.push(payload)
@@ -85,36 +86,25 @@ const mutations = {
     state.history = state.history.filter(ep => ep.id != payload.id)
   },
   [zPlayerMutations.setReallyListened](state, payload) {
-    state.currentEpisodeReallyListened.add(payload)
+    state.reallyListened.add(payload)
   }
 }
 
 const actions = {
   [zPlayerActions.playEpisode](context, episode) {
+    context.commit(zPlayerMutations.addToHistory, context.state.currentEpisode)
     // set new episode
     context.commit(zPlayerMutations.setCurrentEpisode, episode)
     setItem('currentEpisode', episode)
     console.log('playEpisode')
   },
-  [zPlayerActions.setCurrentEpisodeTime](context, time) {
-    context.commit(zPlayerMutations.setCurrentEpisodeTime, time)
-    context.commit(zPlayerMutations.setReallyListened, Math.ceil(time))
+  [zPlayerActions.setLastPoint](context, time) {
+    context.commit(zPlayerMutations.setLastPoint, time)
+    context.commit(zPlayerMutations.setReallyListened, Math.round(time))
 
     window.playerTime ? window.playerTime++ : (window.playerTime = 1)
     if (window.playerTime === 1 || window.playerTime % 20 == 0) {
-      const progress = {
-        EpisodeId: context.state.currentEpisode
-          ? context.state.currentEpisode.id
-          : null,
-        lastPoint: Math.floor(time),
-        reallyListened: context.state.currentEpisodeReallyListened.size,
-        reallyListenedArray: Array.from(
-          context.state.currentEpisodeReallyListened
-        )
-      }
-
-      // console.log(progress)
-      // console.log(context)
+      const progress = getProgressObj(context)
       api.sendProgress(progress)
     }
   },
@@ -142,4 +132,23 @@ export default {
   state,
   mutations,
   actions
+}
+
+function getProgressObj(context) {
+  return {
+    EpisodeId: context.state.currentEpisode
+      ? context.state.currentEpisode.id
+      : null,
+    lastPoint: Math.round(context.state.lastPoint),
+    percentage: Math.round(
+      (Math.round(context.state.lastPoint) * 100) /
+        context.state.currentEpisode.duration
+    ),
+    reallyListened: context.state.reallyListened.size,
+    reallyListenedPercentage: Math.round(
+      (context.state.reallyListened.size * 100) /
+        context.state.currentEpisode.duration
+    ),
+    reallyListenedArray: Array.from(context.state.reallyListened)
+  }
 }

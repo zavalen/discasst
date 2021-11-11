@@ -202,7 +202,7 @@ export default {
       currentUser: (state) => state.auth.currentUser,
       isPlaying: (state) => state.zPlayer.isPlaying,
       currentEpisode: (state) => state.zPlayer.currentEpisode,
-      time: (state) => state.zPlayer.currentEpisodeTime,
+      time: (state) => state.zPlayer.lastPoint,
       queue: (state) => state.zPlayer.queue,
       history: (state) => state.zPlayer.history,
     }),
@@ -250,6 +250,7 @@ export default {
 
       this.playerJsNode.removeAttribute('style')
       this.playerJsNode.innerHTML = ''
+      localStorage.removeItem('pljsuserid')
       this.addEventsHandlers()
       this.isPlayerReady = true
     },
@@ -270,7 +271,7 @@ export default {
       this.playerJsNode.addEventListener('time', () => {
         if (!this.mousepress) {
           this.$store.dispatch(
-            zPlayerActions.setCurrentEpisodeTime,
+            zPlayerActions.setLastPoint,
             this.playerJs.api('time')
           )
         }
@@ -364,7 +365,7 @@ export default {
 
       if (this.mousepress) {
         // this.time = seconds
-        this.$store.dispatch(zPlayerActions.setCurrentEpisodeTime, seconds)
+        this.$store.dispatch(zPlayerActions.setLastPoint, seconds)
       }
     },
     closeMousepress() {
@@ -379,7 +380,7 @@ export default {
       let seconds = (this.currentEpisode.duration * percentage) / 100
 
       // this.time = seconds
-      this.$store.dispatch(zPlayerActions.setCurrentEpisodeTime, seconds)
+      this.$store.dispatch(zPlayerActions.setLastPoint, seconds)
     },
     toggleVolume() {
       if (this.volume) {

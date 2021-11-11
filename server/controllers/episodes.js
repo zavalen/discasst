@@ -1,6 +1,6 @@
 const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
-const EpisodeProgress = require('.../models/EpisodeProgress
+const EpisodeProgress = require('../models/EpisodeProgress')
 const User = require('../models/User')
 const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
@@ -156,7 +156,6 @@ module.exports.getFeed = async (req, res) => {
     if (!req.user && visitorId) {
       modelsToInclude.push({
         model: EpisodeProgress,
-        as: 'progress',
         required: false,
         where: {VisitorId: visitorId}
       })
@@ -212,16 +211,16 @@ module.exports.writeProgress = async (req, res) => {
 }
 
 async function updateOrCreate(model, where, newItem) {
-  try {
-    const foundItem = await model.findOne({where})
-    if (!foundItem) {
-      const item = await model.create(newItem)
-      return {item, created: true}
-    }
-
-    const item = await model.update(newItem, {where})
-    return {item, created: false}
-  } catch (e) {
-    return {}
+  // try {
+  const foundItem = await model.findOne({where})
+  if (!foundItem) {
+    const item = await model.create(newItem)
+    return {item, created: true}
   }
+
+  const item = await model.update(newItem, {where})
+  return {item, created: false}
+  // } catch (e) {
+  //   return {}
+  // }
 }
