@@ -5,6 +5,8 @@ module.exports.jsonToHtml = string => {
     .join('</p><p>')
     .split('\r')
     .join('')
+    .split('<p>&nbsp;</p>')
+    .join('')
 
   return '<p>' + string + '</p>'
 }

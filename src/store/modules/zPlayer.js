@@ -1,5 +1,5 @@
 import {setItem, getItem} from '@/helpers/persistenceStorage.js'
-import api from '@/api/feed'
+import api from '@/api/episodes'
 
 const state = {
   isPlaying: false,
@@ -89,7 +89,11 @@ const mutations = {
 
 const actions = {
   [zPlayerActions.playEpisode](context, episode) {
-    context.commit(zPlayerMutations.addToHistory, context.state.currentEpisode)
+    const previousEpisode = context.state.currentEpisode
+    if (previousEpisode && previousEpisode.id != episode.id) {
+      api.sendToHistory(previousEpisode)
+      context.commit(zPlayerMutations.addToHistory, previousEpisode)
+    }
     // set new episode
     context.commit(zPlayerMutations.setCurrentEpisode, episode)
     setItem('currentEpisode', episode)

@@ -19,6 +19,7 @@ const Visitor = require('./models/Visitor')
 const VisitorInfo = require('./models/VisitorInfo')
 const Podcast = require('./models/Podcast')
 const Episode = require('./models/Episode')
+const UserEpisodesHistory = require('./models/UserEpisodesHistory')
 const EpisodeProgress = require('./models/EpisodeProgress')
 const PodcastsManagers = require('./models/PodcastsManagers')
 
@@ -34,6 +35,8 @@ Podcast.hasMany(Episode)
 Episode.belongsTo(Podcast)
 
 Podcast.belongsToMany(User, {through: PodcastsManagers})
+User.belongsToMany(Episode, {through: UserEpisodesHistory})
+Visitor.belongsToMany(Episode, {through: UserEpisodesHistory})
 
 Visitor.hasMany(VisitorInfo, {onDelete: 'cascade'})
 // Visitor.hasOne(EpisodeProgress)
@@ -44,7 +47,7 @@ EpisodeProgress.belongsTo(User, {onDelete: 'cascade'})
 
 const sync = async () => {
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-  await sequelize.sync({force: true})
+  // await sequelize.sync({force: true})
   // await sequelize.sync()
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 1') // setting the flag back for security
 }

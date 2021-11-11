@@ -80,7 +80,7 @@
         <div class="feed-episode__progress"></div>
       </div>
 
-      <button @click="loadFeed">LOAD MORE</button>
+      <button @click="loadFeed" v-if="!lastPage">LOAD MORE</button>
     </template>
   </div>
 </template>
@@ -113,6 +113,7 @@ export default {
     ...mapState({
       episodes: state => state.feed.episodes,
       isLoading: state => state.feed.isLoading,
+      lastPage: state => state.feed.lastPage,
       errors: state => state.feed.errors,
       currentEpisode: state => state.zPlayer.currentEpisode,
       isPlaying: state => state.zPlayer.isPlaying,

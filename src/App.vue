@@ -15,7 +15,7 @@ import VisitorInfo from '@/components/VisitorInfo'
 import {authActions, authGetters} from '@/store/modules/auth'
 import AuthPopup from '@/components/popups/AuthPopup'
 import {mapGetters} from 'vuex'
-import ZPlayer from '@/components/ZPlayer'
+import ZPlayer from '@/components/zPlayer/ZPlayer'
 import {useToast} from 'vue-toastification'
 
 const toast = useToast()
@@ -26,16 +26,16 @@ export default {
     PdHeader,
     AuthPopup,
     ZPlayer,
-    VisitorInfo,
+    VisitorInfo
   },
   computed: {
     ...mapGetters({
-      isAnonymus: authGetters.isAnonymus,
-    }),
+      isAnonymus: authGetters.isAnonymus
+    })
   },
   data() {
     return {
-      user: null,
+      user: null
     }
   },
   async mounted() {
@@ -44,7 +44,7 @@ export default {
     window.addEventListener('offline', () =>
       toast.error(this.$t('toastifications.offline'), {timeout: false})
     )
-  },
+  }
 }
 </script>
 
