@@ -41,6 +41,9 @@
         <component :is="currentTabComponent"></component>
       </div>
     </div>
+    <div class="zmodal__bottom">
+      sssssssss
+    </div>
   </div>
 </template>
 
@@ -87,33 +90,33 @@ export default {
 <style lang="scss">
 .zmodal {
   max-width: 1240px;
-  margin: 16px auto;
-  height: calc(100vh - 168px);
+  margin: 0 auto 16px;
+  height: calc(100vh - 176px);
   background: var(--color-zplayer-bg);
   border-radius: 10px;
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-  padding: 0 16px;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 
   &__current-episode {
-    overflow: auto;
-    height: 100%;
     padding: 0 32px 16px 16px;
     border-right: 1px solid var(--color-border);
+    height: calc(100vh - 318px);
+  }
+
+  &__right,
+  &__left {
+    padding: 0 16px;
   }
 
   &__left {
     max-width: 40%;
-
-    flex: auto;
-    margin-right: 16px;
   }
 
   &__right {
     max-width: 60%;
-    // width: 100%;
   }
 
   &__top {
@@ -122,6 +125,14 @@ export default {
     border-bottom: 1px solid var(--color-border);
     position: relative;
     margin-bottom: 16px;
+  }
+
+  &__bottom {
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    background: var(--color-zplayer-bg);
+    width: 100%;
+    background: red;
   }
 
   &__btn {
@@ -160,7 +171,7 @@ export default {
 
   &__content {
     padding: 0px 16px;
-    height: 100%;
+    height: calc(100vh - 318px);
   }
 }
 
