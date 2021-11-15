@@ -1,10 +1,11 @@
-
-
+<template>
+  <span></span>
+</template>
 <script>
 import {
   statisticsActions,
   statisticsGetters,
-  statisticsMutations,
+  statisticsMutations
 } from '@/store/modules/statistics'
 import {authGetters} from '@/store/modules/auth'
 import {mapGetters} from 'vuex'
@@ -16,8 +17,8 @@ export default {
   computed: {
     ...mapGetters({
       visitor: statisticsGetters.visitor,
-      currentUser: authGetters.currentUser,
-    }),
+      currentUser: authGetters.currentUser
+    })
   },
   watch: {
     currentUser(newUser) {
@@ -26,19 +27,18 @@ export default {
     },
     visitor(newVisitor) {
       this.$store.dispatch(statisticsActions.sendVisitor, newVisitor)
-    },
+    }
   },
   async mounted() {
-    detectAnyAdblocker().then(async (detected) => {
+    detectAnyAdblocker().then(async detected => {
       if (detected) {
         await this.$store.dispatch(statisticsActions.sendVisitor, {
-          adblock: true,
+          adblock: true
         })
       } else {
         await this.$store.dispatch(statisticsActions.getVisitor)
       }
     })
-  },
+  }
 }
 </script>
-

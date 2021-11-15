@@ -1,12 +1,12 @@
 <template>
   <slide-up-transition>
     <div
-      v-if="isPlayerReady"
+      v-if="isPlayerReady && currentEpisode"
       v-click-outside="closeModal"
       class="player player-container"
     >
       <slide-up-transition>
-        <z-player-modal v-if="isModalOpen" @closeClick="closeModal" />
+        <z-player-modal v-if="isModalOpen" />
       </slide-up-transition>
 
       <div class="zPlayer">
@@ -15,7 +15,7 @@
             <div
               class="zPlayer__progress-time"
               :style="{
-                width: progress ? progress + '%' : '0%',
+                width: progress ? progress + '%' : '0%'
               }"
             ></div>
             <div
@@ -35,7 +35,7 @@
             <div
               class="zPlayer__buffered"
               :style="{
-                width: time ? (time * 100) / buffered + '%' : '0%',
+                width: time ? (time * 100) / buffered + '%' : '0%'
               }"
             ></div>
             <div
@@ -45,7 +45,7 @@
                 left:
                   mouseOverTimePx > 100
                     ? mouseOverTimePx - 50 + 'px'
-                    : mouseOverTimePx + 20 + 'px',
+                    : mouseOverTimePx + 20 + 'px'
               }"
             >
               {{ toHHMMSS(mouseOverTime) }}
@@ -57,7 +57,7 @@
             <div
               class="zPlayer__previous"
               :class="{
-                disabled: !history.length,
+                disabled: !history.length
               }"
               @click="previous"
             >
@@ -71,11 +71,14 @@
             <div
               class="zPlayer__next"
               :class="{
-                disabled: !queue.length,
+                disabled: !queue.length
               }"
               @click="next"
             >
               <svg-icon name="next" />
+            </div>
+            <div class="zPlayer__like" @click="like">
+              <svg-icon name="liked" />
             </div>
             <div class="zPlayer__image">
               <img
@@ -100,27 +103,29 @@
             </div>
             <div class="zPlayer__credits">
               <router-link
+                @click="closeModal"
                 :to="{
                   name: 'episode',
                   params: {
                     podcastSlug: currentEpisode
                       ? currentEpisode.Podcast.slug
                       : 's',
-                    episodeSlug: currentEpisode ? currentEpisode.slug : 's',
-                  },
+                    episodeSlug: currentEpisode ? currentEpisode.slug : 's'
+                  }
                 }"
                 class="zPlayer__title"
               >
                 {{ currentEpisode ? currentEpisode.title : 'No track' }}
               </router-link>
               <router-link
+                @click="closeModal"
                 :to="{
                   name: 'podcast',
                   params: {
                     podcastSlug: currentEpisode
                       ? currentEpisode.Podcast.slug
-                      : 's',
-                  },
+                      : 's'
+                  }
                 }"
                 class="zPlayer__podcast"
               >
@@ -145,7 +150,7 @@
                 <div
                   class="zPlayer__volume"
                   :style="{
-                    height: volume * 100 + '%',
+                    height: volume * 100 + '%'
                   }"
                 ></div>
 
@@ -160,7 +165,7 @@
                   v-if="mouseOverShow"
                   class="zPlayer__volume-overflow-persentage"
                   :style="{
-                    left: mouseOverTimePx + 'px',
+                    left: mouseOverTimePx + 'px'
                   }"
                 ></div>
               </div>
@@ -168,6 +173,7 @@
 
             <div class="zPlayer__playlist" @click="toggleModal" ref="zplaylist">
               <svg-icon name="playlist" />
+              <span class="zPlayer__playlist-counter">{{ queue.length }}</span>
             </div>
           </div>
         </div>
@@ -187,7 +193,7 @@ export default {
   name: 'ZPlayer',
   components: {
     SlideUpTransition,
-    ZPlayerModal,
+    ZPlayerModal
   },
   created() {
     this.addPlayerJS()
@@ -208,9 +214,9 @@ export default {
       mouseOverPx: null,
       mousepressVolume: false,
       volume: 0.8,
-      isModalOpen: false,
+      // isModalOpen: false,
       previousIndex: 0,
-      userInfo: null,
+      userInfo: null
     }
   },
   computed: {
@@ -218,13 +224,14 @@ export default {
       return (this.time * 100) / this.duration
     },
     ...mapState({
-      currentUser: (state) => state.auth.currentUser,
-      isPlaying: (state) => state.zPlayer.isPlaying,
-      currentEpisode: (state) => state.zPlayer.currentEpisode,
-      time: (state) => state.zPlayer.lastPoint,
-      queue: (state) => state.zPlayer.queue,
-      history: (state) => state.zPlayer.history,
-    }),
+      currentUser: state => state.auth.currentUser,
+      isPlaying: state => state.zPlayer.isPlaying,
+      currentEpisode: state => state.zPlayer.currentEpisode,
+      time: state => state.zPlayer.lastPoint,
+      queue: state => state.zPlayer.queue,
+      history: state => state.zPlayer.history,
+      isModalOpen: state => state.zPlayer.isModalOpen
+    })
   },
   watch: {
     currentEpisode(newEpisode) {
@@ -236,7 +243,7 @@ export default {
       } else {
         this.playerJs.api('pause')
       }
-    },
+    }
   },
   methods: {
     addPlayerJS() {
@@ -251,7 +258,7 @@ export default {
     initPlayerJS() {
       this.playerJs = new window.Playerjs({
         id: 'playerjs',
-        file: this.currentEpisode ? this.currentEpisode.file : '',
+        file: this.currentEpisode ? this.currentEpisode.file : ''
       })
       this.playerJsNode = document.getElementById('playerjs')
 
@@ -288,14 +295,14 @@ export default {
         this.buffered = this.playerJs.api('buffered')
       })
 
-      this.playerJsNode.addEventListener('duration', (e) => {
+      this.playerJsNode.addEventListener('duration', e => {
         this.duration = e.info
       })
 
       this.playerJsNode.addEventListener('waiting', () => {
         this.isEpisodeLoading = true
       })
-      document.addEventListener('keydown', (event) => {
+      document.addEventListener('keydown', event => {
         if (event.code === 'Space') {
           event.preventDefault()
           this.togglePlay()
@@ -418,18 +425,18 @@ export default {
       }
     },
     toggleModal() {
-      this.isModalOpen = !this.isModalOpen
+      this.$store.commit(zPlayerMutations.toggleModal)
     },
     closeModal() {
-      this.isModalOpen = false
+      this.$store.commit(zPlayerMutations.closeModal)
     },
     getEpisodeFromHistoryById(id) {
-      return this.history.find((historyEp) => historyEp.id == id)
+      return this.history.find(historyEp => historyEp.id == id)
     },
     getEpisodeFromQueueById(id) {
-      return this.queue.find((ep) => ep.id == id)
-    },
-  },
+      return this.queue.find(ep => ep.id == id)
+    }
+  }
 }
 </script>
 
@@ -528,6 +535,12 @@ export default {
     margin-right: 12px;
   }
 
+  &__like {
+    margin-right: 8px;
+    cursor: pointer;
+    @include button-effect;
+  }
+
   &__loading {
     position: absolute;
     left: -9px;
@@ -593,8 +606,10 @@ export default {
   }
 
   &__podcast {
-    display: block;
-
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    white-space: break-spaces;
     font-size: 12px;
     color: inherit;
     text-decoration: none;
@@ -745,8 +760,21 @@ export default {
   &__playlist {
     margin-left: 24px;
     cursor: pointer;
+    position: relative;
     @include button-effect;
   }
+
+  &__playlist-counter {
+    font-size: 8px;
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    border-radius: 50%;
+    background-color: var(--color-text);
+    color: #fff;
+    padding: 3px;
+  }
+
   &__speed {
     font-weight: 600;
     font-size: 20px;

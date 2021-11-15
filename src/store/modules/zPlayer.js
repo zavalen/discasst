@@ -9,6 +9,7 @@ const state = {
 
   queue: getItem('queue') || [],
   history: getItem('history') || [],
+  isModalOpen: false,
   isLoading: false,
   errors: null
 }
@@ -23,7 +24,9 @@ export const zPlayerMutations = {
   addToHistory: '[zPlayer] addToHistory',
   removeFromHistory: '[zPlayer] removeFromHistory',
   toggle: '[zPlayer] toggle',
-  setReallyListened: '[zPlayer] setReallyListened'
+  setReallyListened: '[zPlayer] setReallyListened',
+  toggleModal: '[zPlayer] toggleModal',
+  closeModal: '[zPlayer] closeModal'
 }
 
 export const zPlayerActions = {
@@ -84,6 +87,12 @@ const mutations = {
   },
   [zPlayerMutations.setReallyListened](state, payload) {
     state.reallyListened.add(payload)
+  },
+  [zPlayerMutations.toggleModal](state) {
+    state.isModalOpen = !state.isModalOpen
+  },
+  [zPlayerMutations.closeModal](state) {
+    state.isModalOpen = false
   }
 }
 

@@ -1,27 +1,45 @@
 <template>
   <div class="zmodal">
-    <div class="zmodal__top">
-      <button
-        class="zmodal__btn"
-        :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerQueue'}"
-        @click="openQueue"
-      >
-        Очередь воспроизведения
-      </button>
-      <button
-        class="zmodal__btn"
-        :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerHistory'}"
-        @click="openhHstory"
-      >
-        История
-      </button>
-
-      <div @click="$emit('closeClick')" class="zmodal__close">
-        <svg-icon name="close" />
+    <div class="zmodal__left ">
+      <div class="zmodal__top">
+        <button
+          class="zmodal__btn"
+          :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerQueue'}"
+          @click="openQueue"
+        >
+          Сейчас играет
+        </button>
+      </div>
+      <div class="zmodal__current-episode scrollbar">
+        <img :src="currentEpisode.Podcast.imageURL" />
+        <h2>{{ currentEpisode.title }}</h2>
+        <div v-html="currentEpisode.description"></div>
       </div>
     </div>
-    <div class="zmodal__content scrollbar">
-      <component :is="currentTabComponent"></component>
+    <div class="zmodal__right">
+      <div class="zmodal__top">
+        <button
+          class="zmodal__btn"
+          :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerQueue'}"
+          @click="openQueue"
+        >
+          Очередь воспроизведения
+        </button>
+        <button
+          class="zmodal__btn"
+          :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerHistory'}"
+          @click="openhHstory"
+        >
+          История
+        </button>
+
+        <div @click="closeModal" class="zmodal__close">
+          <svg-icon name="close" />
+        </div>
+      </div>
+      <div class="zmodal__content scrollbar">
+        <component :is="currentTabComponent"></component>
+      </div>
     </div>
   </div>
 </template>
@@ -31,24 +49,25 @@ import {mapState} from 'vuex'
 
 import ZPlayerHistory from '@/components/zPlayer/ZPlayerHistory'
 import ZPlayerQueue from '@/components/zPlayer/ZPlayerQueue'
+import {zPlayerMutations} from '@/store/modules/zPlayer'
 
 export default {
   name: 'zPlayerModal',
   components: {
     ZPlayerHistory,
-    ZPlayerQueue,
+    ZPlayerQueue
   },
   data() {
     return {
-      currentTabComponent: 'ZPlayerQueue',
+      currentTabComponent: 'ZPlayerQueue'
     }
   },
 
   computed: {
     ...mapState({
-      isPlaying: (state) => state.zPlayer.isPlaying,
-      currentEpisode: (state) => state.zPlayer.currentEpisode,
-    }),
+      isPlaying: state => state.zPlayer.isPlaying,
+      currentEpisode: state => state.zPlayer.currentEpisode
+    })
   },
 
   methods: {
@@ -58,7 +77,10 @@ export default {
     openhHstory() {
       this.currentTabComponent = 'ZPlayerHistory'
     },
-  },
+    closeModal() {
+      this.$store.commit(zPlayerMutations.closeModal)
+    }
+  }
 }
 </script>
 
@@ -72,6 +94,27 @@ export default {
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   padding: 0 16px;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+
+  &__current-episode {
+    overflow: auto;
+    height: 100%;
+    padding: 0 32px 16px 16px;
+    border-right: 1px solid var(--color-border);
+  }
+
+  &__left {
+    max-width: 40%;
+
+    flex: auto;
+    margin-right: 16px;
+  }
+
+  &__right {
+    max-width: 60%;
+    // width: 100%;
+  }
 
   &__top {
     padding: 0px 24px 0px 0;
