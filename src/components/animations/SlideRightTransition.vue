@@ -11,10 +11,10 @@ export default {
 <style>
 .slideright-leave-active,
 .slideright-enter-active {
-  transition: 0.5s;
+  transition: 0.3s;
 }
 .slideright-enter-from {
-  transform: translateX(-100%);
+  transform: translateX(200%);
 }
 .slideright-leave-to {
   transform: translateX(-100%);

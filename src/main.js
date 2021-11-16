@@ -7,7 +7,7 @@ import SvgIcon from '@/components/SvgIcon'
 import vClickOutside from 'click-outside-vue3'
 import Ripple from '@/directives/ripple/ripple'
 import '@/directives/ripple/ripple.css'
-
+import VueLazyLoad from 'vue3-lazyload'
 import VTooltip from 'v-tooltip'
 
 import 'v-tooltip/dist/v-tooltip.css'
@@ -28,6 +28,7 @@ createApp(App)
   .use(store)
   .use(router)
   .use(vClickOutside)
+  .use(VueLazyLoad)
   .use(VTooltip)
   .component('SvgIcon', SvgIcon)
   .directive('ripple', Ripple)

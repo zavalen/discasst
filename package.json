@@ -18,8 +18,10 @@
     "vue": "^3.0.0",
     "vue-adblock-detector": "^1.2.4",
     "vue-i18n": "^9.1.0",
+    "vue-material-tabs": "^0.2.5",
     "vue-router": "^4.0.0-0",
     "vue-toastification": "^2.0.0-rc.5",
+    "vue3-lazyload": "^0.2.2-beta",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {

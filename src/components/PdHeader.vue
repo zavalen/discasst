@@ -86,7 +86,7 @@
             v-ripple
             class="nav__item-link button"
             :class="{
-              button_active: userSubMenuVisible
+              button_active: userSubMenuVisible,
             }"
             href="#"
             @click.prevent="toggleUserSubMenu"
@@ -200,18 +200,18 @@ export default {
     SlideRightTransition,
     PdNotifications,
     PdLoader,
-    SvgIcon
+    SvgIcon,
   },
   data() {
     return {
       userSubMenuVisible: false,
       isMenuActive: false,
       isHeaderVisible: true,
-      scrollBefore: 0
+      scrollBefore: 0,
     }
   },
   mounted() {
-    document.addEventListener('swiped-right', e => {
+    document.addEventListener('swiped-right', (e) => {
       if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
         this.toggleMenu()
     })
@@ -223,15 +223,15 @@ export default {
   },
   computed: {
     ...mapState({
-      theme: state => state.theme.theme,
-      isLoading: state => state.auth.isLoading,
-      isModalOpen: state => state.zPlayer.isModalOpen
+      theme: (state) => state.theme.theme,
+      isLoading: (state) => state.auth.isLoading,
+      isModalOpen: (state) => state.zPlayer.isModalOpen,
     }),
     ...mapGetters({
       currentUser: authGetters.currentUser,
       isLoggedIn: authGetters.isLoggedIn,
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+    }),
   },
   methods: {
     cutString(string, lettersNumber) {
@@ -281,8 +281,8 @@ export default {
 
         this.$router.push({name: 'home'})
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

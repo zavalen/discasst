@@ -1,19 +1,31 @@
 <template>
   <div class="zmodal">
-    <div class="zmodal__left ">
+    <div class="zmodal__left">
       <div class="zmodal__top">
-        <button
-          class="zmodal__btn"
-          :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerQueue'}"
-          @click="openQueue"
-        >
-          Сейчас играет
-        </button>
+        <div class="zmodal__heading">Сейчас играет</div>
       </div>
-      <div class="zmodal__current-episode scrollbar">
-        <img :src="currentEpisode.Podcast.imageURL" />
-        <h2>{{ currentEpisode.title }}</h2>
-        <div v-html="currentEpisode.description"></div>
+      <div class="zmodal__left-wrapper scrollbar">
+        <slide-right-transition>
+          <div
+            v-show="currentEpisodeVisibility"
+            class="zmodal__current-episode zcurrent-episode"
+          >
+            <!-- <div class="zcurrent-episode__now-playing">Сейчас играет</div> -->
+            <div class="zcurrent-episode__header">
+              <img
+                class="zcurrent-episode__image"
+                :src="currentEpisode.Podcast.imageURL"
+              />
+              <div class="zcurrent-episode__controls"></div>
+            </div>
+            <div class="zcurrent-episode__body">
+              <h2 class="zcurrent-episode__heading">
+                {{ currentEpisode.title }}
+              </h2>
+              <div v-html="currentEpisode.description"></div>
+            </div>
+          </div>
+        </slide-right-transition>
       </div>
     </div>
     <div class="zmodal__right">
@@ -41,9 +53,7 @@
         <component :is="currentTabComponent"></component>
       </div>
     </div>
-    <div class="zmodal__bottom">
-      sssssssss
-    </div>
+    <!-- <div class="zmodal__bottom">sssssssss</div> -->
   </div>
 </template>
 
@@ -53,26 +63,38 @@ import {mapState} from 'vuex'
 import ZPlayerHistory from '@/components/zPlayer/ZPlayerHistory'
 import ZPlayerQueue from '@/components/zPlayer/ZPlayerQueue'
 import {zPlayerMutations} from '@/store/modules/zPlayer'
+import SlideRightTransition from '@/components/animations/SlideRightTransition'
 
 export default {
   name: 'zPlayerModal',
   components: {
     ZPlayerHistory,
-    ZPlayerQueue
+    ZPlayerQueue,
+    SlideRightTransition,
   },
   data() {
     return {
-      currentTabComponent: 'ZPlayerQueue'
+      currentTabComponent: 'ZPlayerQueue',
+      currentEpisodeVisibility: true,
     }
   },
 
   computed: {
     ...mapState({
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode
-    })
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+    }),
   },
+  watch: {
+    currentEpisode() {
+      this.currentEpisodeVisibility = false
 
+      setTimeout(async () => {
+        await this.$nextTick()
+        this.currentEpisodeVisibility = true
+      }, 500)
+    },
+  },
   methods: {
     openQueue() {
       this.currentTabComponent = 'ZPlayerQueue'
@@ -82,8 +104,8 @@ export default {
     },
     closeModal() {
       this.$store.commit(zPlayerMutations.closeModal)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -101,50 +123,56 @@ export default {
   flex-wrap: wrap;
 
   &__current-episode {
-    padding: 0 32px 16px 16px;
-    border-right: 1px solid var(--color-border);
-    height: calc(100vh - 318px);
-  }
-
-  &__right,
-  &__left {
-    padding: 0 16px;
+    // height: calc(100vh - 200px);
+    margin-right: 4px;
   }
 
   &__left {
-    max-width: 40%;
+    width: 42%;
+    border-right: 2px solid var(--color-border);
+    background-color: var(--color-body-bg);
+    // height: 100vh;
+
+    overflow: hidden;
+  }
+
+  &__left-wrapper {
+    height: calc(100vh - 226px);
   }
 
   &__right {
-    max-width: 60%;
+    width: 58%;
   }
 
   &__top {
-    padding: 0px 24px 0px 0;
-    margin-left: 2px;
-    border-bottom: 1px solid var(--color-border);
     position: relative;
-    margin-bottom: 16px;
+    box-shadow: 0 2px 2px var(--color-light-shadow);
+    background: var(--color-zplayer-bg);
   }
 
   &__bottom {
-    padding: 16px;
-    border: 1px solid var(--color-border);
+    padding: 4px 24px;
+    border-top: 1px solid var(--color-border);
     background: var(--color-zplayer-bg);
     width: 100%;
-    background: red;
+    display: flex;
+    align-items: center;
   }
 
   &__btn {
-    padding: 18px 12px 12px 12px;
+    padding: 12px 8px 8px 12px;
     background: transparent;
     border-bottom: 4px solid transparent;
     opacity: 0.7;
     border-radius: 0px;
-    font-size: 16px;
-    margin-right: 8px;
+    font-size: 15px;
+    margin-left: 24px;
     position: relative;
     bottom: -1px;
+
+    &:nth-child(2) {
+      margin-left: 8px;
+    }
 
     &_active,
     &:hover,
@@ -163,19 +191,72 @@ export default {
 
   &__close {
     position: absolute;
-    right: 0px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
   }
 
   &__content {
-    padding: 0px 16px;
-    height: calc(100vh - 318px);
+    padding: 12px 24px;
+    height: calc(100vh - 248px);
+  }
+
+  &__heading {
+    padding: 12px 12px 12px 24px;
+    background: transparent;
+    opacity: 0.7;
+    border-radius: 0px;
+    font-size: 15px;
+    position: relative;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
+    text-shadow: 0 0 1px var(--color-text);
+    bottom: -1px;
   }
 }
 
 .strong {
   background: rgb(153, 153, 153);
+}
+
+.zcurrent-episode {
+  // padding: 2px 32px 32px 32px;
+  border-radius: 16px;
+  margin: 16px 32px 32px;
+  background: var(--color-zplayer-bg);
+  box-shadow: 0 2px 2px var(--color-light-shadow);
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+  }
+
+  &__controls {
+    width: 64px;
+  }
+  &__heading {
+    margin-top: 16px;
+    font-size: 20px;
+  }
+
+  &__now-playing {
+    font-size: 14px;
+    text-shadow: 0 0 1px var(--color-text);
+    padding: 8px 0;
+  }
+
+  &__image {
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    width: calc(100% - 186px);
+    // width: 140px;
+    // min-height: 300px;
+  }
+
+  &__body {
+    padding: 4px 32px 24px;
+  }
 }
 </style>

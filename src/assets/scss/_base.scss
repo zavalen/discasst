@@ -174,18 +174,20 @@ input:not([type='select']) {
 }
 
 .scrollbar::-webkit-scrollbar {
-  width: 14px;
+  width: 8px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
   background: transparent;
-  border-left: 0px solid var(--color-border);
+  border-left: 4px solid transparent;
+  width: 4px;
 }
 
 .scrollbar::-webkit-scrollbar-thumb {
   background-color: var(--color-border);
-  border-radius: 20px;
-  border: 3px solid var(--color-header-bg);
+  border-radius: 10px;
+  border: 3px solid var(--color-border);
+  // outline: 2px solid;
 }
 
 .Vue-Toastification__container.bottom-left {

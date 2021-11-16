@@ -1,65 +1,70 @@
 <template>
-  <div class="zmodal__episode zEpisode">
-    <div class="zEpisode__main">
-      <div class="zEpisode__play" @click="playEpisode(episode)">
-        <svg-icon
-          :name="
-            currentEpisode.id == episode.id && isPlaying ? 'pause' : 'play'
-          "
-        />
+  <slide-right-transition>
+    <div v-if="episode" class="zmodal__episode zEpisode">
+      <div class="zEpisode__main">
+        <div class="zEpisode__play" @click="playEpisode(episode)">
+          <svg-icon
+            :name="
+              currentEpisode.id == episode.id && isPlaying ? 'pause' : 'play'
+            "
+          />
+        </div>
+        <div class="zEpisode__creditials">
+          <router-link
+            @click="closeModal"
+            :to="{
+              name: 'episode',
+              params: {
+                podcastSlug: episode.Podcast.slug,
+                episodeSlug: episode.slug,
+              },
+            }"
+            class="zEpisode__title"
+            >{{ episode.title }}</router-link
+          >
+          <router-link
+            @click="closeModal"
+            :to="{
+              name: 'podcast',
+              params: {
+                podcastSlug: episode ? episode.Podcast.slug : 's',
+              },
+            }"
+            class="zEpisode__podcast"
+            >{{ episode.Podcast.title }}</router-link
+          >
+        </div>
+        <div class="zEpisode__description-toggle" @click="toggleDescription">
+          <svg-icon name="description" />
+        </div>
       </div>
-      <div class="zEpisode__creditials">
-        <router-link
-          @click="closeModal"
-          :to="{
-            name: 'episode',
-            params: {
-              podcastSlug: episode.Podcast.slug,
-              episodeSlug: episode.slug
-            }
-          }"
-          class="zEpisode__title"
-          >{{ episode.title }}</router-link
-        >
-        <router-link
-          @click="closeModal"
-          :to="{
-            name: 'podcast',
-            params: {
-              podcastSlug: episode ? episode.Podcast.slug : 's'
-            }
-          }"
-          class="zEpisode__podcast"
-          >{{ episode.Podcast.title }}</router-link
-        >
-      </div>
-      <div class="zEpisode__description-toggle" @click="toggleDescription">
-        <svg-icon name="description" />
-      </div>
+      <div
+        v-if="descriptionOpen"
+        class="zEpisode__description"
+        v-html="episode.description"
+      ></div>
     </div>
-    <div
-      v-if="descriptionOpen"
-      class="zEpisode__description"
-      v-html="episode.description"
-    ></div>
-  </div>
+  </slide-right-transition>
 </template>
 
 <script>
 import {mapState} from 'vuex'
 import {zPlayerActions, zPlayerMutations} from '@/store/modules/zPlayer'
-
+import SlideRightTransition from '@/components/animations/SlideRightTransition'
 export default {
   name: 'zEpisode',
   props: {
     episode: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
+  },
+  components: {
+    SlideRightTransition,
   },
   data() {
     return {
-      descriptionOpen: false
+      descriptionOpen: false,
     }
   },
   methods: {
@@ -75,14 +80,14 @@ export default {
     },
     toggleDescription() {
       this.descriptionOpen = !this.descriptionOpen
-    }
+    },
   },
   computed: {
     ...mapState({
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode
-    })
-  }
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+    }),
+  },
 }
 </script>
 
