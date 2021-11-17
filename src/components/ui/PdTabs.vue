@@ -8,7 +8,7 @@
       :class="[
         {tabs__item_active: tab.value === currentTab},
         tab.value === currentTab && tabActiveClass ? tabActiveClass : '',
-        tabClass
+        tabClass,
       ]"
       :disabled="tab.disabled || false"
       @click="handleClick(tab.value)"
@@ -20,7 +20,7 @@
       :class="lineClass"
       :style="{
         width: `${activeLineWidth}px`,
-        transform: `translateX(${activeLineOffset}px)`
+        transform: `translateX(${activeLineOffset}px)`,
       }"
     />
   </nav>
@@ -32,32 +32,32 @@ export default {
   props: {
     currentTab: {
       type: String,
-      required: true
+      required: true,
     },
     tabs: {
       type: Array,
-      required: true
+      required: true,
     },
     updated: {
       type: [Boolean, String, Array],
-      default: undefined
+      default: undefined,
     },
     wrapperClass: {
       type: String,
-      required: false
+      required: false,
     },
     tabClass: {
       type: String,
-      required: false
+      required: false,
     },
     tabActiveClass: {
       type: String,
-      required: false
+      required: false,
     },
     lineClass: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
   watch: {
     currentTab(newCurrentTab) {
@@ -67,13 +67,13 @@ export default {
     },
     updated() {
       this.moveActiveLine(this.currentTab)
-    }
+    },
   },
   data() {
     return {
       activeLineWidth: 0,
       activeLineOffset: 0,
-      newTab: ''
+      newTab: '',
     }
   },
   methods: {
@@ -85,7 +85,6 @@ export default {
     },
     moveActiveLine(newValue) {
       if (!this.currentTab) return
-      console.log(this.$refs[newValue])
 
       if (!this.$refs || !this.$refs[newValue]) {
         return
@@ -94,12 +93,14 @@ export default {
 
       this.activeLineWidth = element.clientWidth
       this.activeLineOffset = element.offsetLeft
-    }
+
+      console.log('done')
+    },
   },
   mounted() {
-    this.moveActiveLine(this.currentTab)
     this.newTab = this.currentTab
-  }
+    this.moveActiveLine(this.currentTab)
+  },
 }
 </script>
 

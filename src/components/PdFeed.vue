@@ -10,13 +10,13 @@
         :key="episode?.id"
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
-        <div v-tooltip="'Play'" class="feed-episode__left">
+        <div class="feed-episode__left">
           <img v-lazy="episode.Podcast.imageURL" alt="" srcset="" />
           <div class="feed-episode__play" @click="playEpisode(episode)">
             <svg-icon
               v-if="
                 !isPlaying ||
-                  (currentEpisode && currentEpisode.id != episode.id)
+                (currentEpisode && currentEpisode.id != episode.id)
               "
               name="play"
             />
@@ -35,46 +35,63 @@
             name: 'episode',
             params: {
               podcastSlug: episode.Podcast.slug,
-              episodeSlug: episode.slug
-            }
+              episodeSlug: episode.slug,
+            },
           }"
         >
-          <h2
-            class="feed-episode__title"
-            :style="{fontSize: episode.title.length > 80 ? '18px' : ''}"
-            v-tooltip="episode.title.length > 142 ? episode.title : ''"
-          >
-            {{ episode.title }}
-          </h2>
-          <router-link
-            class="feed-episode__podcast-link"
-            :to="{name: 'podcast', params: {podcastSlug: episode.Podcast.slug}}"
-            >{{ episode.Podcast.title }}</router-link
-          >
-          <template v-if="!currentEpisode || currentEpisode.id != episode.id">
-            <button @click.stop.prevent="toggleInQueue(episode)">
-              {{
-                isEpisodeInQueue(episode.id)
-                  ? 'Убрать из очереди'
-                  : 'Добавить в очередь'
-              }}
-            </button>
-          </template>
-          <template v-if="currentEpisode && currentEpisode.id == episode.id">
-            <button @click.stop>Сейчас играет</button>
-          </template>
-          {{ toHHMMSS(episode.duration) }}
-          <!-- 
-          <router-link
-            :to="{
-              name: 'episode',
-              params: {
-                podcastSlug: episode.Podcast.slug,
-                episodeSlug: episode.slug
-              }
-            }"
-            class="feed-episode__link"
-          ></router-link> -->
+          <div class="feed-episode__heading">
+            <div class="feed-episode__time">
+              {{ formatDate(episode.pubDate) }}
+            </div>
+            <h2
+              class="feed-episode__title"
+              :style="{fontSize: episode.title.length > 80 ? '18px' : ''}"
+            >
+              {{ episode.title }}
+            </h2>
+            <div class="feed-episode__subline">
+              <router-link
+                class="feed-episode__podcast-link"
+                :to="{
+                  name: 'podcast',
+                  params: {podcastSlug: episode.Podcast.slug},
+                }"
+                >{{ episode.Podcast.title }}</router-link
+              >
+              <svg-icon
+                @click.stop.prevent
+                name="add-square"
+                v-tooltip="'Подписаться'"
+              />
+            </div>
+          </div>
+          <div class="feed-episode__buttons">
+            <router-link
+              class="button"
+              :to="{
+                name: 'episode',
+                params: {
+                  podcastSlug: episode.Podcast.slug,
+                  episodeSlug: episode.slug,
+                },
+              }"
+            >
+              Обсудить</router-link
+            >
+
+            <template v-if="!currentEpisode || currentEpisode.id != episode.id">
+              <span @click.stop.prevent="toggleInQueue(episode)">
+                {{
+                  isEpisodeInQueue(episode.id)
+                    ? 'Убрать из очереди'
+                    : 'Добавить в очередь'
+                }}
+              </span>
+            </template>
+            <template v-if="currentEpisode && currentEpisode.id == episode.id">
+              <span @click.stop>Сейчас играет</span>
+            </template>
+          </div>
         </router-link>
 
         <div class="feed-episode__progress"></div>
@@ -99,35 +116,35 @@ export default {
   props: {
     apiUrl: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       page: 1,
-      episodesPerPage: 30
+      episodesPerPage: 30,
     }
   },
 
   computed: {
     ...mapState({
-      episodes: state => state.feed.episodes,
-      isLoading: state => state.feed.isLoading,
-      lastPage: state => state.feed.lastPage,
-      errors: state => state.feed.errors,
-      currentEpisode: state => state.zPlayer.currentEpisode,
-      isPlaying: state => state.zPlayer.isPlaying,
-      queue: state => state.zPlayer.queue
+      episodes: (state) => state.feed.episodes,
+      isLoading: (state) => state.feed.isLoading,
+      lastPage: (state) => state.feed.lastPage,
+      errors: (state) => state.feed.errors,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      queue: (state) => state.zPlayer.queue,
     }),
     payload() {
       return {
         apiUrl: this.apiUrl,
         params: {
           offset: (this.page - 1) * this.episodesPerPage,
-          limit: this.episodesPerPage
-        }
+          limit: this.episodesPerPage,
+        },
       }
-    }
+    },
   },
   mounted() {
     this.loadFeed()
@@ -152,7 +169,7 @@ export default {
       }
     },
     isEpisodeInQueue(id) {
-      return this.queue.some(ep => {
+      return this.queue.some((ep) => {
         return ep.id == id
       })
     },
@@ -161,8 +178,13 @@ export default {
         .utc(seconds * 1000)
         .format('HH:mm:ss', {trim: true})
         .replace(/^0(?:0:0?)?/, '')
-    }
-  }
+    },
+    formatDate(date) {
+      return moment(date)
+        .format('DD MMMM YYYY HH:mm', {trim: true})
+        .replace(new Date().getFullYear(), '')
+    },
+  },
 }
 </script>
 
@@ -173,22 +195,26 @@ export default {
 
 .feed-episode {
   background: var(--color-post-bg);
+  // background: linear-gradient(180deg, #f7f9fa 0%, #ebeced 100%);
   border-radius: 10px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 24px;
+  margin-bottom: 24px;
   margin-right: auto;
   margin-left: auto;
   cursor: pointer;
   border: 1px solid var(--color-border);
   box-shadow: 0 2px 2px var(--color-light-shadow);
+  // box-shadow: 0px 100px 70px -10px rgba(169, 180, 203, 0.2),
+  // 0px 4px 4px rgba(0, 0, 0, 0.25), -3px -3px 4px #ffffff, 0px 3px 0px #d6dadf;
   display: flex;
   overflow: hidden;
-  height: 160px;
+  height: 184px;
   width: 700px;
   position: relative;
+  padding-bottom: 4px;
   &:hover {
     .feed-episode__play {
-      opacity: 1;
+      opacity: 0.85;
     }
   }
 
@@ -202,8 +228,35 @@ export default {
     right: 0;
     bottom: 0;
     top: 0;
-    background: rgba(0, 0, 0, 0.301);
     z-index: 2;
+
+    & > .icon {
+      border: 1px solid var(--color-border);
+      background: var(--color-post-bg);
+      z-index: 3;
+      box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+      transition: 0.3s;
+      & > svg {
+        min-width: 32px;
+        min-height: 32px;
+      }
+    }
+
+    & > .play {
+      padding: 38px 38px 38px 32px;
+      border-start-end-radius: 150%;
+      border-end-start-radius: 50%;
+      border-start-start-radius: 50%;
+      border-end-end-radius: 150%;
+      & > svg {
+        margin-left: 6px;
+      }
+    }
+
+    & > .pause {
+      border-radius: 20%;
+      padding: 38px 36px;
+    }
 
     display: flex;
     justify-content: center;
@@ -213,29 +266,38 @@ export default {
   }
 
   &__left {
-    background: rgb(202, 202, 202);
-    box-shadow: 0 2px 2px var(--color-light-shadow);
-    min-width: 160px;
-    max-width: 160px;
-
+    min-width: 176px;
+    max-width: 176px;
+    border-radius: 10px;
+    padding: 12px;
     & > img {
       width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
     }
     position: relative;
   }
 
   &__right {
-    padding: 12px 36px 24px 24px;
+    padding: 12px 36px 16px 12px;
     flex: auto;
     position: relative;
     color: inherit;
     text-decoration: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  &__time {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    margin-bottom: 4px;
   }
 
   &__title {
     margin: 0;
-    font-size: 20px;
+    font-size: 24px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -moz-box;
@@ -245,6 +307,54 @@ export default {
     -webkit-box-orient: vertical;
     line-clamp: 3;
     box-orient: vertical;
+    margin-bottom: 4px;
+    line-height: 120%;
+  }
+
+  &__subline {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+
+    & svg {
+      min-width: 16px;
+      width: 16px;
+      min-height: 16px;
+      height: 16px;
+      position: relative;
+      // top: -1px;
+    }
+  }
+
+  &__buttons {
+    display: flex;
+    align-items: center;
+    & > .button,
+    & > button {
+      &:first-child {
+        border: 1px solid var(--color-border);
+        background: black;
+        color: #fff;
+      }
+      padding: 4px 16px;
+      margin-right: 8px;
+    }
+  }
+
+  &__podcast-link {
+    margin: 0;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    line-clamp: 1;
+    box-orient: vertical;
+    color: var(--color-text);
+    text-decoration: none;
   }
 
   transition: 0.5s;
@@ -255,13 +365,17 @@ export default {
     position: absolute;
     bottom: 0;
     height: 4px;
-    background: red;
-    // width: 50%;
+    background: var(--color-accent);
+    width: 50%;
     z-index: 5;
   }
 }
 
 .playing {
-  background: rgb(153, 153, 153);
+  box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+
+  .feed-episode__play {
+    opacity: 0.85;
+  }
 }
 </style>

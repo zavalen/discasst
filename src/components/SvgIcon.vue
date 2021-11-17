@@ -1,6 +1,7 @@
 <template>
   <span
     class="icon"
+    :class="name"
     v-if="isIconExist"
     :style="{height: height + 'px', width: width + 'px'}"
     v-html="require(`!html-loader!@/assets/icons/${name}.svg`)"
@@ -57,7 +58,9 @@ export default {
 
   > svg {
     width: 100%;
+    min-width: 24px;
     height: 100%;
+    min-height: 24px;
     display: inline-block;
     vertical-align: baseline;
   }

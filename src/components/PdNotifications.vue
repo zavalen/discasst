@@ -254,11 +254,14 @@ export default {
 .notification {
   display: block;
 
-  padding: 16px 24px;
   background: rgba(231, 242, 255, 0.315);
   border-bottom: 1px solid var(--color-border);
   font-size: 14px;
   color: var(--color-text);
   text-decoration: none;
+
+  & > div {
+    padding: 16px 24px;
+  }
 }
 </style>
