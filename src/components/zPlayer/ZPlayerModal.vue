@@ -30,27 +30,22 @@
     </div>
     <div class="zmodal__right">
       <div class="zmodal__top">
-        <button
-          class="zmodal__btn"
-          :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerQueue'}"
-          @click="openQueue"
-        >
-          Очередь воспроизведения
-        </button>
-        <button
-          class="zmodal__btn"
-          :class="{zmodal__btn_active: currentTabComponent == 'ZPlayerHistory'}"
-          @click="openhHstory"
-        >
-          История
-        </button>
+        <pd-tabs
+          :tabs="tabs"
+          :currentTab="currentTab"
+          :wrapper-class="'tabs'"
+          :tab-class="'tabs__item'"
+          :tab-active-class="'tabs__item_active'"
+          :line-class="'tabs__active-line'"
+          @onClick="handleClick"
+        />
 
         <div @click="closeModal" class="zmodal__close">
           <svg-icon name="close" />
         </div>
       </div>
       <div class="zmodal__content scrollbar">
-        <component :is="currentTabComponent"></component>
+        <component :is="currentTab"></component>
       </div>
     </div>
     <!-- <div class="zmodal__bottom">sssssssss</div> -->
@@ -64,48 +59,56 @@ import ZPlayerHistory from '@/components/zPlayer/ZPlayerHistory'
 import ZPlayerQueue from '@/components/zPlayer/ZPlayerQueue'
 import {zPlayerMutations} from '@/store/modules/zPlayer'
 import SlideRightTransition from '@/components/animations/SlideRightTransition'
-
+import PdTabs from '@/components/ui/PdTabs'
 export default {
   name: 'zPlayerModal',
   components: {
     ZPlayerHistory,
     ZPlayerQueue,
     SlideRightTransition,
+    PdTabs
   },
   data() {
     return {
-      currentTabComponent: 'ZPlayerQueue',
       currentEpisodeVisibility: true,
+      currentTab: 'ZPlayerQueue',
+      tabs: [
+        {title: 'Очередь воспроизведения', value: 'ZPlayerQueue'},
+        {title: 'История', value: 'ZPlayerHistory'}
+      ]
     }
   },
 
   computed: {
     ...mapState({
-      isPlaying: (state) => state.zPlayer.isPlaying,
-      currentEpisode: (state) => state.zPlayer.currentEpisode,
-    }),
+      isPlaying: state => state.zPlayer.isPlaying,
+      currentEpisode: state => state.zPlayer.currentEpisode
+    })
   },
   watch: {
     currentEpisode() {
       this.currentEpisodeVisibility = false
 
       setTimeout(async () => {
-        await this.$nextTick()
+        // await this.$nextTick()
         this.currentEpisodeVisibility = true
       }, 500)
-    },
+    }
   },
   methods: {
-    openQueue() {
-      this.currentTabComponent = 'ZPlayerQueue'
-    },
-    openhHstory() {
-      this.currentTabComponent = 'ZPlayerHistory'
-    },
+    // openQueue() {
+    //   this.currentTabComponent = 'ZPlayerQueue'
+    // },
+    // openhHstory() {
+    //   this.currentTabComponent = 'ZPlayerHistory'
+    // },
     closeModal() {
       this.$store.commit(zPlayerMutations.closeModal)
     },
-  },
+    handleClick(newTab) {
+      this.currentTab = newTab
+    }
+  }
 }
 </script>
 
@@ -137,7 +140,7 @@ export default {
   }
 
   &__left-wrapper {
-    height: calc(100vh - 226px);
+    height: calc(100vh - 220px);
   }
 
   &__right {
@@ -231,6 +234,8 @@ export default {
 
   &__header {
     display: flex;
+    margin-left: 32px;
+    margin-top: 24px;
   }
 
   &__controls {

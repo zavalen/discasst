@@ -16,7 +16,7 @@
             <svg-icon
               v-if="
                 !isPlaying ||
-                (currentEpisode && currentEpisode.id != episode.id)
+                  (currentEpisode && currentEpisode.id != episode.id)
               "
               name="play"
             />
@@ -35,8 +35,8 @@
             name: 'episode',
             params: {
               podcastSlug: episode.Podcast.slug,
-              episodeSlug: episode.slug,
-            },
+              episodeSlug: episode.slug
+            }
           }"
         >
           <h2
@@ -99,35 +99,35 @@ export default {
   props: {
     apiUrl: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     return {
       page: 1,
-      episodesPerPage: 30,
+      episodesPerPage: 30
     }
   },
 
   computed: {
     ...mapState({
-      episodes: (state) => state.feed.episodes,
-      isLoading: (state) => state.feed.isLoading,
-      lastPage: (state) => state.feed.lastPage,
-      errors: (state) => state.feed.errors,
-      currentEpisode: (state) => state.zPlayer.currentEpisode,
-      isPlaying: (state) => state.zPlayer.isPlaying,
-      queue: (state) => state.zPlayer.queue,
+      episodes: state => state.feed.episodes,
+      isLoading: state => state.feed.isLoading,
+      lastPage: state => state.feed.lastPage,
+      errors: state => state.feed.errors,
+      currentEpisode: state => state.zPlayer.currentEpisode,
+      isPlaying: state => state.zPlayer.isPlaying,
+      queue: state => state.zPlayer.queue
     }),
     payload() {
       return {
         apiUrl: this.apiUrl,
         params: {
           offset: (this.page - 1) * this.episodesPerPage,
-          limit: this.episodesPerPage,
-        },
+          limit: this.episodesPerPage
+        }
       }
-    },
+    }
   },
   mounted() {
     this.loadFeed()
@@ -152,7 +152,7 @@ export default {
       }
     },
     isEpisodeInQueue(id) {
-      return this.queue.some((ep) => {
+      return this.queue.some(ep => {
         return ep.id == id
       })
     },
@@ -161,8 +161,8 @@ export default {
         .utc(seconds * 1000)
         .format('HH:mm:ss', {trim: true})
         .replace(/^0(?:0:0?)?/, '')
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -235,7 +235,7 @@ export default {
 
   &__title {
     margin: 0;
-    font-size: 22px;
+    font-size: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -moz-box;
