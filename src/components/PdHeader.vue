@@ -39,7 +39,7 @@
                   class="main-nav__item-link button"
                   @click="closeMenu"
                   active-class="button_active"
-                  >{{ $t('header.feed') }}</router-link
+                  >{{ $t('header.episodes') }}</router-link
                 >
               </li>
               <li class="main-nav__item">
@@ -430,9 +430,9 @@ export default {
 
   &__logo {
     font-family: 'Titillium Web', sans-serif;
-    font-size: 30px;
+    font-size: 28px;
     padding-top: 0;
-    margin-right: 46px;
+    margin-right: 84px;
     color: var(--color-accent);
     text-decoration: none;
     position: relative;

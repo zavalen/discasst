@@ -122,6 +122,7 @@ const actions = {
           toast.success(i18n.t('toastifications.registerSuccess'))
 
           resolve(response.data.user)
+          window.reload()
         })
         .catch(result => {
           console.log('Error: ', result)
@@ -144,6 +145,7 @@ const actions = {
           toast.success(i18n.t('toastifications.loginSuccess'))
 
           resolve(response.data.user)
+          window.reload()
         })
         .catch(result => {
           console.log('Error: ', result)

@@ -5,13 +5,13 @@
 </template>
 <script>
 export default {
-  name: 'slideright'
+  name: 'slideright',
 }
 </script>
 <style>
 .slideright-leave-active,
 .slideright-enter-active {
-  transition: 0.4s;
+  transition: 0.3s;
   animation-timing-function: ease-in-out;
 }
 .slideright-enter-from {

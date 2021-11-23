@@ -94,7 +94,10 @@ export default {
       this.activeLineWidth = element.clientWidth
       this.activeLineOffset = element.offsetLeft
 
-      console.log('done')
+      if (!this.activeLineWidth && !this.activeLineOffset) {
+        this.activeLineWidth = 209
+        this.activeLineOffset = 16
+      }
     },
   },
   mounted() {

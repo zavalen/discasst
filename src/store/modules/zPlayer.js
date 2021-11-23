@@ -26,7 +26,8 @@ export const zPlayerMutations = {
   toggle: '[zPlayer] toggle',
   setReallyListened: '[zPlayer] setReallyListened',
   toggleModal: '[zPlayer] toggleModal',
-  closeModal: '[zPlayer] closeModal'
+  closeModal: '[zPlayer] closeModal',
+  updateQueue: '[zPlayer] updateQueue'
 }
 
 export const zPlayerActions = {
@@ -66,6 +67,15 @@ const mutations = {
   },
   [zPlayerMutations.setLastPoint](state, payload) {
     state.lastPoint = payload
+
+    if (payload > 1) {
+      if (!state.currentEpisode.EpisodeProgress) {
+        state.currentEpisode.EpisodeProgress = {}
+      }
+      state.currentEpisode.EpisodeProgress.lastPoint = payload
+      state.currentEpisode.EpisodeProgress.percentage =
+        (payload * 100) / state.currentEpisode.duration
+    }
   },
   [zPlayerMutations.addToQueue](state, payload) {
     state.queue.push(payload)
@@ -93,6 +103,9 @@ const mutations = {
   },
   [zPlayerMutations.closeModal](state) {
     state.isModalOpen = false
+  },
+  [zPlayerMutations.updateQueue](state, payload) {
+    state.queue = payload
   }
 }
 

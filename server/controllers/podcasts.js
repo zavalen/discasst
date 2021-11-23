@@ -2,6 +2,7 @@ const Podcast = require('../models/Podcast')
 const PodcastsManagers = require('../models/PodcastsManagers')
 const Episode = require('../models/Episode')
 const User = require('../models/User')
+const Subscriptions = require('../models/Subscriptions')
 const sequelize = require('../dbConnection')
 const podcastFeedParser = require('podcast-feed-parser')
 const {
@@ -290,70 +291,25 @@ module.exports.deleteArticle = async (req, res) => {
   }
 }
 
-module.exports.getAllPodcasts = async (req, res) => {
+module.exports.getPodcasts = async (req, res) => {
   try {
     //Get all articles:
-    // const {tag, author, limit = 20, offset = 0} = req.query
-    const {limit = 21, offset = 0} = req.query
-    console.log(limit)
-    console.log(offset)
+    const {podcastSlug = null, limit = 20, offset = 0} = req.query
 
-    // let article
-    // if (!author && tag) {
-    //   article = await Podcast.findAll({
-    //     include: [
-    //       {
-    //         model: Tag,
-    //         attributes: ['name'],
-    //         where: {name: tag}
-    //       },
-    //       {
-    //         model: User,
-    //         attributes: ['email', 'username', 'bio', 'image']
-    //       }
-    //     ],
-    //     limit: parseInt(limit),
-    //     offset: parseInt(offset)
-    //   })
-    // } else if (author && !tag) {
-    //   article = await Podcast.findAll({
-    //     include: [
-    //       {
-    //         model: Tag,
-    //         attributes: ['name']
-    //       },
-    //       {
-    //         model: User,
-    //         attributes: ['email', 'username', 'bio', 'image'],
-    //         where: {username: author}
-    //       }
-    //     ],
-    //     limit: parseInt(limit),
-    //     offset: parseInt(offset)
-    //   })
-    // } else if (author && tag) {
-    //   article = await Podcast.findAll({
-    //     include: [
-    //       {
-    //         model: Tag,
-    //         attributes: ['name'],
-    //         where: {name: tag}
-    //       },
-    //       {
-    //         model: User,
-    //         attributes: ['email', 'username', 'bio', 'image'],
-    //         where: {username: author}
-    //       }
-    //     ],
-    //     limit: parseInt(limit),
-    //     offset: parseInt(offset)
-    //   })
-    // } else {
+    if (podcastSlug) {
+      const podcast = await Podcast.findOne({
+        where: {
+          slug: podcastSlug
+        }
+      })
+      res.json({podcast})
+      return
+    }
+
     const podcasts = await Podcast.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset)
     })
-    // }
 
     res.json({podcasts})
   } catch (e) {
@@ -364,39 +320,64 @@ module.exports.getAllPodcasts = async (req, res) => {
   }
 }
 
-module.exports.getFeed = async (req, res) => {
+module.exports.subscribe = async (req, res) => {
   try {
-    const query = `
-            SELECT UserEmail
-            FROM followers
-            WHERE followerEmail = "${req.user.email}"`
-    const followingUsers = await sequelize.query(query)
-    if (followingUsers[0].length == 0) {
-      return res.json({articles: []})
-    }
-    let followingUserEmail = []
-    for (let t of followingUsers[0]) {
-      followingUserEmail.push(t.UserEmail)
-    }
+    const {podcastId} = req.query
+    const userId = req.user.id
+    const podcast = await Podcast.findByPk(podcastId)
+    console.log(podcast)
 
-    let article = await Podcast.findAll({
-      where: {
-        UserEmail: followingUserEmail
-      },
-      include: [Tag, User]
-    })
-
-    let articles = []
-    for (let t of article) {
-      let addArt = sanitizeOutputMultiple(t)
-      articles.push(addArt)
+    if (podcast) {
+      await Subscriptions.create({
+        PodcastId: podcast.id,
+        UserId: userId
+      })
     }
 
-    res.json({articles})
+    res.status(200).json({subscribed: true})
   } catch (e) {
     const code = res.statusCode ? res.statusCode : 422
     return res.status(code).json({
-      errors: {body: ['Could not get feed ', e.message]}
+      errors: {body: ['Could not subscribe', e.message]}
+    })
+  }
+}
+
+module.exports.getSubscribtions = async (req, res) => {
+  try {
+    const userId = req.user.id
+    const subscriptionsArray = await Subscriptions.findAll({
+      where: {UserId: userId}
+    })
+
+    let subscriptions = []
+    subscriptionsArray.forEach(sub => {
+      subscriptions.push(sub.PodcastId)
+    })
+
+    res.status(200).json({subscriptions})
+  } catch (e) {
+    const code = res.statusCode ? res.statusCode : 422
+    return res.status(code).json({
+      errors: {body: ['Could not get subscriptions', e.message]}
+    })
+  }
+}
+
+module.exports.unsubscribe = async (req, res) => {
+  try {
+    const {podcastId} = req.query
+    const userId = req.user.id
+    console.log(podcastId)
+    await Subscriptions.destroy({
+      where: {UserId: userId, PodcastId: podcastId}
+    })
+
+    res.status(200).json({unsubscribed: true})
+  } catch (e) {
+    const code = res.statusCode ? res.statusCode : 422
+    return res.status(code).json({
+      errors: {body: ['Could not subscribe', e.message]}
     })
   }
 }

@@ -3,7 +3,8 @@ const router = express.Router()
 const EpisodeController = require('../controllers/episodes')
 const {authByToken, appendUserByTokenIfExist} = require('../middleware/auth')
 
-router.get('/', appendUserByTokenIfExist, EpisodeController.getFeed)
+router.get('/', appendUserByTokenIfExist, EpisodeController.getEpisodes)
+router.get('/:podcastSlug', EpisodeController.getEpisodesByPodcastSlug)
 router.post(
   '/progress',
   appendUserByTokenIfExist,

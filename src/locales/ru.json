@@ -6,6 +6,7 @@
   "header": {
     "home": "Главная",
     "feed": "Лента",
+    "episodes": "Эпизоды",
     "podcasts": "Подкасты",
     "register": "Зарегистрироваться",
     "login": "Войти",
@@ -48,6 +49,16 @@
   "toastifications": {
     "loginSuccess": "Вы вошли",
     "registerSuccess": "Вы зарегистрировались!",
-    "offline": "Проверьте подключение к интернету."
+    "offline": "Проверьте подключение к интернету.",
+    "subsciribe": "Вы подписались на",
+    "unsubsciribe": "Вы отписались от"
+  },
+  "time": {
+    "minute": "минута",
+    "someMinutes": "минут",
+    "pluralMinutes": "минуты",
+    "hour": "час",
+    "someHours": "часа",
+    "manyHours": "часов"
   }
 }

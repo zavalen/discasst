@@ -76,6 +76,15 @@ img {
   }
 }
 
+hr {
+  height: 1px;
+  border: 0;
+  background-color: var(--bg-menu-item-hover);
+}
+
+ul {
+  padding: 0;
+}
 .container {
   max-width: 1240px;
   padding: 0 16px;

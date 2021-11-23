@@ -45,6 +45,26 @@ function sanitizeOutputMultiple(article) {
   return article
 }
 
+module.exports.getEpisodesByPodcastSlug = async (req, res) => {
+  try {
+    const {podcastSlug} = req.params
+
+    const podcast = await Podcast.findOne({
+      where: {slug: podcastSlug}
+    })
+
+    const episodes = await Episode.findAll({
+      where: {PodcastId: podcast.id}
+    })
+
+    res.status(200).json({episodes})
+  } catch (e) {
+    return res.status(422).json({
+      errors: {body: ['Could not get article', e.message]}
+    })
+  }
+}
+
 module.exports.getSingleArticleBySlug = async (req, res) => {
   try {
     const {slug} = req.params
@@ -132,11 +152,11 @@ module.exports.deleteArticle = async (req, res) => {
   }
 }
 
-module.exports.getFeed = async (req, res) => {
+module.exports.getEpisodes = async (req, res) => {
   try {
-    let {limit = 20, offset = 0} = req.query
-    if (limit > 100) {
-      limit = 100
+    let {limit = 20, offset = 0, podcastSlug = null} = req.query
+    if (limit > 50) {
+      limit = 50
     }
 
     const modelsToInclude = [
@@ -145,7 +165,7 @@ module.exports.getFeed = async (req, res) => {
       }
     ]
 
-    if (req.user) {
+    if (req.user && req.user.id) {
       modelsToInclude.push({
         model: EpisodeProgress,
         required: false,
@@ -153,24 +173,24 @@ module.exports.getFeed = async (req, res) => {
       })
     }
 
-    const visitorId = req.headers.visitorid
-    if (!req.user && visitorId) {
-      modelsToInclude.push({
-        model: EpisodeProgress,
-        required: false,
-        where: {VisitorId: visitorId}
-      })
-    }
-
-    const episodes = await Episode.findAll({
+    const query = {
       limit: parseInt(limit),
       offset: parseInt(offset),
       order: [['pubDate', 'DESC']],
       include: modelsToInclude
-    })
+    }
+
+    if (podcastSlug) {
+      const podcast = await Podcast.findOne({where: {slug: podcastSlug}})
+      query.where = {PodcastId: podcast.id}
+    }
+
+    const episodes = await Episode.findAll(query)
 
     res.json({episodes})
   } catch (e) {
+    console.log(e)
+
     throw new Error('Error in getFeed')
 
     // const code = res.statusCode ? res.statusCode : 422

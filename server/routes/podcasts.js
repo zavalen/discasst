@@ -3,9 +3,12 @@ const router = express.Router()
 const PodcastController = require('../controllers/podcasts')
 const {authByToken} = require('../middleware/auth')
 
-router.post('/', PodcastController.createPodcast) //Register a new user
-router.get('/', PodcastController.getAllPodcasts) //Gets the currently logged-in user
-// router.post('/users/login', PodcastController.loginUser) //Login for existing user
-// router.patch('/user', authByToken, PodcastController.updateUserDetails) //Updated user information for current user
+router.post('/', PodcastController.createPodcast)
+router.get('/', PodcastController.getPodcasts)
+// router.get('/:slug', PodcastController.getPodcastBySlug)
+
+router.get('/subscriptions', authByToken, PodcastController.getSubscribtions)
+router.post('/subscriptions', authByToken, PodcastController.subscribe)
+router.delete('/subscriptions', authByToken, PodcastController.unsubscribe)
 
 module.exports = router

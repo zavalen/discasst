@@ -7,12 +7,15 @@
   <footer class="app__footer"></footer>
   <auth-popup v-if="isAnonymus" />
   <visitor-info />
+  <scroll-to-top />
 </template>
 
 <script>
 import PdHeader from '@/components/PdHeader'
 import VisitorInfo from '@/components/VisitorInfo'
+import ScrollToTop from '@/components/ui/ScrollToTop'
 import {authActions, authGetters} from '@/store/modules/auth'
+import {podcastsActions} from '@/store/modules/podcasts'
 import AuthPopup from '@/components/popups/AuthPopup'
 import {mapGetters} from 'vuex'
 import ZPlayer from '@/components/zPlayer/ZPlayer'
@@ -26,25 +29,28 @@ export default {
     PdHeader,
     AuthPopup,
     ZPlayer,
-    VisitorInfo
+    VisitorInfo,
+    ScrollToTop,
   },
   computed: {
     ...mapGetters({
-      isAnonymus: authGetters.isAnonymus
-    })
+      isAnonymus: authGetters.isAnonymus,
+    }),
   },
   data() {
     return {
-      user: null
+      user: null,
     }
   },
   async mounted() {
     this.user = await this.$store.dispatch(authActions.getCurrentUser)
-
+    if (this.user) {
+      await this.$store.dispatch(podcastsActions.getSubscribtions)
+    }
     window.addEventListener('offline', () =>
       toast.error(this.$t('toastifications.offline'), {timeout: false})
     )
-  }
+  },
 }
 </script>
 

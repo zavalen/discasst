@@ -61,11 +61,11 @@ export default {
 .sidebar {
   margin-left: 60px;
   width: 300px;
-  background: var(--color-post-bg);
+  background: var(--color-block-bg);
 }
 
 .search-header {
-  background: var(--color-post-bg);
+  background: var(--color-block-bg);
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
   margin: 30px 0;
   border-radius: 10px;

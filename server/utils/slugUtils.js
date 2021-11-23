@@ -16,6 +16,11 @@ module.exports.slugify = string => {
     trim: true // trim leading and trailing replacement chars, defaults to `true`
   })
 
+  slug = slug
+    .split('-')
+    .slice(0, 10)
+    .join('-')
+
   return slug
 }
 
