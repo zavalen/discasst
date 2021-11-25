@@ -139,25 +139,44 @@ module.exports.getUserById = async (req, res) => {
 
 module.exports.updateUserDetails = async (req, res) => {
   try {
-    // const user = await User.findByPK(req.user.email)
-    const user = await User.findOne({where: {email: req.body.user.email}})
+    const user = await User.findByPk(req.user.id)
 
     if (!user) {
       res.status(401)
-      throw new Error('No user with this email id')
+      throw new Error('No user with this id')
     }
 
     if (req.body.user) {
-      const username = req.body.user.username
-        ? req.body.user.username
-        : user.username
-      const bio = req.body.user.bio ? req.body.user.bio : user.bio
-      const image = req.body.user.image ? req.body.user.image : user.image
-      let password = user.password
-      if (req.body.user.password)
-        password = await hashPassword(req.body.user.password)
+      if (req.body.user.username) {
+        const existingUser = await User.findOne({
+          where: {username: req.body.user.username}
+        })
+        if (existingUser) {
+          res.status(401)
+          throw new Error('This username is aldready taken')
+        }
+      }
+      const username = req.body.user.username || user.username
 
-      const updatedUser = await user.update({username, bio, image, password})
+      const firstName = req.body.user.firstName || user.firstName
+      const lastName = req.body.user.lastName || user.lastName
+      const bio = req.body.user.bio || user.bio
+      const image = req.body.user.image || user.image
+      const gender = req.body.user.gender || user.gender
+      const theme = req.body.user.theme || user.theme
+      const lang = req.body.user.lang || user.lang
+
+      const updatedUser = await user.update({
+        firstName,
+        lastName,
+        username,
+        bio,
+        image,
+        gender,
+        theme,
+        lang
+      })
+
       delete updatedUser.dataValues.password
       updatedUser.dataValues.token = req.header('Authorization').split(' ')[1]
       res.json(updatedUser)

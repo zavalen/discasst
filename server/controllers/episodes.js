@@ -2,10 +2,12 @@ const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
 const EpisodeProgress = require('../models/EpisodeProgress')
 const User = require('../models/User')
+const Subscriptions = require('../models/Subscriptions')
 const UserEpisodesHistory = require('../models/UserEpisodesHistory')
 const {slugify} = require('../utils/slugUtils')
 const sequelize = require('../dbConnection')
 const podcastFeedParser = require('podcast-feed-parser')
+const {Op} = require('sequelize')
 
 function sanitizeOutput(article, user) {
   const newTagList = []
@@ -154,7 +156,13 @@ module.exports.deleteArticle = async (req, res) => {
 
 module.exports.getEpisodes = async (req, res) => {
   try {
-    let {limit = 20, offset = 0, podcastSlug = null} = req.query
+    let {
+      limit = 20,
+      offset = 0,
+      podcastSlug = null,
+      podcastsIds = null,
+      subscriptions = false
+    } = req.query
     if (limit > 50) {
       limit = 50
     }
@@ -182,7 +190,37 @@ module.exports.getEpisodes = async (req, res) => {
 
     if (podcastSlug) {
       const podcast = await Podcast.findOne({where: {slug: podcastSlug}})
+      if (!podcast) {
+        throw new Error('No such podcast slug')
+      }
       query.where = {PodcastId: podcast.id}
+    }
+
+    if (subscriptions && req.user && req.user.id) {
+      const subscriptionsArray = await Subscriptions.findAll({
+        where: {
+          UserId: req.user.id
+        }
+      })
+      let subscriptionsIds = []
+      subscriptionsArray.forEach(sub => {
+        subscriptionsIds.push(sub.PodcastId)
+      })
+
+      if (!subscriptionsIds.length) {
+        res.json({episodes: []})
+        return
+      }
+      podcastsIds = subscriptionsIds.join(',')
+    }
+
+    if (podcastsIds) {
+      podcastsIds = podcastsIds.split(',')
+      query.where = {
+        PodcastId: {
+          [Op.or]: podcastsIds
+        }
+      }
     }
 
     const episodes = await Episode.findAll(query)
@@ -192,11 +230,6 @@ module.exports.getEpisodes = async (req, res) => {
     console.log(e)
 
     throw new Error('Error in getFeed')
-
-    // const code = res.statusCode ? res.statusCode : 422
-    // return res.status(code).json({
-    //   errors: {body: ['Could not create article', e.message]}
-    // })
   }
 }
 

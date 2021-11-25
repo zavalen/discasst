@@ -1,28 +1,29 @@
 <template>
   <pd-popup v-if="isOpen" ref="authPopup">
+    <div class="authpopup__header">
+      <router-link
+        class="button"
+        :class="{button_active: authComponent === 'LoginForm'}"
+        :to="{
+          query: {
+            auth: 'login',
+          },
+        }"
+        >{{ $t('header.login') }}</router-link
+      >
+      <router-link
+        class="button"
+        :class="{button_active: authComponent === 'RegisterForm'}"
+        :to="{
+          query: {
+            auth: 'register',
+          },
+        }"
+        >{{ $t('header.register') }}</router-link
+      >
+    </div>
+
     <component :is="authComponent" />
-    <router-link
-      class="button"
-      exact-path-active-class="button_active"
-      exact-path
-      :to="{
-        query: {
-          auth: 'login',
-        },
-      }"
-      >{{ $t('header.login') }}</router-link
-    >
-    <router-link
-      class="button"
-      exact-path
-      active-class="button_active"
-      :to="{
-        query: {
-          auth: 'register',
-        },
-      }"
-      >{{ $t('header.register') }}</router-link
-    >
   </pd-popup>
 </template>
 
@@ -84,3 +85,9 @@ export default {
   },
 }
 </script>
+
+<style lang="scss">
+.authpopup__header {
+  margin-bottom: 24px;
+}
+</style>

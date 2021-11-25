@@ -1,27 +1,33 @@
 import {setItem, getItem} from '@/helpers/persistenceStorage.js'
+import api from '@/api/auth'
+import auth from '@/store/modules/auth'
 
 const state = {
   lang: getItem('lang') || 'ru'
 }
 
 export const langMutations = {
-  switch: '[lang] switch'
+  set: '[lang] set'
 }
 
 export const langActions = {
-  switchAndSave: '[lang] switchAndSave'
+  setAndSave: '[lang] setAndSave'
 }
 
 const mutations = {
-  [langMutations.switch](state) {
-    state.lang = state.lang === 'ru' ? 'en' : 'ru'
+  [langMutations.set](state, lang) {
+    state.lang = lang
   }
 }
 
 const actions = {
-  [langActions.switchAndSave](ctx) {
-    ctx.commit(langMutations.switch)
+  async [langActions.setAndSave](ctx, payload) {
+    ctx.commit(langMutations.set, payload)
     setItem('lang', state.lang)
+
+    if (auth.state.currentUser) {
+      await api.updateUserDetails({lang: payload})
+    }
   }
 }
 

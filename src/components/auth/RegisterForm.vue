@@ -1,6 +1,6 @@
 <template>
   <div class="auth-page">
-    <h2>{{ $t('register.header') }}</h2>
+    <!-- <h2>{{ $t('register.header') }}</h2> -->
 
     <pd-validation-errors
       v-if="validationErrors"
@@ -60,16 +60,16 @@ export default {
     return {
       username: '',
       email: '',
-      password: ''
+      password: '',
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: state => state.auth.isSubmitting,
-      validationErrors: state => state.auth.validationErrors,
-      theme: state => state.theme.theme,
-      lang: state => state.lang.lang
-    })
+      isSubmitting: (state) => state.auth.isSubmitting,
+      validationErrors: (state) => state.auth.validationErrors,
+      theme: (state) => state.theme.theme,
+      lang: (state) => state.lang.lang,
+    }),
   },
   mounted() {
     this.$router.push('?auth=register')
@@ -88,12 +88,12 @@ export default {
           email: this.email,
           password: this.password,
           theme: this.theme,
-          lang: this.lang
+          lang: this.lang,
         })
         .then(() => {
           this.$router.push('?')
         })
-    }
-  }
+    },
+  },
 }
 </script>

@@ -5,6 +5,7 @@ const User = require('../models/User')
 const Subscriptions = require('../models/Subscriptions')
 const sequelize = require('../dbConnection')
 const podcastFeedParser = require('podcast-feed-parser')
+const {getPodcastJson} = require('../utils/podcastParser')
 const {
   slugify,
   isAcceptablePodcastSlug,
@@ -67,73 +68,12 @@ module.exports.createPodcast = async (req, res) => {
       return
     }
 
-    const options = {
-      meta: {
-        title: '',
-        description: '',
-        subtitle: '',
-        imageURL: '',
-        lastUpdated: '',
-        link: '',
-        language: '',
-        editor: '',
-        author: '',
-        summary: '',
-        categories: [],
-        owner: {
-          name: '',
-          email: ''
-        },
-        explicit: true,
-        complete: true,
-        blocked: true
-      },
-      episodes: [
-        {
-          title: '',
-          description: '',
-          imageURL: '',
-          pubDate: '',
-          link: '',
-          language: '',
-          'itunes:season': '',
-          'itunes:episode': '',
-          enclosure: {
-            length: '0',
-            type: '',
-            url: ''
-          },
-          duration: 0,
-          summary: '',
-          blocked: true,
-          explicit: true,
-          order: 1
-        }
-      ]
-    }
-
-    const fullPodcast = await getPodcastFromRss(rssUrl, options)
+    const fullPodcast = await getPodcastJson(rssUrl)
     if (!fullPodcast) throw new Error('Something wrong while parsing')
     const podcast = fullPodcast.meta
-    podcast.rss = rssUrl
-    if (
-      podcast.description.includes('\n') ||
-      podcast.description.includes('\r')
-    ) {
-      podcast.description = jsonToHtml(podcast.description)
-    }
-    // CREATE SLUG
-    let slug = slugify(podcast.title)
-    if (!(await isAcceptablePodcastSlug(slug))) {
-      slug = slug + '-' + Math.floor(Math.random() * 1000)
-    }
-    podcast.slug = slug
 
-    podcast.ownerName = podcast.owner.name
-    podcast.ownerEmail = podcast.owner.email
-
-    for (let key in podcast) {
-      podcast[key] = sanitizeHtml(podcast[key])
+    if (!(await isAcceptablePodcastSlug(podcast.slug))) {
+      podcast.slug = podcast.slug + '-' + Math.floor(Math.random() * 1000)
     }
 
     const newPodcast = await Podcast.create(podcast)
@@ -151,30 +91,14 @@ module.exports.createPodcast = async (req, res) => {
     }
 
     const episodes = fullPodcast.episodes
-    console.log(episodes.length)
     for (let i = 0; i < episodes.length; i++) {
       const episode = episodes[i]
-      episode.episode = +episode.episode || episodes.length - i
 
-      if (
-        episode.description.includes('\n') ||
-        episode.description.includes('\r')
-      ) {
-        episode.description = jsonToHtml(episode.description)
-      }
       episode.PodcastId = newPodcast.id
-      episode.file = episode.enclosure.url
-      episode.enclosure = JSON.stringify(episode.enclosure)
-      let epSlug = slugify(episode.title)
       // if (!(await isAcceptableEpisodeSlug(slug))) {
       //   epSlug = epSlug + '-' + Math.floor(Math.random() * 1000)
       // }
-      episode.slug = epSlug
 
-      for (let key in episode) {
-        episode[key] = sanitizeHtml(episode[key])
-      }
-      console.log(episode)
       await Episode.create(episode)
     }
 
@@ -382,19 +306,19 @@ module.exports.unsubscribe = async (req, res) => {
   }
 }
 
-async function getPodcastFromRss(url) {
-  const podcast = await getPodcastJson(url)
-  // podcast.meta.description = formatJsonToHtml(podcast.meta.description)
+// async function getPodcastFromRss(url) {
+//   const podcast = await getPodcastJson(url)
+//   // podcast.meta.description = formatJsonToHtml(podcast.meta.description)
 
-  // podcast.episodes = podcast.episodes.map(ep => {
-  //   ep.description = formatJsonToHtml(ep.description)
-  // })
+//   // podcast.episodes = podcast.episodes.map(ep => {
+//   //   ep.description = formatJsonToHtml(ep.description)
+//   // })
 
-  return podcast
-}
+//   return podcast
+// }
 
-async function getPodcastJson(url) {
-  const podcast = await podcastFeedParser.getPodcastFromURL(url)
+// async function getPodcastJson(url) {
+//   const podcast = await podcastFeedParser.getPodcastFromURL(url)
 
-  return podcast
-}
+//   return podcast
+// }

@@ -8,36 +8,37 @@ const state = {
 }
 
 export const feedMutations = {
-  getFirstPageStart: '[feed] getFirstPageStart',
-  getFirstPageSuccess: '[feed] getFirstPageSuccess',
-  addToFeedSuccess: '[feed] getFirstPageSuccess',
-  getFeedFailure: '[feed] getFeedFailure',
+  getEpisodesStart: '[feed] getEpisodesStart',
+  getEpisodesSuccess: '[feed] getEpisodesSuccess',
+  addToEpisodesSuccess: '[feed] getEpisodesSuccess',
+  getEpisodesFailure: '[feed] getEpisodesFailure',
 
   makePageLast: '[feed] makePageLast'
 }
 
 export const feedActions = {
-  getFeed: '[feed] getFeed'
+  getEpisodes: '[feed] getEpisodes'
 }
 
 const mutations = {
-  [feedMutations.getFirstPageStart](state) {
+  [feedMutations.getEpisodesStart](state) {
     state.isLoading = true
     state.errors = null
     state.episodes = []
     state.lastPage = false
   },
-  [feedMutations.getFirstPageSuccess](state, payload) {
+
+  [feedMutations.getEpisodesSuccess](state, payload) {
     state.isLoading = false
     state.episodes = payload
     state.errors = null
   },
-  [feedMutations.addToFeedSuccess](state, payload) {
+  [feedMutations.addToEpisodesSuccess](state, payload) {
     state.isLoading = false
     state.episodes = state.episodes.concat(payload)
     state.errors = null
   },
-  [feedMutations.getFeedFailure](state, payload) {
+  [feedMutations.getEpisodesFailure](state, payload) {
     state.isLoading = false
     state.errors = payload
   },
@@ -47,22 +48,22 @@ const mutations = {
 }
 
 const actions = {
-  [feedActions.getFeed](context, payload) {
+  [feedActions.getEpisodes](context, payload) {
     return new Promise(resolve => {
       if (payload.page === 1) {
-        context.commit(feedMutations.getFirstPageStart)
+        context.commit(feedMutations.getEpisodesStart)
       }
       feed
-        .getFeed(payload)
+        .getEpisodes(payload)
         .then(response => {
           if (payload.page === 1) {
             context.commit(
-              feedMutations.getFirstPageSuccess,
+              feedMutations.getEpisodesSuccess,
               response.data.episodes
             )
           } else {
             context.commit(
-              feedMutations.addToFeedSuccess,
+              feedMutations.addToEpisodesSuccess,
               response.data.episodes
             )
           }
@@ -72,7 +73,7 @@ const actions = {
           resolve(response.data.episodes)
         })
         .catch(result => {
-          context.commit(feedMutations.getFeedFailure, result.response)
+          context.commit(feedMutations.getEpisodesFailure, result.response)
         })
     })
   }
@@ -83,7 +84,3 @@ export default {
   mutations,
   actions
 }
-
-// function makeArrayUnique(arr) {
-//   return arr.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i)
-// }

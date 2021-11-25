@@ -1,37 +1,49 @@
 <template>
-  <a href="#" @click.prevent="switchTheme">
-    <!-- <svg-icon
-        style="margin-right:8px"
-        :name="theme === 'light' ? 'moon' : 'sun'"
-      /> -->
-    <svg-icon style="margin-right: 8px" v-if="theme === 'light'" name="moon" />
-    <svg-icon style="margin-right: 8px" v-if="theme !== 'light'" name="sun" />
+  <a href="?switch-theme" @click.prevent="switchTheme">
+    <svg-icon
+      style="margin-right: 8px"
+      :name="theme === 'light' ? 'moon' : 'sun'"
+    />
     {{ theme === 'light' ? $t('header.darkTheme') : $t('header.lightTheme') }}
   </a>
 </template>
 
 <script>
 import {themeActions} from '@/store/modules/theme'
+import {mapState, mapGetters} from 'vuex'
+import {authGetters} from '@/store/modules/auth'
 
 export default {
   name: 'ThemeSwitcher',
-  components: {},
-  beforeMount() {
+  mounted() {
     this.setTheme()
   },
   computed: {
-    theme() {
-      return this.$store.state.theme.theme
-    },
+    ...mapState({
+      theme: (state) => state.theme.theme,
+    }),
+    ...mapGetters({
+      currentUser: authGetters.currentUser,
+    }),
   },
   methods: {
     switchTheme() {
-      this.$store.dispatch(themeActions.switchAndSave)
-      this.setTheme()
+      const newTheme = this.theme === 'light' ? 'dark' : 'light'
+      this.$store.dispatch(themeActions.setAndSave, newTheme)
     },
-    setTheme() {
+    setTheme(theme = this.theme) {
       let html = document.getElementsByTagName('html')[0]
-      html.setAttribute('data-theme', this.theme)
+      html.setAttribute('data-theme', theme)
+    },
+  },
+  watch: {
+    theme(newTheme) {
+      this.setTheme(newTheme)
+    },
+    currentUser(user) {
+      if (user && user.theme) {
+        this.$store.dispatch(themeActions.setAndSave, user.theme)
+      }
     },
   },
 }

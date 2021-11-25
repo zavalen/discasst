@@ -17,7 +17,7 @@
             </button>
           </form>
         </div>
-        <pd-feed :api-url="apiUrl" />
+        <pd-episodes :api-url="apiUrl" />
       </div>
       <div class="sidebar"></div>
     </div>
@@ -25,14 +25,14 @@
 </template>
 
 <script>
-import PdFeed from '@/components/PdFeed'
+import PdEpisodes from '@/components/PdEpisodes'
 export default {
   name: 'PdSearch',
-  components: {PdFeed},
+  components: {PdEpisodes},
   data() {
     return {
       search: '',
-      apiUrl: '/articles',
+      apiUrl: '/episodes',
     }
   },
   watch: {

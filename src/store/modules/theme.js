@@ -1,26 +1,32 @@
 import {setItem, getItem} from '@/helpers/persistenceStorage.js'
+import api from '@/api/auth'
+import auth from '@/store/modules/auth'
 
 const state = {
   theme: getItem('theme') || 'light'
 }
 
 export const themeMutation = {
-  switch: '[theme] switch'
+  set: '[theme] set'
 }
 export const themeActions = {
-  switchAndSave: '[theme] switchAndSave'
+  setAndSave: '[theme] setAndSave'
 }
 
 const mutations = {
-  [themeMutation.switch](state) {
-    state.theme = state.theme === 'light' ? 'dark' : 'light'
+  [themeMutation.set](state, theme) {
+    state.theme = theme
   }
 }
 
 const actions = {
-  [themeActions.switchAndSave](context) {
-    context.commit(themeMutation.switch)
-    setItem('theme', state.theme)
+  async [themeActions.setAndSave](context, payload) {
+    context.commit(themeMutation.set, payload)
+    setItem('theme', payload)
+
+    if (auth.state.currentUser) {
+      await api.updateUserDetails({theme: payload})
+    }
   }
 }
 

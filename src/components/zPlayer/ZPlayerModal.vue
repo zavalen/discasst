@@ -41,7 +41,7 @@
         />
 
         <div @click="closeModal" class="zmodal__close">
-          <svg-icon name="close" />
+          <svg-icon name="arrow-down" />
         </div>
       </div>
       <div class="zmodal__content scrollbar">
@@ -49,6 +49,7 @@
       </div>
     </div>
     <!-- <div class="zmodal__bottom">sssssssss</div> -->
+    <span class="zmodal__bottom-arrow"> </span>
   </div>
 </template>
 
@@ -66,7 +67,7 @@ export default {
     ZPlayerHistory,
     ZPlayerQueue,
     SlideRightTransition,
-    PdTabs
+    PdTabs,
   },
   data() {
     return {
@@ -74,16 +75,16 @@ export default {
       currentTab: 'ZPlayerQueue',
       tabs: [
         {title: 'Очередь воспроизведения', value: 'ZPlayerQueue'},
-        {title: 'История', value: 'ZPlayerHistory'}
-      ]
+        {title: 'История', value: 'ZPlayerHistory'},
+      ],
     }
   },
 
   computed: {
     ...mapState({
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode
-    })
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+    }),
   },
   watch: {
     currentEpisode() {
@@ -93,7 +94,7 @@ export default {
         // await this.$nextTick()
         this.currentEpisodeVisibility = true
       }, 500)
-    }
+    },
   },
   methods: {
     // openQueue() {
@@ -107,8 +108,8 @@ export default {
     },
     handleClick(newTab) {
       this.currentTab = newTab
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -120,7 +121,8 @@ export default {
   background: var(--color-zplayer-bg);
   border-radius: 10px;
   box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-  overflow: hidden;
+  // overflow: hidden;
+  position: relative;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -217,6 +219,20 @@ export default {
     box-shadow: none;
     text-shadow: 0 0 1px var(--color-text);
     bottom: -1px;
+  }
+
+  &__bottom-arrow {
+    position: absolute;
+    background: var(--color-header-bg-submenu);
+    transform: rotate(-45deg);
+    width: 16px;
+    height: 16px;
+    right: 28px;
+    bottom: -8px;
+    transition: 0.2s;
+    border-left: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 2px;
   }
 }
 

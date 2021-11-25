@@ -40,8 +40,23 @@ const routes = [
   },
   {
     path: '/feed',
-    name: 'feed',
-    component: () => import('@/views/GlobalFeed')
+    name: 'episodes',
+    component: () => import('@/views/GlobalFeed'),
+    redirect: {name: 'allEpisodes'},
+    children: [
+      {
+        path: '',
+        name: 'allEpisodes',
+        component: () => import('@/components/PdEpisodes'),
+        props: {apiUrl: '/episodes'}
+      },
+      {
+        path: 'subscriptions',
+        name: 'subscriptions',
+        component: () => import('@/components/PdEpisodes'),
+        props: {apiUrl: '/episodes?subscriptions=true'}
+      }
+    ]
   },
   {
     path: '/:podcastSlug/:episodeSlug',
@@ -54,14 +69,14 @@ const routes = [
     component: () => import('@/views/Podcast')
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: '404',
-    component: () => import('@/views/NotFound')
-  },
-  {
     path: '/add-podcast',
     name: 'add-podcast',
     component: () => import('@/views/AddPodcast')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: '404',
+    component: () => import('@/views/NotFound')
   }
 ]
 

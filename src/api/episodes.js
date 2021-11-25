@@ -1,6 +1,6 @@
 import axios from '@/api/axios'
 
-const getFeed = payload => {
+const getEpisodes = payload => {
   return axios.get(payload.apiUrl, {
     params: payload.params
   })
@@ -22,7 +22,7 @@ const getHistory = payload => {
 }
 
 export default {
-  getFeed,
+  getEpisodes,
   sendProgress,
   sendToHistory,
   getHistory

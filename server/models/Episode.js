@@ -25,9 +25,6 @@ const Episode = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true
     },
-    subtitle: {
-      type: DataTypes.TEXT
-    },
     pubDate: {
       type: DataTypes.STRING,
       allowNull: true
@@ -41,7 +38,7 @@ const Episode = sequelize.define(
       allowNull: false
     },
     enclosure: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSON,
       allowNull: true
     },
     duration: {
@@ -56,11 +53,6 @@ const Episode = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    summary: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-
     explicit: {
       type: DataTypes.BOOLEAN,
       allowNull: true

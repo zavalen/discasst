@@ -3,36 +3,23 @@
     <div class="feed-container">
       <div class="sidebar-left">
         <ul class="left-menu" :class="{'menu-margin': scrollDown}">
-          <li
-            class="left-menu__item"
-            :class="{'left-menu__item_active': apiUrl === '/episodes'}"
-            @click="apiUrl = '/episodes'"
-          >
-            <svg-icon name="all" />Все подряд
-          </li>
-          <li class="left-menu__item"><svg-icon name="radio" />Популярные</li>
-          <li class="left-menu__item">
-            <svg-icon name="subscriptions" />
-            <span> Подписки </span>
-          </li>
+          <template v-for="button in episodesButtons" :key="button.title">
+            <li v-if="button.loggedUsers ? isLoggedIn : true">
+              <router-link
+                :to="{name: button.pathName}"
+                class="left-menu__item"
+                exact-active-class="left-menu__item_active"
+              >
+                <svg-icon :name="button.icon" /> <span>{{ button.title }}</span>
+              </router-link>
+            </li>
+          </template>
           <hr style="margin-bottom: 16px" />
-          <span class="ad-title">Рекламируемые подкасты</span>
-          <li
-            class="left-menu__item"
-            :class="{
-              'left-menu__item_active':
-                apiUrl === '/episodes?podcastSlug=newochem&limit=5&offser=0',
-            }"
-            @click="apiUrl = '/episodes?podcastSlug=newochem&limit=5&offser=0'"
-          >
-            <svg-icon name="subscriptions" />
-            <span> Newочём </span>
-          </li>
         </ul>
       </div>
 
       <div class="feed">
-        <pd-feed :api-url="apiUrl" />
+        <router-view />
       </div>
       <div class="sidebar"></div>
     </div>
@@ -40,15 +27,41 @@
 </template>
 
 <script>
-import PdFeed from '@/components/PdFeed'
+import {mapState, mapGetters} from 'vuex'
+import {authGetters} from '@/store/modules/auth'
+
+const episodesButtons = [
+  {
+    title: 'Свежие',
+    icon: 'all',
+    pathName: 'allEpisodes',
+    loggedUsers: false,
+  },
+  {
+    title: 'Подписки',
+    icon: 'subscriptions',
+    pathName: 'subscriptions',
+    loggedUsers: true,
+  },
+]
+
 export default {
   name: 'PdGlobalFeed',
-  components: {PdFeed},
   data() {
     return {
-      apiUrl: '/episodes',
+      episodesButtons,
       scrollDown: false,
     }
+  },
+  computed: {
+    ...mapState({
+      userSubscriptions: (state) => state.podcasts.userSubscriptions,
+    }),
+    ...mapGetters({
+      currentUser: authGetters.currentUser,
+      isLoggedIn: authGetters.isLoggedIn,
+      isAnonymus: authGetters.isAnonymus,
+    }),
   },
   mounted() {
     document.addEventListener('mousewheel', this.wheelHandler)
@@ -78,11 +91,12 @@ export default {
   justify-content: space-between;
   width: 100%;
 }
-.feed {
-  width: 700px;
-}
+// .feed {
+//   width: 700px;
+// }
 .sidebar-left {
-  flex: auto;
+  // flex: auto;
+  width: 175px;
 }
 .sidebar {
   border-radius: 10px;
@@ -113,7 +127,7 @@ export default {
     color: var(--color-text-secondary);
     text-shadow: 0 0 0.5px var(--color-text-secondary);
     border: 1px solid transparent;
-
+    text-decoration: none;
     & > .icon {
       margin-right: 10px;
     }

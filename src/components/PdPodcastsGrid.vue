@@ -28,7 +28,7 @@ import {mapState} from 'vuex'
 import PdLoader from '@/components/ui/PdLoader'
 
 export default {
-  name: 'PdFeed',
+  name: 'PdEpisodes',
   components: {PdLoader},
 
   props: {

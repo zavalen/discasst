@@ -3,7 +3,7 @@
     <draggable
       v-model="queue"
       item-key="id"
-      handle=".zEpisode__drag"
+      handle=".zEpisode__icon"
       :component-data="{
         tag: 'ul',
         type: 'transition-group',
@@ -18,7 +18,7 @@
           <div class="zEpisode__main">
             <div
               class="zEpisode__play"
-              @click="playEpisode(episode(element.id))"
+              @click="playEpisode(getEpisodeById(element.id))"
             >
               <svg-icon
                 :name="
@@ -46,7 +46,7 @@
                 :to="{
                   name: 'podcast',
                   params: {
-                    podcastSlug: episode ? element.Podcast.slug : 's',
+                    podcastSlug: element ? element.Podcast.slug : '',
                   },
                 }"
                 class="zEpisode__podcast"
@@ -54,8 +54,11 @@
               >
             </div>
           </div>
-          <div class="zEpisode__drag">
+          <div class="zEpisode__icon">
             <svg-icon name="drag" />
+          </div>
+          <div @click="removeFromQueue(element.id)" class="zEpisode__icon">
+            <svg-icon name="close" />
           </div>
         </div>
       </template>
@@ -110,11 +113,13 @@ export default {
     closeModal() {
       this.$store.commit(zPlayerMutations.closeModal)
     },
-    toggleDescription() {
-      this.descriptionOpen = !this.descriptionOpen
-    },
-    episode(id) {
+
+    getEpisodeById(id) {
       return this.queue.find((ep) => ep.id === id)
+    },
+    removeFromQueue(id) {
+      const episode = this.getEpisodeById(id)
+      this.$store.commit(zPlayerMutations.removeFromQueue, episode)
     },
   },
 }
@@ -134,7 +139,7 @@ export default {
 }
 
 .zEpisode {
-  padding: 16px;
+  padding: 8px 16px;
   border-radius: 10px;
   border: 1px solid var(--color-border);
   margin-bottom: 8px;
@@ -147,6 +152,7 @@ export default {
   &__main {
     display: flex;
     align-items: center;
+    flex: auto;
   }
   &__play {
     margin-right: 16px;
@@ -203,8 +209,12 @@ export default {
     cursor: pointer;
   }
 
-  &__drag {
-    cursor: move;
+  &__icon {
+    cursor: pointer;
+    margin-left: 8px;
+    .drag {
+      cursor: move;
+    }
   }
 }
 

@@ -171,9 +171,16 @@
               </div>
             </div>
 
-            <div class="zPlayer__playlist" @click="toggleModal" ref="zplaylist">
+            <div
+              class="zPlayer__playlist"
+              :class="{zPlayer__playlist_active: isModalOpen}"
+              @click="toggleModal"
+              ref="zplaylist"
+            >
               <svg-icon name="playlist" />
-              <span class="zPlayer__playlist-counter">{{ queue.length }}</span>
+              <span ref="queueCounter" class="zPlayer__playlist-counter">{{
+                queue.length
+              }}</span>
             </div>
           </div>
         </div>
@@ -214,7 +221,6 @@ export default {
       mouseOverPx: null,
       mousepressVolume: false,
       volume: 0.8,
-      // isModalOpen: false,
       previousIndex: 0,
       userInfo: null,
     }
@@ -257,6 +263,13 @@ export default {
       } else {
         this.playerJs.api('pause')
       }
+    },
+    queue() {
+      this.$refs.queueCounter.classList.add('counter-changed')
+
+      setTimeout(() => {
+        this.$refs.queueCounter.classList.remove('counter-changed')
+      }, 500)
     },
   },
   methods: {
@@ -775,6 +788,10 @@ export default {
     cursor: pointer;
     position: relative;
     @include button-effect;
+
+    &_active {
+      opacity: 1;
+    }
   }
 
   &__playlist-counter {
@@ -786,10 +803,11 @@ export default {
     width: 16px;
     height: 16px;
     background-color: var(--color-text);
-    color: #fff;
+    color: var(--color-text-reverse);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: 0.3s;
   }
 
   &__speed {
@@ -813,5 +831,10 @@ export default {
   &:hover {
     opacity: 0.2;
   }
+}
+
+.counter-changed {
+  background: var(--color-accent);
+  transform: scale(1.3);
 }
 </style>

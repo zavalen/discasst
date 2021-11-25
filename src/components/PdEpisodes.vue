@@ -22,8 +22,13 @@
       </div>
     </template>
     <div v-if="errors">Something goes wrong...</div>
-
-    <template v-if="episodes.length >= 1">
+    <div
+      class="no-episode"
+      v-if="!episodes.length && apiUrl.includes('subscriptions')"
+    >
+      У вас ещё нет ни одной подписки :(
+    </div>
+    <template v-if="episodes.length">
       <div
         class="feed-episode"
         v-for="episode in episodes"
@@ -151,7 +156,7 @@
 </template>
 
 <script>
-import {feedActions} from '@/store/modules/feed'
+import {feedActions} from '@/store/modules/episodes'
 import {mapState, mapGetters} from 'vuex'
 import {authGetters} from '@/store/modules/auth'
 import {podcastsActions} from '@/store/modules/podcasts'
@@ -161,7 +166,7 @@ import 'moment/locale/ru' // without this line it didn't work
 moment.locale('ru')
 
 export default {
-  name: 'PdFeed',
+  name: 'PdEpisodes',
 
   props: {
     apiUrl: {
@@ -218,12 +223,18 @@ export default {
       moment.locale(newLang)
     },
     apiUrl() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
       this.page = 1
       this.loadFeed()
-      window.scrollTo({y: 0, behavior: 'smooth'})
     },
-    userSubscriptions(newVal) {
-      console.log(newVal)
+    userSubscriptions() {
+      this.page = 1
+      if (this.apiUrl.includes('subscriptions')) {
+        this.loadFeed()
+      }
     },
   },
   methods: {
@@ -235,7 +246,7 @@ export default {
       }
     },
     loadFeed() {
-      this.$store.dispatch(feedActions.getFeed, this.payload)
+      this.$store.dispatch(feedActions.getEpisodes, this.payload)
       this.page++
     },
     toggleInQueue(episode) {
@@ -257,9 +268,12 @@ export default {
         .replace(/^0(?:0:0?)?/, '')
     },
     formatDate(date) {
-      return moment(date)
-        .format('D MMMM YYYY', {trim: true})
-        .replace(new Date().getFullYear(), '')
+      return (
+        moment(date)
+          // .unix(date / 1000)
+          .format('D MMMM YYYY', {trim: true})
+          .replace(new Date().getFullYear(), '')
+      )
     },
     formatDuration(seconds) {
       let minutes = Math.floor(seconds / 60)
@@ -326,7 +340,7 @@ export default {
   display: flex;
   overflow: hidden;
   height: 184px;
-  width: 700px;
+  width: 686px;
   position: relative;
   padding-bottom: 4px;
   &:hover {
@@ -571,5 +585,23 @@ export default {
   to {
     background-position: 315px 0, 0 0, 0 190px, 50px 195px;
   }
+}
+
+.no-episode {
+  background: var(--color-block-bg);
+  border-radius: 10px;
+  margin-right: auto;
+  margin-left: auto;
+  border: 1px solid var(--color-border);
+  // box-shadow: 0 2px 2px var(--color-light-shadow);
+  overflow: hidden;
+  position: relative;
+  padding: 24px 36px;
+  font-weight: 600;
+  height: 360px;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

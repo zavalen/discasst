@@ -1,5 +1,5 @@
 <template>
-  <header class="header" :class="{hide: !isHeaderVisible && !isModalOpen}">
+  <header :class="{hide: !isHeaderVisible && !isModalOpen}" class="header">
     <div class="header__wrapper container">
       <div class="header__left" v-click-outside="closeMenu">
         <a href="#" class="header__burger" @click="toggleMenu">
@@ -35,11 +35,11 @@
               <li class="main-nav__item">
                 <router-link
                   v-ripple
-                  :to="{name: 'feed'}"
+                  :to="{name: 'episodes'}"
                   class="main-nav__item-link button"
                   @click="closeMenu"
                   active-class="button_active"
-                  >{{ $t('header.episodes') }}</router-link
+                  >{{ $t('header.feed') }}</router-link
                 >
               </li>
               <li class="main-nav__item">
@@ -100,6 +100,8 @@
               class="user-submenu"
             >
               <div v-if="isAnonymus" class="user-submenu__top">
+                <span class="user-submenu__top-arrow"></span>
+
                 {{ $t('header.anonymus') }}
               </div>
               <div
@@ -107,6 +109,8 @@
                 class="user-submenu__top"
                 :class="{'user-submenu__top_logged': isLoggedIn}"
               >
+                <span class="user-submenu__top-arrow"></span>
+
                 <user-icon />
                 {{ cutString(currentUser.username, 21) }}
                 <router-link
@@ -286,7 +290,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 @import '@/assets/scss/_mixins.scss';
 
 .main-nav,
@@ -507,23 +511,9 @@ export default {
     white-space: nowrap;
     font-weight: 600;
     position: relative;
-    overflow: hidden;
-    // &:before,
-    &:after {
-      content: '\A';
-      position: absolute;
-      background: var(--color-header-bg-submenu);
-      transform: rotate(45deg);
-      width: 12px;
-      height: 12px;
-      right: 8px;
-      top: -6px;
-      transition: 0.2s;
-    }
-    &:before {
-      // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-      z-index: -1;
-    }
+    // overflow: hidden;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 
     .user-icon {
       width: 30px;
@@ -532,16 +522,28 @@ export default {
 
     &_logged {
       padding: 0 32px 0 16px;
-      white-space: nowrap;
       &:hover {
         background: var(--bg-menu-item-hover);
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        &:after {
+
+        .user-submenu__top-arrow {
           background: var(--bg-menu-item-hover);
         }
       }
     }
+  }
+
+  &__top-arrow {
+    position: absolute;
+    background: var(--color-header-bg-submenu);
+    transform: rotate(45deg);
+    width: 12px;
+    height: 12px;
+    right: 7px;
+    top: -6px;
+    transition: 0.2s;
+    border-left: 1px solid var(--color-border);
+    border-top: 1px solid var(--color-border);
+    border-radius: 2px;
   }
 
   &__arrow-right {
@@ -613,6 +615,6 @@ export default {
 }
 
 .hide {
-  top: -56px;
+  top: -56px !important;
 }
 </style>

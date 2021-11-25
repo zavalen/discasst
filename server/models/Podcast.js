@@ -23,31 +23,25 @@ const Podcast = sequelize.define('Podcast', {
     type: DataTypes.TEXT,
     allowNull: true
   },
-  subtitle: {
-    type: DataTypes.TEXT
-  },
   imageURL: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true
   },
+  rss: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
   link: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false
   },
   language: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  authorName: {
+
+  creator: {
     type: DataTypes.STRING,
-    allowNull: true
-  },
-  summary: {
-    type: DataTypes.TEXT,
-    allowNull: true
-  },
-  categories: {
-    type: DataTypes.JSON,
     allowNull: true
   },
   ownerName: {
@@ -59,12 +53,24 @@ const Podcast = sequelize.define('Podcast', {
     allowNull: true
   },
   explicit: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
     allowNull: true
   },
-  rss: {
-    type: DataTypes.STRING,
-    allowNull: false
+  generator: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  copyright: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  categories: {
+    type: DataTypes.JSON,
+    allowNull: true
+  },
+  keywords: {
+    type: DataTypes.JSON,
+    allowNull: true
   }
 })
 

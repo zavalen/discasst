@@ -1,6 +1,6 @@
 <template>
   <div class="auth-wrapper">
-    <h2 class="auth-wrapper__header">{{ $t('login.header') }}</h2>
+    <!-- <h2 class="auth-wrapper__header">{{ $t('login.header') }}</h2> -->
 
     <pd-validation-errors
       v-if="validationErrors"
@@ -45,14 +45,14 @@ export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
     }
   },
   computed: {
     ...mapState({
-      isSubmitting: state => state.auth.isSubmitting,
-      validationErrors: state => state.auth.validationErrors
-    })
+      isSubmitting: (state) => state.auth.isSubmitting,
+      validationErrors: (state) => state.auth.validationErrors,
+    }),
   },
   mounted() {
     this.$router.push({query: {auth: 'login'}})
@@ -69,7 +69,7 @@ export default {
       this.$store
         .dispatch(authActions.login, {
           email: this.email,
-          password: this.password
+          password: this.password,
         })
         .then(() => {
           this.$router.push({query: {}})
@@ -79,7 +79,7 @@ export default {
       if (e.key === 'Enter') {
         this.onSubmit()
       }
-    }
-  }
+    },
+  },
 }
 </script>
