@@ -12,7 +12,7 @@ const getPodcastBySlug = podcastSlug => {
   return axios.get(`/podcasts`, {params: {podcastSlug}})
 }
 
-const addPodcast = rss => {
+const findOrAddPodcast = rss => {
   return axios.post(`/podcasts`, {rss: rss})
 }
 
@@ -33,7 +33,7 @@ const unsubscribe = podcastId => {
 export default {
   getPodcasts,
   getEpisodeById,
-  addPodcast,
+  findOrAddPodcast,
   getPodcastBySlug,
   getSubscribtions,
   subscribe,

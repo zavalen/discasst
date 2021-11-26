@@ -265,11 +265,12 @@ export default {
       }
     },
     queue() {
-      this.$refs.queueCounter.classList.add('counter-changed')
-
-      setTimeout(() => {
-        this.$refs.queueCounter.classList.remove('counter-changed')
-      }, 500)
+      if (this.$refs.queueCounter) {
+        this.$refs.queueCounter.classList.add('counter-changed')
+        setTimeout(() => {
+          this.$refs.queueCounter.classList.remove('counter-changed')
+        }, 500)
+      }
     },
   },
   methods: {

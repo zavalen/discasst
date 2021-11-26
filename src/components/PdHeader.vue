@@ -422,7 +422,7 @@ export default {
 
   background: var(--color-header-bg);
   padding-top: 8px;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
 
   box-shadow: 0 2px 2px var(--color-light-shadow);
   &__wrapper {
@@ -615,6 +615,6 @@ export default {
 }
 
 .hide {
-  top: -56px !important;
+  top: -52px !important;
 }
 </style>

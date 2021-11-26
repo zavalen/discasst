@@ -65,6 +65,7 @@ export default {
   },
   mounted() {
     document.addEventListener('mousewheel', this.wheelHandler)
+    window.scrollTo({top: 0})
   },
   unmounted() {
     document.removeEventListener('mousewheel', this.wheelHandler)
