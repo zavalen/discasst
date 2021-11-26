@@ -59,7 +59,6 @@ module.exports.createPodcast = async (req, res) => {
     if (!validator.isURL(req.body.rss)) throw new Error('It is not URL')
 
     const rssUrl = req.body.rss
-
     const existingPodcast = await Podcast.findOne({
       where: {rss: rssUrl}
     })

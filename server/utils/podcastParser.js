@@ -13,11 +13,19 @@ module.exports.getPodcastJson = async url => {
   console.log('Start parsing podcast: ' + url)
 
   const podcastJson = await parser.parseURL(url)
+
   let parsingTime = Date.now() - startTime
   console.log(
     `Parsing of "${podcastJson.title}" (${url}) takes ${parsingTime /
       1000} seconds.`
   )
+
+  // fs.writeFile('podcasttest.json', JSON.stringify(podcastJson), err => {
+  //   if (err) {
+  //     console.error(err)
+  //     return
+  //   }
+  // })
 
   if (
     !podcastJson ||
@@ -32,25 +40,29 @@ module.exports.getPodcastJson = async url => {
   }
 
   const meta = getPodcastMeta(podcastJson, url)
+  console.log(meta)
 
   const episodes = getEpisodes(podcastJson)
 
-  // fs.writeFile('podcasttest.json', JSON.stringify({meta, episodes}), err => {
-  //   if (err) {
-  //     console.error(err)
-  //     return
-  //   }
-  // })
+  let formattingTime = Date.now() - startTime - parsingTime
+  console.log(
+    `Formatting of "${podcastJson.title}" (${url}) takes ${formattingTime /
+      1000} seconds.`
+  )
 
   return {meta, episodes}
 }
 
 function getPodcastMeta(podcastJson, rssUrl) {
   const meta = {}
+
   meta.title = podcastJson.title
+  if (rssUrl.includes('https://www.patreon.com/rss')) {
+    meta.title = meta.title + ' (Patreon feed)'
+  }
   meta.slug = slugify(meta.title)
   meta.description = jsonToHtml(podcastJson.description)
-  meta.imageURL = podcastJson.image?.url || podcastJson.itunes.image || ''
+  meta.imageURL = podcastJson.itunes.image || podcastJson.image?.url || ''
   meta.rss = rssUrl
   meta.link = podcastJson.link || ''
   meta.language = getLanguage(podcastJson.language)
@@ -144,6 +156,8 @@ function getLanguage(lang) {
 }
 
 function convertTimeToSeconds(time) {
+  if (!time) return 0
+
   return +time.split(':').reduce((acc, time) => 60 * acc + +time)
 }
 

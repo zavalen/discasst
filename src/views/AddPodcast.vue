@@ -3,7 +3,7 @@
     <div class="add-podcast">
       <div v-if="errors">{{ errors }}</div>
 
-      <form @submit.prevent="findOrAddPodcast">
+      <form @submit.prevent="findOrAddPodcast(searchQuery)">
         <input
           placeholder="RSS link or apple podcast link"
           type="text"
@@ -58,37 +58,24 @@ export default {
   },
   methods: {
     async getRssFromAppleById(searchQuery) {
-      if (
-        (searchQuery.startsWith('https://podcasts.apple.com/') &&
-          searchQuery.includes('id')) ||
-        searchQuery.startsWith('id')
-      ) {
-        let match = searchQuery.match(/id(\d+)/)
-        let podID
-        if (match) {
-          podID = match[1]
-        } else {
-          podID = searchQuery.match(/\d+/)
-        }
-
-        if (!podID) {
-          this.errors = 'Не удалось найти ID подкаста'
-          return
-        }
-
-        const results = await this.search(podID)
-        this.rss = results[0].feedUrl
+      let match = searchQuery.match(/id(\d+)/)
+      let podID
+      if (match) {
+        podID = match[1]
+      } else {
+        podID = searchQuery.match(/\d+/)
       }
+
+      if (!podID) {
+        this.errors = 'Не удалось найти ID подкаста'
+        return
+      }
+
+      const results = await this.search(podID)
+      this.rss = results[0].feedUrl
     },
     getRssFromUrl(searchQuery) {
-      if (
-        !searchQuery.startsWith('https://podcasts.apple.com/') &&
-        !searchQuery.startsWith('id')
-      ) {
-        if (this.isValidHttpUrl(searchQuery)) {
-          this.rss = searchQuery
-        }
-      }
+      this.rss = searchQuery
     },
     async search(searchQuery) {
       const encodedSearchQuery = encodeURI(searchQuery)
@@ -111,9 +98,8 @@ export default {
         this.errors = 'Что-то пошло не так'
       }
     },
-    async findOrAddPodcast(rss = this.rss) {
+    async findOrAddPodcast(rss) {
       this.isLoading = true
-
       const addedPodcast = await podcasts
         .findOrAddPodcast(rss)
         .then((response) => response.data)
@@ -139,12 +125,26 @@ export default {
   watch: {
     async searchQuery(newVal) {
       this.errors = null
-      this.getRssFromAppleById(newVal)
-      this.getRssFromUrl(newVal)
-      this.search(newVal)
+      if (newVal.length > 3) {
+        if (
+          newVal.startsWith('https://podcasts.apple.com/') ||
+          newVal.startsWith('id')
+        ) {
+          this.getRssFromAppleById(newVal)
+        } else if (this.isValidHttpUrl(newVal)) {
+          this.getRssFromUrl(newVal)
+        } else {
+          this.search(newVal)
+        }
+      }
     },
     rss(newRss) {
-      this.findOrAddPodcast(newRss)
+      if (typeof newRss === 'object') {
+        this.rss = this.searchQuery
+      }
+      if (typeof newRss === 'string') {
+        this.findOrAddPodcast(newRss)
+      }
     },
   },
 }

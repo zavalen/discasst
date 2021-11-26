@@ -48,21 +48,21 @@ export default {
 
 
 <style lang="scss">
-.feed-container {
-  display: flex;
-  max-width: 1128px;
-  width: 100%;
-  margin: 0 auto;
-}
+// .feed-container {
+//   display: flex;
+//   max-width: 1128px;
+//   width: 100%;
+//   margin: 0 auto;
+// }
 
-.feed {
-  width: 768px;
-}
-.sidebar {
-  margin-left: 60px;
-  width: 300px;
-  background: var(--color-block-bg);
-}
+// .feed {
+//   width: 768px;
+// }
+// .sidebar {
+//   margin-left: 60px;
+//   width: 300px;
+//   background: var(--color-block-bg);
+// }
 
 .search-header {
   background: var(--color-block-bg);

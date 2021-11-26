@@ -84,7 +84,6 @@ const actions = {
   },
   [statisticsActions.sendVisitor](context, visitor) {
     return new Promise(resolve => {
-      console.log(visitor)
       api
         .sendVisitor(visitor)
         .then(() => {
