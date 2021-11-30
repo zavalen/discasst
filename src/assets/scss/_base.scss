@@ -68,18 +68,18 @@ img {
   }
   &__zPlayer {
     position: sticky;
-    bottom: 16px;
+    bottom: 8px;
     max-width: 1240px;
     z-index: 97;
     padding: 0 16px;
-    margin: 0 auto 24px auto;
+    margin: 0 auto 12px auto;
   }
 }
 
 hr {
   height: 1px;
   border: 0;
-  background-color: var(--bg-menu-item-hover);
+  background-color: var(--bg-block-hover);
 }
 
 ul {
@@ -143,7 +143,7 @@ button {
   &_active,
   &:active,
   &:hover {
-    background-color: var(--bg-menu-item-hover);
+    background-color: var(--bg-block-hover);
     color: var(--color-text);
   }
 
@@ -201,4 +201,28 @@ input:not([type='select']) {
 
 .Vue-Toastification__container.bottom-left {
   bottom: 72px !important;
+}
+
+// .loading,
+img[lazy='loading'] {
+  background: linear-gradient(0.25turn, transparent, #fff, transparent),
+    linear-gradient(var(--bg-block-hover), var(--bg-block-hover)),
+    radial-gradient(
+      38px circle at 19px 19px,
+      var(--bg-block-hover) 50%,
+      transparent 51%
+    ),
+    linear-gradient(var(--bg-block-hover), var(--bg-block-hover));
+  background-repeat: no-repeat;
+  background-size: -315px 250px, 315px 180px, 100px 100px, 225px 30px;
+  background-position: -315px 0, 0 0, 0px 190px, 50px 195px;
+  animation-name: imgloading;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes imgloading {
+  to {
+    background-position: 315px 0, 0 0, 0 190px, 50px 195px;
+  }
 }

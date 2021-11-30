@@ -7,6 +7,7 @@ const getEpisodes = payload => {
 }
 
 const sendProgress = payload => {
+  console.log(payload)
   return axios.post('/episodes/progress', {progress: payload})
 }
 

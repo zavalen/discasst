@@ -119,7 +119,6 @@ const actions = {
     // set new episode
     context.commit(zPlayerMutations.setCurrentEpisode, episode)
     setItem('currentEpisode', episode)
-    console.log('playEpisode')
   },
   [zPlayerActions.setLastPoint](context, time) {
     context.commit(zPlayerMutations.setLastPoint, time)

@@ -28,7 +28,10 @@ createApp(App)
   .use(store)
   .use(router)
   .use(vClickOutside)
-  .use(VueLazyLoad)
+  .use(VueLazyLoad, {
+    log: false,
+    error: '/images/placeholder.png'
+  })
   .use(VTooltip)
   .component('SvgIcon', SvgIcon)
   .directive('ripple', Ripple)

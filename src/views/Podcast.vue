@@ -96,7 +96,7 @@ export default {
       border-radius: 10px;
       border: 1px solid var(--color-border);
       box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-      background-color: var(--bg-menu-item-hover);
+      background-color: var(--bg-block-hover);
     }
   }
 

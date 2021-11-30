@@ -28,6 +28,7 @@
                 "
               />
             </div>
+            <img class="zEpisode__image" v-lazy="element.Podcast.imageURL" />
             <div class="zEpisode__creditials">
               <router-link
                 @click="closeModal"
@@ -155,9 +156,16 @@ export default {
     flex: auto;
   }
   &__play {
-    margin-right: 16px;
+    margin-right: 12px;
     cursor: pointer;
-    width: 30px;
+    width: 24px;
+  }
+
+  &__image {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+    border-radius: 4px;
   }
 
   &__credits {

@@ -135,7 +135,7 @@ export default {
 
     &_active,
     &:hover {
-      background-color: var(--bg-menu-item-hover);
+      background-color: var(--bg-block-hover);
       color: var(--color-text);
       border-color: var(--color-border);
     }

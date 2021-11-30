@@ -173,7 +173,7 @@ export default {
     transition: 0.3s;
 
     &:hover {
-      background-color: var(--bg-menu-item-hover);
+      background-color: var(--bg-block-hover);
     }
   }
 }

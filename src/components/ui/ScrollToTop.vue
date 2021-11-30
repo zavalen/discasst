@@ -53,7 +53,7 @@ export default {
   background-color: transparent;
 
   &:hover {
-    background-color: var(--bg-menu-item-hover);
+    background-color: var(--bg-block-hover);
 
     .icon {
       opacity: 1;
@@ -62,7 +62,7 @@ export default {
 
   .icon {
     position: absolute;
-    bottom: 36px;
+    bottom: 24px;
     left: 16px;
     opacity: 0.3;
     transition: 0.3s;

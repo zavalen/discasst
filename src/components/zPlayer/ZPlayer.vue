@@ -250,14 +250,17 @@ export default {
         )
       }
     },
-    async feedEpisodes(newVal) {
-      if (!this.currentEpisode && newVal.length > 0) {
-        this.$store.dispatch(zPlayerActions.playEpisode, newVal[0])
-        await this.$nextTick()
-        this.$store.commit(zPlayerMutations.pause)
-      }
-    },
+    // async feedEpisodes(newVal) {
+    //   if (!this.currentEpisode && newVal.length > 0) {
+    //     this.$store.dispatch(zPlayerActions.playEpisode, newVal[0])
+    //     await this.$nextTick()
+    //     this.$store.commit(zPlayerMutations.pause)
+    //   }
+    // },
     isPlaying(newVal) {
+      if (!this.playerJs) {
+        return
+      }
       if (newVal) {
         this.playerJs.api('play')
       } else {
@@ -329,7 +332,10 @@ export default {
         this.isEpisodeLoading = true
       })
       document.addEventListener('keydown', (event) => {
-        if (event.code === 'Space') {
+        if (
+          event.code === 'Space' &&
+          document.activeElement.tagName.toLowerCase() !== 'input'
+        ) {
           event.preventDefault()
           this.togglePlay()
         }

@@ -54,30 +54,31 @@
               </li>
             </div>
             <div class="main-nav__right">
-              <li class="main-nav__item">
+              <!-- <li class="main-nav__item">
                 <router-link
                   :to="{name: 'add-podcast'}"
                   class="main-nav__item-link button"
                   active-class="button_active"
                   >{{ $t('header.addPodcast') }}</router-link
                 >
-              </li>
+              </li> -->
             </div>
           </ul>
         </slide-right-transition>
       </div>
+
       <ul class="header__user-menu nav">
         <template v-if="isAnonymus"> </template>
         <template v-if="isLoggedIn"> </template>
         <li class="nav__item">
-          <router-link
+          <span
+            @click="toggleSearch"
             v-ripple
-            :to="{name: 'search'}"
-            active-class="button_active"
+            :class="{button_active: searchActive}"
             class="nav__item-link button"
           >
-            <svg-icon name="search" />
-          </router-link>
+            <svg-icon :name="searchActive ? 'close' : 'search'" />
+          </span>
         </li>
         <pd-notifications class="nav__item" />
 
@@ -178,6 +179,18 @@
       </template>
       {{ $t('logout.confirmation') }}
     </pd-popup>
+    <div
+      class="header__search-wrapper"
+      @click="closeSearch"
+      v-if="searchActive"
+    >
+      <discover-search
+        @click.stop
+        @found="closeSearch"
+        :is-active="true"
+        class="header__search"
+      />
+    </div>
   </header>
 </template>
 
@@ -193,6 +206,8 @@ import FadeTransition from '@/components/animations/FadeTransition.vue'
 import SlideRightTransition from '@/components/animations/SlideRightTransition.vue'
 import PdLoader from '@/components/ui/PdLoader'
 import SvgIcon from './SvgIcon.vue'
+import DiscoverSearch from '@/components/DiscoverSearch'
+
 export default {
   name: 'PdNavbar',
   components: {
@@ -205,6 +220,7 @@ export default {
     PdNotifications,
     PdLoader,
     SvgIcon,
+    DiscoverSearch,
   },
   data() {
     return {
@@ -212,6 +228,7 @@ export default {
       isMenuActive: false,
       isHeaderVisible: true,
       scrollBefore: 0,
+      searchActive: false,
     }
   },
   mounted() {
@@ -285,6 +302,12 @@ export default {
 
         this.$router.push({name: 'home'})
       }
+    },
+    toggleSearch() {
+      this.searchActive = !this.searchActive
+    },
+    closeSearch() {
+      this.searchActive = false
     },
   },
 }
@@ -380,6 +403,23 @@ export default {
 .header {
   transition: 0.4s;
 
+  &__search-wrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: var(--color-popup-overlay);
+    z-index: 99999;
+    padding-top: 56px;
+  }
+
+  &__search {
+    max-width: 768px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
   * {
     transition: 0.2s;
   }
@@ -388,7 +428,7 @@ export default {
     display: flex;
     align-items: center;
     height: 100%;
-    flex: auto;
+    // flex: auto;
   }
 
   &__burger {
@@ -436,7 +476,7 @@ export default {
     font-family: 'Titillium Web', sans-serif;
     font-size: 28px;
     padding-top: 0;
-    margin-right: 84px;
+    margin-right: 48px;
     color: var(--color-accent);
     text-decoration: none;
     position: relative;
@@ -523,10 +563,10 @@ export default {
     &_logged {
       padding: 0 32px 0 16px;
       &:hover {
-        background: var(--bg-menu-item-hover);
+        background: var(--bg-block-hover);
 
         .user-submenu__top-arrow {
-          background: var(--bg-menu-item-hover);
+          background: var(--bg-block-hover);
         }
       }
     }
@@ -577,7 +617,7 @@ export default {
       padding: 16px 32px;
       flex: auto;
       &:hover {
-        background: var(--bg-menu-item-hover);
+        background: var(--bg-block-hover);
         text-shadow: 0 0 1px var(--color-text-secondary);
       }
     }
@@ -609,12 +649,12 @@ export default {
     font-size: 14px;
     width: 50%;
     &:hover {
-      background: var(--bg-menu-item-hover);
+      background: var(--bg-block-hover);
     }
   }
 }
 
 .hide {
-  top: -52px !important;
+  top: -54px !important;
 }
 </style>

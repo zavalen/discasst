@@ -36,12 +36,13 @@
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
         <div class="feed-episode__left">
-          <img
+          <!-- <img
             v-lazy="episode.Podcast.imageURL"
             class="loading"
             alt=""
             srcset=""
-          />
+          /> -->
+          <img v-lazy="episode.Podcast.imageURL" />
           <div class="feed-episode__play" @click="playEpisode(episode)">
             <svg-icon
               v-if="
@@ -76,7 +77,7 @@
             </div>
             <h2
               class="feed-episode__title"
-              :style="{fontSize: episode.title.length > 65 ? '18px' : ''}"
+              :style="{fontSize: episode.title.length > 63 ? '18px' : ''}"
             >
               {{ episode.title }}
             </h2>
@@ -92,7 +93,7 @@
               <svg-icon
                 v-if="!userSubscriptions.includes(episode.Podcast.id)"
                 @click.stop.prevent="subscribe(episode.Podcast)"
-                name="add-square"
+                name="add-circle"
                 v-tooltip="'Подписаться'"
               />
               <svg-icon
@@ -115,23 +116,36 @@
               }"
             >
               <svg-icon style="margin-right: 8px" name="comments" />
-              Обсудить</router-link
+              1</router-link
             >
-
+            <svg-icon
+              class="button feed-episode__icon"
+              v-tooltip="'Добавить в закладки'"
+              name="like"
+            />
             <template v-if="!currentEpisode || currentEpisode.id != episode.id">
-              <span
-                style="font-size: 14px"
+              <svg-icon
+                v-if="!isEpisodeInQueue(episode.id)"
+                class="button feed-episode__icon"
+                v-tooltip="'Добавить в очередь'"
                 @click.stop.prevent="toggleInQueue(episode)"
-              >
-                {{
-                  isEpisodeInQueue(episode.id)
-                    ? 'Убрать из очереди'
-                    : 'Добавить в очередь'
-                }}
-              </span>
+                name="add-to-playlist"
+              />
+              <svg-icon
+                v-if="isEpisodeInQueue(episode.id)"
+                class="button feed-episode__icon"
+                v-tooltip="'Убрать из очередь'"
+                @click.stop.prevent="toggleInQueue(episode)"
+                name="in-playlist"
+              />
             </template>
             <template v-if="currentEpisode && currentEpisode.id == episode.id">
-              <span style="font-size: 14px" @click.stop>Сейчас играет</span>
+              <svg-icon
+                v-tooltip="'Сейчас играет'"
+                class="button feed-episode__icon"
+                @click.stop
+                name="now-playing"
+              />
             </template>
           </div>
         </router-link>
@@ -276,7 +290,7 @@ export default {
       )
     },
     formatDuration(seconds) {
-      let minutes = Math.floor(seconds / 60)
+      let minutes = Math.ceil(seconds / 60)
       let lastNumber = minutes.toString().split('').pop()
       let textMinutes = this.$t('time.someMinutes')
       lastNumber == 1 && minutes != 11 && minutes != 12
@@ -410,7 +424,7 @@ export default {
       border-radius: 10px;
       border: 1px solid var(--color-border);
       box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-      background-color: var(--bg-menu-item-hover);
+      background-color: var(--bg-block-hover);
     }
     position: relative;
   }
@@ -480,13 +494,18 @@ export default {
 
   &__comments {
     padding: 4px 12px 4px 8px;
-    margin-right: 8px;
+    margin-right: 4px;
     border: 1px solid var(--color-text);
     color: var(--color-text);
     display: flex;
     align-items: center;
     text-decoration: none;
     border-radius: 10px;
+  }
+
+  &__icon {
+    padding: 16px;
+    border-radius: 50%;
   }
 
   &__podcast-link {
@@ -566,13 +585,13 @@ export default {
 
 .loading {
   background: linear-gradient(0.25turn, transparent, #fff, transparent),
-    linear-gradient(var(--bg-menu-item-hover), var(--bg-menu-item-hover)),
+    linear-gradient(var(--bg-block-hover), var(--bg-block-hover)),
     radial-gradient(
       38px circle at 19px 19px,
-      var(--bg-menu-item-hover) 50%,
+      var(--bg-block-hover) 50%,
       transparent 51%
     ),
-    linear-gradient(var(--bg-menu-item-hover), var(--bg-menu-item-hover));
+    linear-gradient(var(--bg-block-hover), var(--bg-block-hover));
   background-repeat: no-repeat;
   background-size: -315px 250px, 315px 180px, 100px 100px, 225px 30px;
   background-position: -315px 0, 0 0, 0px 190px, 50px 195px;

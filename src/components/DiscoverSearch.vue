@@ -1,63 +1,63 @@
 <template>
-  <div class="home container">
-    <div class="discover-search" v-click-outside="blur" @click="focus">
-      <form class="discover-search__form" @submit.prevent.stop>
-        <button v-if="!isLoading" class="discover-search__submit" type="submit">
-          <svg-icon name="search" />
-        </button>
-        <pd-loader v-if="isLoading" class="discover-search__loading" />
+  <div class="discover-search" v-click-outside="blur" @click="focus">
+    <form class="discover-search__form" @submit.prevent.stop>
+      <svg-icon
+        v-if="!isLoading"
+        class="discover-search__submit"
+        name="search"
+      />
+      <pd-loader v-if="isLoading" class="discover-search__loading" />
+      <input
+        class="discover-search__input"
+        ref="discoverSearch"
+        placeholder="Умный поиск"
+        type="text"
+        v-model.trim="searchQuery"
+      />
+      <button
+        class="discover-search__clear"
+        v-if="searchQuery.length"
+        @click.prevent.stop="clearSearch"
+        v-tooltip="'Очистить поиск'"
+      >
+        <svg-icon name="close" />
+      </button>
+    </form>
 
-        <input
-          class="discover-search__input"
-          placeholder="Умный поиск"
-          type="text"
-          v-model.trim="searchQuery"
-          autocomplete="off"
-        />
-        <button
-          class="discover-search__clear"
-          v-if="searchQuery.length"
-          @click.prevent.stop="clearSearch"
-        >
-          <svg-icon name="close" />
-        </button>
-      </form>
-
-      <template v-if="focusing">
-        <div class="discover-search__results scrollbar">
-          <div>
-            Это умный поискЭто умный поискЭто умный поискЭто умный поискЭто
-            умный поискЭто умный поискЭто умный поискЭто умный поискЭто умный
-            поискЭто умный поискЭто умный поискЭто умный поискЭто умный поискЭто
-            умный поискЭто умный поискЭто умный поискЭто умный поискЭто умный
-            поискЭто умный поискЭто умный поискЭто умный поискЭто умный поискЭто
-            умный поискЭто умный поискЭто умный поискЭто умный поискЭто умный
-            поискЭто умный поискЭто умный поискЭто умный поискЭто умный поискЭто
-            умный поискЭто умный поискЭто умный поискЭто умный поискЭто умный
-            поискЭто умный поискЭто умный поискЭто умный поискЭто умный поискЭто
-            умный поискЭто умный поискЭто умный поискЭто умный поискЭто умный
-            поискЭто умный поискЭто умный поискЭто умный поиск
-          </div>
-
-          <div
-            class="discover-search__result discover-search-result"
-            v-for="searchResult in searchResults"
-            :key="searchResult.collectionId"
-            @click="rss = searchResult.feedUrl"
-          >
-            <img
-              v-lazy="searchResult.artworkUrl60"
-              class="loading discover-search-result__image"
-              alt=""
-            />
-            <div>{{ searchResult.collectionName }}</div>
-          </div>
-          <div v-if="errors">{{ errors }}</div>
+    <template v-if="focusing">
+      <div class="discover-search__results scrollbar">
+        <div class="discover-search__message" v-if="searchQuery.length < 2">
+          Это поиск по всем подкастам в интернете. Если на Discasst нет
+          подкаста, который вы ищете, то он появится после того, как вы его
+          найдёте в поиске.
         </div>
-      </template>
+        <div
+          class="discover-search__message"
+          v-if="searchQuery.length > 2 && !searchResults.length"
+        >
+          Ничего не найдено.
+        </div>
+        <div
+          class="discover-search__result discover-search-result"
+          v-for="searchResult in searchResults"
+          :key="searchResult.collectionId"
+          @click="rss = searchResult.feedUrl"
+          :class="{
+            'discover-search-result_active': searchResult == selectedResult,
+          }"
+        >
+          <img
+            v-lazy="searchResult.artworkUrl60"
+            class="loading discover-search-result__image"
+            alt=""
+          />
+          <div>{{ searchResult.collectionName }}</div>
+        </div>
+        <!-- <div v-if="errors">{{ errors }}</div> -->
+      </div>
+    </template>
 
-      <!-- <h2 v-if="isLoading">ЗАГРУЗКА...</h2> -->
-    </div>
+    <!-- <h2 v-if="isLoading">ЗАГРУЗКА...</h2> -->
   </div>
 </template>
 
@@ -66,9 +66,15 @@ import podcasts from '@/api/podcasts'
 import PdLoader from '@/components/ui/PdLoader'
 
 export default {
-  name: 'findOrAddPodcast',
+  name: 'discoverSearch',
   components: {PdLoader},
-
+  props: {
+    isActive: {
+      required: false,
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       isLoading: false,
@@ -77,10 +83,42 @@ export default {
       rss: '',
       errors: null,
       searchResults: null,
+      selectedResult: null,
+      selectedResultIndex: -1,
     }
   },
   mounted() {
     window.scrollTo({top: 0})
+    document.addEventListener('keydown', (event) => {
+      if (this.focusing && this.searchResults && this.searchResults.length) {
+        if (event.code === 'ArrowDown') {
+          this.selectedResultIndex++
+          if (!this.searchResults[this.selectedResultIndex]) {
+            this.selectedResultIndex = 0
+          }
+          this.selectedResult = this.searchResults[this.selectedResultIndex]
+        }
+
+        if (event.code === 'ArrowUp') {
+          this.selectedResultIndex--
+          if (!this.searchResults[this.selectedResultIndex]) {
+            this.selectedResultIndex = this.searchResults.length - 1
+          }
+          this.selectedResult = this.searchResults[this.selectedResultIndex]
+        }
+
+        if (event.code === 'Enter') {
+          if (this.selectedResult) {
+            this.rss = this.selectedResult.feedUrl
+          }
+        }
+      }
+    })
+
+    if (this.isActive) {
+      this.focusing = true
+      this.$refs.discoverSearch.focus()
+    }
   },
   methods: {
     async getRssFromAppleById(searchQuery) {
@@ -114,18 +152,11 @@ export default {
           return response.json()
         })
 
-        if (data.results.length) {
-          this.isLoading = false
-
-          this.searchResults = data.results
-          console.log(this.searchResults)
-          this.isLoading = false
-          return data.results
-        } else {
-          this.errors = 'Ничего не найдено'
-          this.searchResults = []
-          this.isLoading = false
-        }
+        this.isLoading = false
+        this.searchResults = data.results
+        console.log(this.searchResults)
+        this.isLoading = false
+        return data.results
       } catch (error) {
         this.errors = 'Что-то пошло не так'
         this.isLoading = false
@@ -137,6 +168,11 @@ export default {
         .findOrAddPodcast(rss)
         .then((response) => response.data)
 
+      this.isLoading = false
+      this.focusing = false
+      this.searchQuery = ''
+
+      this.$emit('found', true)
       this.$router.push({
         name: 'podcast',
         params: {podcastSlug: addedPodcast.slug},
@@ -169,7 +205,7 @@ export default {
   watch: {
     async searchQuery(newVal) {
       this.errors = null
-      if (newVal.length > 2) {
+      if (newVal.length > 1) {
         if (
           newVal.startsWith('https://podcasts.apple.com/') ||
           newVal.startsWith('id')
@@ -178,7 +214,13 @@ export default {
         } else if (this.isValidHttpUrl(newVal)) {
           this.getRssFromUrl(newVal)
         } else {
-          this.search(newVal)
+          if (window.waitForSearch) {
+            clearTimeout(window.waitForSearch)
+          }
+          this.isLoading = true
+          window.waitForSearch = setTimeout(() => {
+            this.search(newVal)
+          }, 800)
         }
       } else {
         this.searchResults = []
@@ -190,6 +232,9 @@ export default {
       }
       if (typeof newRss === 'string') {
         this.findOrAddPodcast(newRss)
+        this.selectedResultIndex = -1
+        this.selectedResult = null
+        document.activeElement.blur()
       }
     },
   },
@@ -198,12 +243,13 @@ export default {
 
 <style lang="scss" scoped>
 .discover-search {
-  padding: 12px 12px;
+  padding: 16px 12px;
   background: var(--color-header-bg);
-  margin-top: 24px;
+  // margin-top: 24px;
   border-radius: 10px;
-  border: 1px solid var(--color-border);
+  // border: 1px solid var(--color-border);
   position: relative;
+  // min-width: 400px;
   &__form {
     margin: 0;
     height: auto;
@@ -217,7 +263,7 @@ export default {
     border-radius: 48px;
     padding: 10px 48px;
     background: var(--color-block-bg);
-
+    border: 2px solid var(--color-border);
     &:active,
     &:focus {
       // box-shadow: 0 2px 2px var(--color-light-shadow);
@@ -230,14 +276,13 @@ export default {
   &__loading {
     background: transparent;
     position: absolute;
+    display: block;
+    padding: 0 12px;
     left: 2px;
     top: 50%;
     transform: translateY(-54%);
     opacity: 0.4;
     transition: 0.3;
-    &:hover {
-      opacity: 1;
-    }
   }
   &__loading {
     height: 24px;
@@ -248,6 +293,9 @@ export default {
   &__clear {
     right: 2px;
     left: auto;
+    &:hover {
+      opacity: 1;
+    }
   }
 
   &__results {
@@ -270,6 +318,13 @@ export default {
   &__result {
     // margin-bottom: 4px;
   }
+
+  &__message {
+    margin: 4px 16px;
+    border: 1px solid var(--color-border);
+    padding: 16px;
+    border-radius: 10px;
+  }
 }
 
 .discover-search-result {
@@ -280,6 +335,7 @@ export default {
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
+  &_active,
   &:hover {
     background: var(--bg-block-hover);
   }

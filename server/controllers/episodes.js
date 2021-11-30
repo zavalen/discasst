@@ -250,13 +250,14 @@ module.exports.writeProgress = async (req, res) => {
       }
       updateOrCreate(EpisodeProgress, where, progress)
 
-      res.status(200)
+      res.status(200).json({status: 200})
     } else {
       let where = {
         VisitorId: progress.VisitorId,
         EpisodeId: progress.EpisodeId
       }
       updateOrCreate(EpisodeProgress, where, progress)
+      res.status(200).json({status: 200})
     }
   } catch (e) {
     // const code = res.statusCode ? res.statusCode : 422

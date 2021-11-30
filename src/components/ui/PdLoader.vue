@@ -1,5 +1,5 @@
 <template>
-  <div class="lds-ring">
+  <div class="spin-loading">
     <div></div>
     <div></div>
     <div></div>
@@ -13,35 +13,35 @@ export default {
 </script>
 
 <style lang="scss">
-.lds-ring {
+.spin-loading {
   display: inline-block;
   position: relative;
-  width: 80px;
-  height: 80px;
+  // width: 80px;
+  // height: 80px;
   margin: 0 auto;
 }
-.lds-ring div {
+.spin-loading div {
   box-sizing: border-box;
   display: block;
   position: absolute;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border: 8px solid var(--color-text-secondary);
+  width: inherit;
+  height: inherit;
+  // margin: 8px;
+  border: 2px solid var(--color-text-secondary);
   border-radius: 50%;
-  animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  animation: spin-loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
   border-color: var(--color-text-secondary) transparent transparent transparent;
 }
-.lds-ring div:nth-child(1) {
+.spin-loading div:nth-child(1) {
   animation-delay: -0.45s;
 }
-.lds-ring div:nth-child(2) {
+.spin-loading div:nth-child(2) {
   animation-delay: -0.3s;
 }
-.lds-ring div:nth-child(3) {
+.spin-loading div:nth-child(3) {
   animation-delay: -0.15s;
 }
-@keyframes lds-ring {
+@keyframes spin-loading {
   0% {
     transform: rotate(0deg);
   }

@@ -4,6 +4,7 @@ const parser = new Parser()
 const {jsonToHtml} = require('./stringUtils')
 const sanitizeHtml = require('sanitize-html')
 const {slugify} = require('./slugUtils')
+const fetch = require('node-fetch')
 
 module.exports.getPodcastJson = async url => {
   // const getPodcastJson = async url => {
@@ -12,7 +13,9 @@ module.exports.getPodcastJson = async url => {
   let startTime = Date.now()
   console.log('Start parsing podcast: ' + url)
 
-  const podcastJson = await parser.parseURL(url)
+  const podcastJson = await parser.parseURL(url).catch(async err => {
+    console.log(err)
+  })
 
   let parsingTime = Date.now() - startTime
   console.log(

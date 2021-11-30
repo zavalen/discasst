@@ -213,7 +213,7 @@ export default {
       padding: 16px 32px;
       flex: auto;
       &:hover {
-        background: var(--bg-menu-item-hover);
+        background: var(--bg-block-hover);
         text-shadow: 0 0 1px var(--color-text-secondary);
       }
     }
