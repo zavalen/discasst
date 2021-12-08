@@ -13,11 +13,14 @@ export const feedMutations = {
   addToEpisodesSuccess: '[feed] getEpisodesSuccess',
   getEpisodesFailure: '[feed] getEpisodesFailure',
 
-  makePageLast: '[feed] makePageLast'
+  makePageLast: '[feed] makePageLast',
+
+  setRating: '[feed] setRating'
 }
 
 export const feedActions = {
-  getEpisodes: '[feed] getEpisodes'
+  getEpisodes: '[feed] getEpisodes',
+  setRating: '[feed] setRating'
 }
 
 const mutations = {
@@ -45,6 +48,11 @@ const mutations = {
   [feedMutations.makePageLast](state) {
     state.lastPage = true
   }
+  // [feedMutations.setRating](state, payload) {
+  //   const episode = state.episodes.find(ep => ep.id === payload.episodeId)
+  //   episode.rating.userRating += payload.value
+  //   episode.rating.sum += payload.value
+  // }
 }
 
 const actions = {
@@ -75,6 +83,18 @@ const actions = {
         .catch(result => {
           context.commit(feedMutations.getEpisodesFailure, result.response)
         })
+    })
+  },
+  [feedActions.setRating](context, payload) {
+    return new Promise(() => {
+      // context.commit(feedMutations.setRating, payload)
+
+      feed.setRating(payload)
+      // .then(response => {
+
+      // })
+      // .catch(result => {
+      // })
     })
   }
 }

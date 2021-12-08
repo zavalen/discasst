@@ -44,8 +44,8 @@ export default {
 .scrollTop {
   position: fixed;
 
-  left: calc(50% + 1204px / 2);
-  right: 0;
+  right: calc(50% + 1226px / 2);
+  left: 0;
   top: 0;
   bottom: 0;
   cursor: pointer;
@@ -63,7 +63,7 @@ export default {
   .icon {
     position: absolute;
     bottom: 24px;
-    left: 16px;
+    right: 16px;
     opacity: 0.3;
     transition: 0.3s;
   }

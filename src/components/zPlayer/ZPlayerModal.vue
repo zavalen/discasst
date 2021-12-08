@@ -14,7 +14,7 @@
             <div class="zcurrent-episode__header">
               <img
                 class="zcurrent-episode__image"
-                :src="currentEpisode.Podcast.imageURL"
+                :src="currentEpisode.podcast.imageURL"
               />
               <div class="zcurrent-episode__controls"></div>
             </div>

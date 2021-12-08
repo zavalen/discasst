@@ -28,14 +28,14 @@
                 "
               />
             </div>
-            <img class="zEpisode__image" v-lazy="element.Podcast.imageURL" />
+            <img class="zEpisode__image" v-lazy="element.podcast.imageURL" />
             <div class="zEpisode__creditials">
               <router-link
                 @click="closeModal"
                 :to="{
                   name: 'episode',
                   params: {
-                    podcastSlug: element.Podcast.slug,
+                    podcastSlug: element.podcast.slug,
                     episodeSlug: element.slug,
                   },
                 }"
@@ -47,11 +47,11 @@
                 :to="{
                   name: 'podcast',
                   params: {
-                    podcastSlug: element ? element.Podcast.slug : '',
+                    podcastSlug: element ? element.podcast.slug : '',
                   },
                 }"
                 class="zEpisode__podcast"
-                >{{ element.Podcast.title }}</router-link
+                >{{ element.podcast.title }}</router-link
               >
             </div>
           </div>

@@ -2,52 +2,27 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
-const io = require('socket.io')(server, {
-  cors: {
-    origin: process.env.FRONTEND_HOST,
-    methods: ['GET', 'POST']
-  }
-})
+// const io = require('socket.io')(server, {
+//   cors: {
+//     origin: process.env.FRONTEND_HOST,
+//     methods: ['GET', 'POST']
+//   }
+// })
 const morgan = require('morgan')
 const cors = require('cors')
 
 const {notFound, errorHandler} = require('./middleware/errorHandler')
 const sequelize = require('./dbConnection')
 
-const User = require('./models/User')
-const Visitor = require('./models/Visitor')
-const VisitorInfo = require('./models/VisitorInfo')
-const Podcast = require('./models/Podcast')
-const Episode = require('./models/Episode')
-const UserEpisodesHistory = require('./models/UserEpisodesHistory')
-const EpisodeProgress = require('./models/EpisodeProgress')
-const PodcastsManagers = require('./models/PodcastsManagers')
-const Subscriptions = require('./models/Subscriptions')
-
 const userRoute = require('./routes/users')
 const podcastRoute = require('./routes/podcasts')
 const episodeRoute = require('./routes/episodes')
 
+const setAssociations = require('./models/associations')
+setAssociations()
+
 //CORS
 app.use(cors({credentials: true, origin: true}))
-
-User.hasMany(VisitorInfo)
-Podcast.hasMany(Episode)
-Episode.belongsTo(Podcast)
-
-Podcast.belongsToMany(User, {through: PodcastsManagers})
-User.belongsToMany(Episode, {through: UserEpisodesHistory})
-Visitor.belongsToMany(Episode, {through: UserEpisodesHistory})
-
-Visitor.hasMany(VisitorInfo, {onDelete: 'cascade'})
-// Visitor.hasOne(EpisodeProgress)
-// User.hasOne(EpisodeProgress)
-Episode.hasOne(EpisodeProgress, {onDelete: 'cascade'})
-EpisodeProgress.belongsTo(Visitor, {onDelete: 'cascade'})
-EpisodeProgress.belongsTo(User, {onDelete: 'cascade'})
-EpisodeProgress.belongsTo(Episode, {onDelete: 'cascade'})
-
-User.belongsToMany(Podcast, {through: Subscriptions})
 
 const sync = async () => {
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
@@ -75,17 +50,17 @@ app.use('/api/episodes', episodeRoute)
 app.use(notFound)
 app.use(errorHandler)
 
-const onConnection = socket => {
-  console.log('A user connected')
+// const onConnection = socket => {
+//   console.log('A user connected')
 
-  socket.on('q', q)
-}
+//   socket.on('q', q)
+// }
 
-io.on('connection', onConnection)
+// io.on('connection', onConnection)
 
-function q(time) {
-  console.log(time)
-}
+// function q(time) {
+//   console.log(time)
+// }
 
 const PORT = process.env.PORT || 8081
 

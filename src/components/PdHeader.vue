@@ -23,8 +23,9 @@
           @click="closeMenu"
           class="header__logo"
           :to="{name: 'home'}"
-          >Discasst</router-link
         >
+          <svg-icon name="logo" />
+        </router-link>
         <slide-right-transition>
           <ul
             class="header__main-nav main-nav"
@@ -487,6 +488,11 @@ export default {
       text-decoration: none;
     }
 
+    .icon,
+    svg {
+      height: 32px;
+      width: auto;
+    }
     &:active {
       bottom: -1px;
     }

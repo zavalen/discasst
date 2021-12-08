@@ -7,7 +7,7 @@ const validator = require('validator')
 var uaParser = require('ua-parser-js')
 
 const {hashPassword, matchPassword} = require('../utils/password')
-const {sign, decode} = require('../utils/jwt')
+const {sign} = require('../utils/jwt')
 
 module.exports.createUser = async (req, res) => {
   try {
@@ -42,8 +42,8 @@ module.exports.createUser = async (req, res) => {
     if (podcastUserOwner) {
       PodcastsManagers.create({
         role: 'owner',
-        PodcastId: podcastUserOwner.id,
-        UserId: user.id
+        podcastId: podcastUserOwner.id,
+        userId: user.id
       })
     }
 

@@ -46,7 +46,7 @@ const mutations = {
     state.visitor = payload.visitor
   },
   [statisticsMutations.setUserId](state, payload) {
-    state.visitor.UserId = payload
+    state.visitor.userId = payload
   }
 }
 
@@ -59,7 +59,7 @@ const actions = {
         .then(response => {
           const visitor = response || {}
           visitor.visitorId = getVisitorId()
-          visitor.UserId = auth.state.currentUser
+          visitor.userId = auth.state.currentUser
             ? auth.state.currentUser.id
             : null
           visitor.ip = response.query
@@ -71,7 +71,7 @@ const actions = {
           const response = {}
           const visitor = {}
           visitor.visitorId = getVisitorId()
-          visitor.UserId = auth.state.currentUser
+          visitor.userId = auth.state.currentUser
             ? auth.state.currentUser.id
             : null
           response.visitor = visitor

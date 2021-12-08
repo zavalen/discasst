@@ -77,14 +77,14 @@
             >
               <svg-icon name="next" />
             </div>
-            <div class="zPlayer__like" @click="like">
-              <svg-icon name="liked" />
-            </div>
+            <!-- <div class="zPlayer__like" @click="like">
+            </div> -->
+
             <div class="zPlayer__image">
               <img
                 :src="
                   currentEpisode
-                    ? currentEpisode.Podcast.imageURL
+                    ? currentEpisode.podcast.imageURL
                     : './images/headphones.png'
                 "
                 alt=""
@@ -108,7 +108,7 @@
                   name: 'episode',
                   params: {
                     podcastSlug: currentEpisode
-                      ? currentEpisode.Podcast.slug
+                      ? currentEpisode.podcast.slug
                       : 's',
                     episodeSlug: currentEpisode ? currentEpisode.slug : 's',
                   },
@@ -123,65 +123,68 @@
                   name: 'podcast',
                   params: {
                     podcastSlug: currentEpisode
-                      ? currentEpisode.Podcast.slug
+                      ? currentEpisode.podcast.slug
                       : 's',
                   },
                 }"
                 class="zPlayer__podcast"
               >
-                {{ currentEpisode ? currentEpisode.Podcast.title : 'No track' }}
+                {{ currentEpisode ? currentEpisode.podcast.title : 'No track' }}
               </router-link>
             </div>
-            <div class="zPlayer__open">
+            <!-- <div class="zPlayer__open">
               <svg-icon name="open" />
-            </div>
+            </div> -->
           </div>
           <div class="zPlayer__main-right">
-            <div class="zPlayer__speed" @click="changeSpeed">x{{ speed }}</div>
-            <div class="zPlayer__volume-block">
-              <svg-icon @click="toggleVolume" v-if="volume > 0" name="volume" />
-              <svg-icon
-                @click="toggleVolume"
-                v-if="volume == 0"
-                name="volume-zero"
-              />
-
-              <div class="zPlayer__volume-line">
-                <div
-                  class="zPlayer__volume"
-                  :style="{
-                    height: volume * 100 + '%',
-                  }"
-                ></div>
-
-                <div
-                  class="zPlayer__volume-overflow"
-                  @mousedown="volumeTo"
-                  @mouseup="volumeMouseLeave"
-                  @mousemove="volumeMouseOver"
-                  @mouseleave="volumeMouseLeave"
-                ></div>
-                <div
-                  v-if="mouseOverShow"
-                  class="zPlayer__volume-overflow-persentage"
-                  :style="{
-                    left: mouseOverTimePx + 'px',
-                  }"
-                ></div>
-              </div>
+            <!-- <div class="zPlayer__speed" @click="changeSpeed">x{{ speed }}</div> -->
+            <div class="zPlayer__playlist">
+              <episode-rating :episode="currentEpisode" />
             </div>
+          </div>
+          <div class="zPlayer__volume-block">
+            <svg-icon @click="toggleVolume" v-if="volume > 0" name="volume" />
+            <svg-icon
+              @click="toggleVolume"
+              v-if="volume == 0"
+              name="volume-zero"
+            />
 
-            <div
-              class="zPlayer__playlist"
-              :class="{zPlayer__playlist_active: isModalOpen}"
-              @click="toggleModal"
-              ref="zplaylist"
-            >
-              <svg-icon name="playlist" />
-              <span ref="queueCounter" class="zPlayer__playlist-counter">{{
-                queue.length
-              }}</span>
+            <div class="zPlayer__volume-line">
+              <div
+                class="zPlayer__volume"
+                :style="{
+                  height: volume * 100 + '%',
+                }"
+              ></div>
+
+              <div
+                class="zPlayer__volume-overflow"
+                @mousedown="volumeTo"
+                @mouseup="volumeMouseLeave"
+                @mousemove="volumeMouseOver"
+                @mouseleave="volumeMouseLeave"
+              ></div>
+              <div
+                v-if="mouseOverShow"
+                class="zPlayer__volume-overflow-persentage"
+                :style="{
+                  left: mouseOverTimePx + 'px',
+                }"
+              ></div>
             </div>
+          </div>
+
+          <div
+            class="zPlayer__playlist"
+            :class="{zPlayer__playlist_active: isModalOpen}"
+            @click="toggleModal"
+            ref="zplaylist"
+          >
+            <svg-icon name="playlist" />
+            <span ref="queueCounter" class="zPlayer__playlist-counter">{{
+              queue.length
+            }}</span>
           </div>
         </div>
       </div>
@@ -195,12 +198,14 @@ import {mapState} from 'vuex'
 import {zPlayerMutations, zPlayerActions} from '@/store/modules/zPlayer'
 import ZPlayerModal from '@/components/zPlayer/ZPlayerModal'
 import moment from 'moment'
+import EpisodeRating from '@/components/EpisodeRating'
 
 export default {
   name: 'ZPlayer',
   components: {
     SlideUpTransition,
     ZPlayerModal,
+    EpisodeRating,
   },
   created() {
     this.addPlayerJS()
@@ -243,11 +248,8 @@ export default {
   watch: {
     currentEpisode(newEpisode) {
       this.playerJs.api('play', newEpisode.file)
-      if (newEpisode.EpisodeProgress && newEpisode.EpisodeProgress.lastPoint) {
-        this.playerJs.api(
-          'seek',
-          Math.floor(newEpisode.EpisodeProgress.lastPoint)
-        )
+      if (newEpisode.progress && newEpisode.progress.lastPoint) {
+        this.playerJs.api('seek', Math.floor(newEpisode.progress.lastPoint))
       }
     },
     // async feedEpisodes(newVal) {
@@ -749,7 +751,7 @@ export default {
   &__volume-block {
     position: relative;
     cursor: pointer;
-    margin-left: 12px;
+    margin-left: 18px;
     @include button-effect;
 
     &:hover .zPlayer__volume-line {
@@ -791,7 +793,7 @@ export default {
   }
 
   &__playlist {
-    margin-left: 24px;
+    margin-left: 18px;
     cursor: pointer;
     position: relative;
     @include button-effect;
@@ -820,7 +822,7 @@ export default {
   &__speed {
     font-weight: 600;
     font-size: 20px;
-    margin-left: 15px;
+    margin-left: 8px;
     text-align: right;
     width: 40px;
     cursor: pointer;

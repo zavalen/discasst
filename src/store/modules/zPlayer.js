@@ -55,11 +55,9 @@ const mutations = {
     state.currentEpisode = payload
     state.queue = state.queue.filter(ep => ep.id != state.currentEpisode.id)
 
-    if (payload.EpisodeProgress && payload.EpisodeProgress.lastPoint) {
-      state.reallyListened = new Set(
-        payload.EpisodeProgress.reallyListenedArray
-      )
-      state.lastPoint = payload.EpisodeProgress.lastPoint
+    if (payload.progress && payload.progress.lastPoint) {
+      state.reallyListened = new Set(payload.progress.reallyListenedArray)
+      state.lastPoint = payload.progress.lastPoint
     } else {
       state.reallyListened = new Set()
       state.lastPoint = 0
@@ -69,11 +67,11 @@ const mutations = {
     state.lastPoint = payload
 
     if (payload > 1) {
-      if (!state.currentEpisode.EpisodeProgress) {
-        state.currentEpisode.EpisodeProgress = {}
+      if (!state.currentEpisode.progress) {
+        state.currentEpisode.progress = {}
       }
-      state.currentEpisode.EpisodeProgress.lastPoint = payload
-      state.currentEpisode.EpisodeProgress.percentage =
+      state.currentEpisode.progress.lastPoint = payload
+      state.currentEpisode.progress.percentage =
         (payload * 100) / state.currentEpisode.duration
     }
   },

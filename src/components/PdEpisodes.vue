@@ -37,27 +37,31 @@
       >
         <div class="feed-episode__left">
           <!-- <img
-            v-lazy="episode.Podcast.imageURL"
+            v-lazy="episode.podcast.imageURL"
             class="loading"
             alt=""
             srcset=""
           /> -->
-          <img v-lazy="episode.Podcast.imageURL" />
-          <div class="feed-episode__play" @click="playEpisode(episode)">
-            <svg-icon
-              v-if="
-                !isPlaying ||
-                (currentEpisode && currentEpisode.id != episode.id)
-              "
-              name="play"
-            />
-            <svg-icon
-              v-if="
-                currentEpisode && currentEpisode.id == episode.id && isPlaying
-              "
-              name="pause"
-            />
+          <div class="feed-episode__image">
+            <img v-lazy="episode.podcast.imageURL" />
+            <div class="feed-episode__play" @click="playEpisode(episode)">
+              <svg-icon
+                v-if="
+                  !isPlaying ||
+                  (currentEpisode && currentEpisode.id != episode.id)
+                "
+                name="play"
+              />
+              <svg-icon
+                v-if="
+                  currentEpisode && currentEpisode.id == episode.id && isPlaying
+                "
+                name="pause"
+              />
+            </div>
           </div>
+
+          <episode-rating :episode="episode" />
         </div>
 
         <router-link
@@ -65,7 +69,7 @@
           :to="{
             name: 'episode',
             params: {
-              podcastSlug: episode.Podcast.slug,
+              podcastSlug: episode.podcast.slug,
               episodeSlug: episode.slug,
             },
           }"
@@ -77,7 +81,7 @@
             </div>
             <h2
               class="feed-episode__title"
-              :style="{fontSize: episode.title.length > 63 ? '18px' : ''}"
+              :style="{fontSize: episode.title.length > 68 ? '18px' : ''}"
             >
               {{ episode.title }}
             </h2>
@@ -86,19 +90,19 @@
                 class="feed-episode__podcast-link"
                 :to="{
                   name: 'podcast',
-                  params: {podcastSlug: episode.Podcast.slug},
+                  params: {podcastSlug: episode.podcast.slug},
                 }"
-                >{{ episode.Podcast.title }}</router-link
+                >{{ episode.podcast.title }}</router-link
               >
               <svg-icon
-                v-if="!userSubscriptions.includes(episode.Podcast.id)"
-                @click.stop.prevent="subscribe(episode.Podcast)"
+                v-if="!userSubscriptions.includes(episode.podcast.id)"
+                @click.stop.prevent="subscribe(episode.podcast)"
                 name="add-circle"
                 v-tooltip="'Подписаться'"
               />
               <svg-icon
-                v-if="userSubscriptions.includes(episode.Podcast.id)"
-                @click.stop.prevent="unsubscribe(episode.Podcast)"
+                v-if="userSubscriptions.includes(episode.podcast.id)"
+                @click.stop.prevent="unsubscribe(episode.podcast)"
                 name="tick-square"
                 v-tooltip="'Вы подписаны'"
               />
@@ -110,51 +114,52 @@
               :to="{
                 name: 'episode',
                 params: {
-                  podcastSlug: episode.Podcast.slug,
+                  podcastSlug: episode.podcast.slug,
                   episodeSlug: episode.slug,
                 },
               }"
             >
               <svg-icon style="margin-right: 8px" name="comments" />
-              1</router-link
+              Обсудить</router-link
             >
-            <svg-icon
-              class="button feed-episode__icon"
-              v-tooltip="'Добавить в закладки'"
-              name="like"
-            />
-            <template v-if="!currentEpisode || currentEpisode.id != episode.id">
-              <svg-icon
-                v-if="!isEpisodeInQueue(episode.id)"
-                class="button feed-episode__icon"
-                v-tooltip="'Добавить в очередь'"
-                @click.stop.prevent="toggleInQueue(episode)"
-                name="add-to-playlist"
-              />
-              <svg-icon
-                v-if="isEpisodeInQueue(episode.id)"
-                class="button feed-episode__icon"
-                v-tooltip="'Убрать из очередь'"
-                @click.stop.prevent="toggleInQueue(episode)"
-                name="in-playlist"
-              />
-            </template>
-            <template v-if="currentEpisode && currentEpisode.id == episode.id">
-              <svg-icon
-                v-tooltip="'Сейчас играет'"
-                class="button feed-episode__icon"
-                @click.stop
-                name="now-playing"
-              />
-            </template>
           </div>
         </router-link>
-
-        <div
-          v-if="isLoggedIn"
-          class="feed-episode__progress"
-          :style="{width: episode.EpisodeProgress?.percentage + '%'}"
-        ></div>
+        <div class="feed-episode__buttons-block">
+          <template v-if="!currentEpisode || currentEpisode.id != episode.id">
+            <svg-icon
+              v-if="!isEpisodeInQueue(episode.id)"
+              class="button feed-episode__icon"
+              v-tooltip="'Добавить в очередь'"
+              @click.stop.prevent="toggleInQueue(episode)"
+              name="add-to-playlist"
+            />
+            <svg-icon
+              v-if="isEpisodeInQueue(episode.id)"
+              class="button feed-episode__icon"
+              v-tooltip="'Убрать из очередь'"
+              @click.stop.prevent="toggleInQueue(episode)"
+              name="in-playlist"
+            />
+          </template>
+          <template v-if="currentEpisode && currentEpisode.id == episode.id">
+            <svg-icon
+              v-tooltip="'Сейчас играет'"
+              class="button feed-episode__icon"
+              @click.stop
+              name="now-playing"
+            />
+          </template>
+          <div class="feed-episode__more">
+            <svg-icon name="more" />
+          </div>
+        </div>
+        <div v-if="isLoggedIn" class="feed-episode__progress-wrapper">
+          <div
+            v-if="isLoggedIn"
+            class="feed-episode__progress"
+            :style="{width: episode.progress?.percentage + '%'}"
+          ></div>
+        </div>
       </div>
 
       <button
@@ -179,9 +184,13 @@ import moment from 'moment'
 import 'moment/locale/ru' // without this line it didn't work
 moment.locale('ru')
 
+import EpisodeRating from '@/components/EpisodeRating'
+
 export default {
   name: 'PdEpisodes',
-
+  components: {
+    EpisodeRating,
+  },
   props: {
     apiUrl: {
       type: String,
@@ -348,15 +357,14 @@ export default {
   margin-bottom: 24px;
   margin-right: auto;
   margin-left: auto;
-  cursor: pointer;
   border: 1px solid var(--color-border);
   box-shadow: 0 2px 2px var(--color-light-shadow);
   display: flex;
-  overflow: hidden;
-  height: 184px;
+  // overflow: hidden;
+  // height: 184px;
   width: 686px;
   position: relative;
-  padding-bottom: 4px;
+  // padding-bottom: 4px;
   &:hover {
     .feed-episode__play {
       opacity: 0.85;
@@ -378,12 +386,13 @@ export default {
     bottom: 0;
     top: 0;
     z-index: 2;
+    cursor: pointer;
 
     & > .icon {
       border: 1px solid var(--color-border);
       background: var(--color-block-bg);
       z-index: 3;
-      box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+      // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
       transition: 0.3s;
       & > svg {
         min-width: 32px;
@@ -392,11 +401,13 @@ export default {
     }
 
     & > .play {
-      padding: 38px 38px 38px 32px;
-      border-start-end-radius: 150%;
-      border-end-start-radius: 50%;
-      border-start-start-radius: 50%;
-      border-end-end-radius: 150%;
+      border-radius: 20%;
+      padding: 36px 36px 36px 36px;
+      // padding: 38px 38px 38px 32px;
+      // border-start-end-radius: 150%;
+      // border-end-start-radius: 50%;
+      // border-start-start-radius: 50%;
+      // border-end-end-radius: 150%;
       & > svg {
         margin-left: 6px;
       }
@@ -404,7 +415,7 @@ export default {
 
     & > .pause {
       border-radius: 20%;
-      padding: 38px 36px;
+      padding: 36px 36px;
     }
 
     display: flex;
@@ -415,10 +426,13 @@ export default {
   }
 
   &__left {
-    min-width: 176px;
-    max-width: 176px;
+    min-width: 156px;
+    max-width: 156px;
     border-radius: 10px;
-    padding: 12px;
+    padding: 12px 12px 12px 20px;
+  }
+
+  &__image {
     & > img {
       width: 100%;
       border-radius: 10px;
@@ -427,10 +441,11 @@ export default {
       background-color: var(--bg-block-hover);
     }
     position: relative;
+    margin-bottom: 8px;
   }
 
   &__right {
-    padding: 12px 36px 16px 12px;
+    padding: 12px 36px 14px 16px;
     flex: auto;
     position: relative;
     color: inherit;
@@ -438,6 +453,23 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    cursor: pointer;
+  }
+
+  &__buttons-block {
+    min-width: 48px;
+    // background-color: var(--color-accent);
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    // border-left: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+
+  &__arrow-icon {
   }
 
   &__time {
@@ -480,6 +512,7 @@ export default {
   &__buttons {
     display: flex;
     align-items: center;
+
     // & > .button,
     // & > button {
     //   &:first-child {
@@ -495,12 +528,12 @@ export default {
   &__comments {
     padding: 4px 12px 4px 8px;
     margin-right: 4px;
-    border: 1px solid var(--color-text);
     color: var(--color-text);
     display: flex;
     align-items: center;
     text-decoration: none;
     border-radius: 10px;
+    // border: 1px solid var(--color-text);
   }
 
   &__icon {
@@ -531,10 +564,26 @@ export default {
   &__progress {
     position: absolute;
     bottom: 0;
-    height: 4px;
+    height: 3px;
     background: var(--color-accent);
     z-index: 5;
     transition: 0.3s;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  &__progress-wrapper {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 10px;
+    z-index: 5;
+    transition: 0.3s;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow: hidden;
+  }
+
+  &__rating {
   }
 }
 

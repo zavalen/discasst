@@ -6,6 +6,13 @@ const getEpisodes = payload => {
   })
 }
 
+const setRating = payload => {
+  console.log(payload)
+  return axios.post('/episodes/rating', {
+    rating: payload
+  })
+}
+
 const sendProgress = payload => {
   console.log(payload)
   return axios.post('/episodes/progress', {progress: payload})
@@ -26,5 +33,6 @@ export default {
   getEpisodes,
   sendProgress,
   sendToHistory,
-  getHistory
+  getHistory,
+  setRating
 }

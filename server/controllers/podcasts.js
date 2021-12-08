@@ -3,55 +3,9 @@ const PodcastsManagers = require('../models/PodcastsManagers')
 const Episode = require('../models/Episode')
 const User = require('../models/User')
 const Subscriptions = require('../models/Subscriptions')
-const sequelize = require('../dbConnection')
-const podcastFeedParser = require('podcast-feed-parser')
 const {getPodcastJson} = require('../utils/podcastParser')
-const {
-  slugify,
-  isAcceptablePodcastSlug,
-  isAcceptableEpisodeSlug
-} = require('../utils/slugUtils')
-const {jsonToHtml} = require('../utils/stringUtils')
-const sanitizeHtml = require('sanitize-html')
+const {isAcceptablePodcastSlug} = require('../utils/slugUtils')
 const validator = require('validator')
-
-function sanitizeOutput(article, user) {
-  const newTagList = []
-  for (let t of article.dataValues.Tags) {
-    newTagList.push(t.name)
-  }
-  delete article.dataValues.Tags
-  article.dataValues.tagList = newTagList
-
-  if (article) {
-    delete user.dataValues.password
-    delete user.dataValues.email
-    delete user.dataValues.following
-    article.dataValues.author = user
-    return article
-  }
-}
-
-function sanitizeOutputMultiple(article) {
-  const newTagList = []
-  for (let t of article.dataValues.Tags) {
-    newTagList.push(t.name)
-  }
-  delete article.dataValues.Tags
-  article.dataValues.tagList = newTagList
-
-  let user = {
-    username: article.dataValues.User.username,
-    email: article.dataValues.User.email,
-    bio: article.dataValues.User.bio,
-    image: article.dataValues.User.image
-  }
-
-  delete article.dataValues.User
-  article.dataValues.author = user
-
-  return article
-}
 
 module.exports.createPodcast = async (req, res) => {
   try {
@@ -84,8 +38,8 @@ module.exports.createPodcast = async (req, res) => {
     if (existingUser) {
       PodcastsManagers.create({
         role: 'owner',
-        PodcastId: newPodcast.id,
-        UserId: existingUser.id
+        podcastId: newPodcast.id,
+        userId: existingUser.id
       })
     }
 
@@ -93,7 +47,7 @@ module.exports.createPodcast = async (req, res) => {
     for (let i = 0; i < episodes.length; i++) {
       const episode = episodes[i]
 
-      episode.PodcastId = newPodcast.id
+      episode.podcastId = newPodcast.id
       // if (!(await isAcceptableEpisodeSlug(slug))) {
       //   epSlug = epSlug + '-' + Math.floor(Math.random() * 1000)
       // }
@@ -123,93 +77,6 @@ module.exports.getPodcastBySlug = async (req, res) => {
   } catch (e) {
     return res.status(422).json({
       errors: {body: ['Could not get podcast', e.message]}
-    })
-  }
-}
-
-module.exports.getSingleArticleBySlug = async (req, res) => {
-  try {
-    const {slug} = req.params
-    let article = await Podcast.findByPk(slug, {include: Tag})
-
-    const user = await article.getUser()
-
-    article = sanitizeOutput(article, user)
-
-    res.status(200).json({article})
-  } catch (e) {
-    return res.status(422).json({
-      errors: {body: ['Could not get article', e.message]}
-    })
-  }
-}
-
-module.exports.updateArticle = async (req, res) => {
-  try {
-    if (!req.body.article) throw new Error('No articles data')
-    const data = req.body.article
-    const slugInfo = req.params.slug
-    let article = await Podcast.findByPk(slugInfo, {include: Tag})
-
-    if (!article) {
-      res.status(404)
-      throw new Error('Article not found')
-    }
-
-    const user = await User.findByPK(req.user.email)
-
-    if (user.email != article.UserEmail) {
-      res.status(403)
-      throw new Error('You must be the author to modify this article')
-    }
-
-    const title = data.title ? data.title : article.title
-    const description = data.description
-      ? data.description
-      : article.description
-    const body = data.body ? data.body : article.body
-    const slug = data.title ? slugify(title) : slugInfo
-
-    const updatedArticle = await article.update({
-      slug,
-      title,
-      description,
-      body
-    })
-
-    article = sanitizeOutput(updatedArticle, user)
-    res.status(200).json({article})
-  } catch (e) {
-    const code = res.statusCode ? res.statusCode : 422
-    return res.status(code).json({
-      errors: {body: ['Could not update article', e.message]}
-    })
-  }
-}
-
-module.exports.deleteArticle = async (req, res) => {
-  try {
-    const slugInfo = req.params.slug
-    let article = await Podcast.findByPk(slugInfo, {include: Tag})
-
-    if (!article) {
-      res.status(404)
-      throw new Error('Article not found')
-    }
-
-    const user = await User.findByPK(req.user.email)
-
-    if (user.email != article.UserEmail) {
-      res.status(403)
-      throw new Error('You must be the author to modify this article')
-    }
-
-    await Podcast.destroy({where: {slug: slugInfo}})
-    res.status(200).json({message: 'Article deleted successfully'})
-  } catch (e) {
-    const code = res.statusCode ? res.statusCode : 422
-    return res.status(code).json({
-      errors: {body: ['Could not delete article', e.message]}
     })
   }
 }
@@ -252,8 +119,8 @@ module.exports.subscribe = async (req, res) => {
 
     if (podcast) {
       await Subscriptions.create({
-        PodcastId: podcast.id,
-        UserId: userId
+        podcastId: podcast.id,
+        userId: userId
       })
     }
 
@@ -270,12 +137,12 @@ module.exports.getSubscribtions = async (req, res) => {
   try {
     const userId = req.user.id
     const subscriptionsArray = await Subscriptions.findAll({
-      where: {UserId: userId}
+      where: {userId: userId}
     })
 
     let subscriptions = []
     subscriptionsArray.forEach(sub => {
-      subscriptions.push(sub.PodcastId)
+      subscriptions.push(sub.podcastId)
     })
 
     res.status(200).json({subscriptions})
@@ -293,7 +160,7 @@ module.exports.unsubscribe = async (req, res) => {
     const userId = req.user.id
     console.log(podcastId)
     await Subscriptions.destroy({
-      where: {UserId: userId, PodcastId: podcastId}
+      where: {userId: userId, podcastId: podcastId}
     })
 
     res.status(200).json({unsubscribed: true})
@@ -304,20 +171,3 @@ module.exports.unsubscribe = async (req, res) => {
     })
   }
 }
-
-// async function getPodcastFromRss(url) {
-//   const podcast = await getPodcastJson(url)
-//   // podcast.meta.description = formatJsonToHtml(podcast.meta.description)
-
-//   // podcast.episodes = podcast.episodes.map(ep => {
-//   //   ep.description = formatJsonToHtml(ep.description)
-//   // })
-
-//   return podcast
-// }
-
-// async function getPodcastJson(url) {
-//   const podcast = await podcastFeedParser.getPodcastFromURL(url)
-
-//   return podcast
-// }

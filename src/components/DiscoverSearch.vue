@@ -243,7 +243,7 @@ export default {
 
 <style lang="scss" scoped>
 .discover-search {
-  padding: 16px 12px;
+  padding: 20px 16px;
   background: var(--color-header-bg);
   // margin-top: 24px;
   border-radius: 10px;
@@ -261,7 +261,7 @@ export default {
     margin: 0;
     width: 100%;
     border-radius: 48px;
-    padding: 10px 48px;
+    padding: 12px 48px;
     background: var(--color-block-bg);
     border: 2px solid var(--color-border);
     &:active,
@@ -299,7 +299,7 @@ export default {
   }
 
   &__results {
-    padding-top: 68px;
+    padding-top: 84px;
     padding-bottom: 8px;
     border-radius: 10px;
     max-height: calc(100vh - 200px);

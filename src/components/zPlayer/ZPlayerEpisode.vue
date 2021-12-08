@@ -15,7 +15,7 @@
             :to="{
               name: 'episode',
               params: {
-                podcastSlug: episode.Podcast.slug,
+                podcastSlug: episode.podcast.slug,
                 episodeSlug: episode.slug,
               },
             }"
@@ -27,11 +27,11 @@
             :to="{
               name: 'podcast',
               params: {
-                podcastSlug: episode ? episode.Podcast.slug : 's',
+                podcastSlug: episode ? episode.podcast.slug : 's',
               },
             }"
             class="zEpisode__podcast"
-            >{{ episode.Podcast.title }}</router-link
+            >{{ episode.podcast.title }}</router-link
           >
         </div>
         <div class="zEpisode__description-toggle" @click="toggleDescription">

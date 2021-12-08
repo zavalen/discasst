@@ -1,10 +1,9 @@
-const fs = require('fs')
+// const fs = require('fs')
 const Parser = require('rss-parser')
 const parser = new Parser()
 const {jsonToHtml} = require('./stringUtils')
 const sanitizeHtml = require('sanitize-html')
 const {slugify} = require('./slugUtils')
-const fetch = require('node-fetch')
 
 module.exports.getPodcastJson = async url => {
   // const getPodcastJson = async url => {
@@ -78,8 +77,10 @@ function getPodcastMeta(podcastJson, rssUrl) {
   meta.generator = podcastJson.generator || ''
   meta.copyright = podcastJson.copyright || ''
   meta.categories =
-    podcastJson.itunes.categoriesWithSubs || podcastJson.itunes.categories || ''
-  meta.keywords = podcastJson.keywords || podcastJson.itunes.keywords || ''
+    podcastJson.itunes.categoriesWithSubs ||
+    podcastJson.itunes.categories ||
+    null
+  meta.keywords = podcastJson.keywords || podcastJson.itunes.keywords || null
   if (meta.keywords && meta.keywords.length) {
     meta.keywords = meta.keywords.map(keyword => keyword.trim())
   }

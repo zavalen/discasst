@@ -1,158 +1,30 @@
 const Podcast = require('../models/Podcast')
 const Episode = require('../models/Episode')
+const Rating = require('../models/Rating')
 const EpisodeProgress = require('../models/EpisodeProgress')
-const User = require('../models/User')
 const Subscriptions = require('../models/Subscriptions')
 const UserEpisodesHistory = require('../models/UserEpisodesHistory')
-const {slugify} = require('../utils/slugUtils')
-const sequelize = require('../dbConnection')
-const podcastFeedParser = require('podcast-feed-parser')
 const {Op} = require('sequelize')
 
-function sanitizeOutput(article, user) {
-  const newTagList = []
-  for (let t of article.dataValues.Tags) {
-    newTagList.push(t.name)
-  }
-  delete article.dataValues.Tags
-  article.dataValues.tagList = newTagList
+// module.exports.getEpisodesByPodcastSlug = async (req, res) => {
+//   try {
+//     const {podcastSlug} = req.params
 
-  if (article) {
-    delete user.dataValues.password
-    delete user.dataValues.email
-    delete user.dataValues.following
-    article.dataValues.author = user
-    return article
-  }
-}
+//     const podcast = await Podcast.findOne({
+//       where: {slug: podcastSlug}
+//     })
 
-function sanitizeOutputMultiple(article) {
-  const newTagList = []
-  for (let t of article.dataValues.Tags) {
-    newTagList.push(t.name)
-  }
-  delete article.dataValues.Tags
-  article.dataValues.tagList = newTagList
+//     const episodes = await Episode.findAll({
+//       where: {podcastId: podcast.id}
+//     })
 
-  let user = {
-    username: article.dataValues.User.username,
-    email: article.dataValues.User.email,
-    bio: article.dataValues.User.bio,
-    image: article.dataValues.User.image
-  }
-
-  delete article.dataValues.User
-  article.dataValues.author = user
-
-  return article
-}
-
-module.exports.getEpisodesByPodcastSlug = async (req, res) => {
-  try {
-    const {podcastSlug} = req.params
-
-    const podcast = await Podcast.findOne({
-      where: {slug: podcastSlug}
-    })
-
-    const episodes = await Episode.findAll({
-      where: {PodcastId: podcast.id}
-    })
-
-    res.status(200).json({episodes})
-  } catch (e) {
-    return res.status(422).json({
-      errors: {body: ['Could not get article', e.message]}
-    })
-  }
-}
-
-module.exports.getSingleArticleBySlug = async (req, res) => {
-  try {
-    const {slug} = req.params
-    let article = await Podcast.findByPk(slug, {include: Tag})
-
-    const user = await article.getUser()
-
-    article = sanitizeOutput(article, user)
-
-    res.status(200).json({article})
-  } catch (e) {
-    return res.status(422).json({
-      errors: {body: ['Could not get article', e.message]}
-    })
-  }
-}
-
-module.exports.updateArticle = async (req, res) => {
-  try {
-    if (!req.body.article) throw new Error('No articles data')
-    const data = req.body.article
-    const slugInfo = req.params.slug
-    let article = await Podcast.findByPk(slugInfo, {include: Tag})
-
-    if (!article) {
-      res.status(404)
-      throw new Error('Article not found')
-    }
-
-    const user = await User.findByPK(req.user.email)
-
-    if (user.email != article.UserEmail) {
-      res.status(403)
-      throw new Error('You must be the author to modify this article')
-    }
-
-    const title = data.title ? data.title : article.title
-    const description = data.description
-      ? data.description
-      : article.description
-    const body = data.body ? data.body : article.body
-    const slug = data.title ? slugify(title) : slugInfo
-
-    const updatedArticle = await article.update({
-      slug,
-      title,
-      description,
-      body
-    })
-
-    article = sanitizeOutput(updatedArticle, user)
-    res.status(200).json({article})
-  } catch (e) {
-    const code = res.statusCode ? res.statusCode : 422
-    return res.status(code).json({
-      errors: {body: ['Could not update article', e.message]}
-    })
-  }
-}
-
-module.exports.deleteArticle = async (req, res) => {
-  try {
-    const slugInfo = req.params.slug
-    let article = await Podcast.findByPk(slugInfo, {include: Tag})
-
-    if (!article) {
-      res.status(404)
-      throw new Error('Article not found')
-    }
-
-    const user = await User.findByPK(req.user.email)
-
-    if (user.email != article.UserEmail) {
-      res.status(403)
-      throw new Error('You must be the author to modify this article')
-    }
-
-    await Podcast.destroy({where: {slug: slugInfo}})
-    res.status(200).json({message: 'Article deleted successfully'})
-  } catch (e) {
-    const code = res.statusCode ? res.statusCode : 422
-    return res.status(code).json({
-      errors: {body: ['Could not delete article', e.message]}
-    })
-  }
-}
+//     res.status(200).json({episodes})
+//   } catch (e) {
+//     return res.status(422).json({
+//       errors: {body: ['Could not get article', e.message]}
+//     })
+//   }
+// }
 
 module.exports.getEpisodes = async (req, res) => {
   try {
@@ -169,15 +41,22 @@ module.exports.getEpisodes = async (req, res) => {
 
     const modelsToInclude = [
       {
-        model: Podcast
+        model: Podcast,
+        as: 'podcast'
+      },
+
+      {
+        model: Rating,
+        required: false
       }
     ]
 
     if (req.user && req.user.id) {
       modelsToInclude.push({
         model: EpisodeProgress,
+        as: 'progress',
         required: false,
-        where: {UserId: req.user.id}
+        where: {userId: req.user.id}
       })
     }
 
@@ -193,18 +72,18 @@ module.exports.getEpisodes = async (req, res) => {
       if (!podcast) {
         throw new Error('No such podcast slug')
       }
-      query.where = {PodcastId: podcast.id}
+      query.where = {podcastId: podcast.id}
     }
 
     if (subscriptions && req.user && req.user.id) {
       const subscriptionsArray = await Subscriptions.findAll({
         where: {
-          UserId: req.user.id
+          userId: req.user.id
         }
       })
       let subscriptionsIds = []
       subscriptionsArray.forEach(sub => {
-        subscriptionsIds.push(sub.PodcastId)
+        subscriptionsIds.push(sub.podcastId)
       })
 
       if (!subscriptionsIds.length) {
@@ -217,13 +96,37 @@ module.exports.getEpisodes = async (req, res) => {
     if (podcastsIds) {
       podcastsIds = podcastsIds.split(',')
       query.where = {
-        PodcastId: {
+        podcastId: {
           [Op.or]: podcastsIds
         }
       }
     }
 
     const episodes = await Episode.findAll(query)
+
+    for (let index = 0; index < episodes.length; index++) {
+      const episode = episodes[index]
+      let sum = 0
+      let plusesCount = 0
+      let minusesCount = 0
+      let userRating = 0
+      episode.Ratings.forEach(item => {
+        sum += item.value
+
+        if (item.value == 1) {
+          plusesCount++
+        }
+
+        if (item.value == -1) {
+          minusesCount++
+        }
+        if (req.user && req.user.id == item.userId) {
+          userRating = item.value
+        }
+      })
+      episode.dataValues.rating = {sum, userRating, plusesCount, minusesCount}
+      delete episode.dataValues.Ratings
+    }
 
     res.json({episodes})
   } catch (e) {
@@ -240,12 +143,12 @@ module.exports.writeProgress = async (req, res) => {
 
     progress.VisitorId = req.headers.visitorid || progress.visitorId
     if (req.user) {
-      progress.UserId = req.user.id
+      progress.userId = req.user.id
     }
 
-    if (progress.UserId) {
+    if (progress.userId) {
       let where = {
-        UserId: progress.UserId,
+        userId: progress.userId,
         EpisodeId: progress.EpisodeId
       }
       updateOrCreate(EpisodeProgress, where, progress)
@@ -268,6 +171,40 @@ module.exports.writeProgress = async (req, res) => {
   }
 }
 
+module.exports.writeRating = async (req, res) => {
+  try {
+    console.log(req.query)
+    if (!req.user) throw new Error('No user')
+    if (!req.body.rating && !(req.query.episodeId && req.query.value)) {
+      throw new Error('No rating')
+    }
+
+    let rating = req.body.rating || {
+      episodeId: req.query.episodeId,
+      value: req.query.value
+    }
+
+    rating.userId = req.user.id
+
+    if (rating.value < -1 && rating.value > 1) throw new Error('Wrong rating')
+
+    let where = {
+      userId: req.user.id,
+      episodeId: rating.episodeId
+    }
+
+    updateOrCreate(Rating, where, rating)
+
+    res.status(200).json({status: 200})
+  } catch (e) {
+    const code = res.statusCode ? res.statusCode : 422
+    // throw new Error('Error in writeRating')
+    return res.status(code).json({
+      errors: {body: [e.message]}
+    })
+  }
+}
+
 module.exports.getHistory = async (req, res) => {
   try {
     let {limit = 20, offset = 0} = req.query
@@ -279,14 +216,14 @@ module.exports.getHistory = async (req, res) => {
       modelsToInclude.push({
         model: UserEpisodesHistory,
         required: true,
-        where: {UserId: req.user.id}
+        where: {userId: req.user.id}
       })
     } else {
       const visitorId = req.headers.visitorid
       modelsToInclude.push({
         model: UserEpisodesHistory,
         required: true,
-        where: {UserId: visitorId}
+        where: {userId: visitorId}
       })
     }
     const episodes = await Episode.findAll({
@@ -312,7 +249,7 @@ module.exports.addToHistory = async (req, res) => {
     if (!episode) throw new Error('No episode object')
 
     episode.VisitorId = req.headers.visitorid || episode.visitorId || null
-    episode.UserId = req.user ? req.user.id : null
+    episode.userId = req.user ? req.user.id : null
     episode.EpisodeId = episode.id
     delete episode.id
 
