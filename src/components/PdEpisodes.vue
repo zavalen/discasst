@@ -402,20 +402,20 @@ export default {
 
     & > .play {
       border-radius: 20%;
-      padding: 36px 36px 36px 36px;
+      padding: 34px;
       // padding: 38px 38px 38px 32px;
       // border-start-end-radius: 150%;
       // border-end-start-radius: 50%;
       // border-start-start-radius: 50%;
       // border-end-end-radius: 150%;
       & > svg {
-        margin-left: 6px;
+        margin-left: 4px;
       }
     }
 
     & > .pause {
       border-radius: 20%;
-      padding: 36px 36px;
+      padding: 34px;
     }
 
     display: flex;
@@ -429,7 +429,7 @@ export default {
     min-width: 156px;
     max-width: 156px;
     border-radius: 10px;
-    padding: 12px 12px 12px 20px;
+    padding: 12px 12px 14px 20px;
   }
 
   &__image {
@@ -437,11 +437,12 @@ export default {
       width: 100%;
       border-radius: 10px;
       border: 1px solid var(--color-border);
-      box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+      // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
+      box-shadow: 0 2px 2px var(--color-light-shadow);
       background-color: var(--bg-block-hover);
     }
     position: relative;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
   }
 
   &__right {

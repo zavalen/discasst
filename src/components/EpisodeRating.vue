@@ -8,15 +8,28 @@
     >
       <svg-icon name="rating-arrow-down" />
     </div>
-
-    <span
-      class="rating__number"
-      v-tooltip="
-        episode.rating.minusesCount + ' / ' + episode.rating.plusesCount
-      "
-    >
-      {{ episode.rating.sum || '—' }}
-    </span>
+    <transition name="slide-fade" mode="out-in">
+      <span
+        :key="episode.rating.sum"
+        class="rating__number"
+        :class="{
+          rating__number_minus: !episode.rating.sum < 0,
+        }"
+        v-tooltip="
+          '- ' +
+          episode.rating.minusesCount +
+          ' | ' +
+          episode.rating.plusesCount +
+          ' +'
+        "
+      >
+        {{
+          episode.rating.plusesCount || episode.rating.minusesCount
+            ? episode.rating.sum
+            : '—'
+        }}
+      </span>
+    </transition>
     <div
       v-tooltip="'Плюс'"
       class="rating__plus"
@@ -52,30 +65,46 @@ export default {
       if (this.isAnonymus) {
         this.$router.push({name: 'login'})
       } else {
-        const rating = {
-          episodeId: episode.id,
-          value: 0,
-        }
-
         if (episode.rating.userRating == value) {
           episode.rating.sum -= value
-          episode.rating.userRating = 0
-          rating.value = 0
-        } else if (episode.rating.userRating == -value) {
-          episode.rating.sum += value * 2
-          episode.rating.userRating = value
-          rating.value = value
+
+          if (value == 1) {
+            episode.rating.plusesCount--
+          }
+          if (value == -1) {
+            episode.rating.minusesCount--
+          }
+          value = 0
         } else {
-          episode.rating.sum += value
-          episode.rating.userRating = value
-          rating.value = value
-        }
+          let multiply = episode.rating.userRating == -value ? 2 : 1
+          episode.rating.sum += value * multiply
 
-        if (value == 1) {
-          episode.rating.userRating
-        }
+          if (multiply == 1) {
+            if (value == 1) {
+              episode.rating.plusesCount++
+            }
+            if (value == -1) {
+              episode.rating.minusesCount++
+            }
+          }
 
-        this.$store.dispatch(feedActions.setRating, rating)
+          if (multiply == 2) {
+            if (value == 1) {
+              episode.rating.plusesCount++
+              episode.rating.minusesCount--
+            }
+            if (value == -1) {
+              episode.rating.plusesCount--
+              episode.rating.minusesCount++
+            }
+          }
+        }
+        episode.rating.userRating = value
+
+        this.$store.dispatch(feedActions.setRating, {
+          episodeId: episode.id,
+          value,
+        })
       }
     },
   },
@@ -108,12 +137,15 @@ export default {
   }
 
   &__plus_active {
+    background: rgba(4, 202, 4, 0.08);
     path {
       fill: rgb(4, 202, 4);
     }
   }
 
   &__minus_active {
+    background: rgba(211, 37, 37, 0.08);
+
     path {
       fill: rgb(211, 37, 37);
     }
@@ -128,6 +160,26 @@ export default {
     text-shadow: 0 0 1px var(--color-text);
     align-items: center;
     justify-content: center;
+
+    &_minus {
+      color: rgb(211, 37, 37);
+    }
   }
+}
+
+.slide-fade-enter-active {
+  transition: all 0.2s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.2s ease;
+}
+.slide-fade-enter-from {
+  transform: translateY(-10px);
+  opacity: 0;
+}
+
+.slide-fade-leave-to {
+  transform: translateY(10px);
+  opacity: 0;
 }
 </style>

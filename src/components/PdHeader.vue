@@ -206,7 +206,6 @@ import UserIcon from '@/components/ui/UserIcon.vue'
 import FadeTransition from '@/components/animations/FadeTransition.vue'
 import SlideRightTransition from '@/components/animations/SlideRightTransition.vue'
 import PdLoader from '@/components/ui/PdLoader'
-import SvgIcon from './SvgIcon.vue'
 import DiscoverSearch from '@/components/DiscoverSearch'
 
 export default {
@@ -220,7 +219,6 @@ export default {
     SlideRightTransition,
     PdNotifications,
     PdLoader,
-    SvgIcon,
     DiscoverSearch,
   },
   data() {
@@ -490,7 +488,7 @@ export default {
 
     .icon,
     svg {
-      height: 32px;
+      height: 30px;
       width: auto;
     }
     &:active {
