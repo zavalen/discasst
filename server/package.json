@@ -1,22 +1,16 @@
 {
-  "name": "conduit_nodejs",
+  "name": "discasst",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "production": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Varun-Hegde/Conduit_NodeJS.git"
-  },
-  "author": "Varun Hegde",
+  "repository": {},
+  "author": "Valiantsin",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Varun-Hegde/Conduit_NodeJS/issues"
-  },
-  "homepage": "https://github.com/Varun-Hegde/Conduit_NodeJS#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
@@ -25,12 +19,9 @@
     "express-async-handler": "^1.1.4",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
-    "mysql2": "^2.2.5",
+    "mysql2": "^2.3.3",
     "nanoid": "^3.1.30",
     "passport": "^0.5.0",
-    "pg": "^8.5.1",
-    "pg-hstore": "^2.3.3",
-    "podcast-feed-parser": "^1.0.4",
     "rss-parser": "^3.12.0",
     "sanitize-html": "^2.5.3",
     "sequelize": "^6.5.0",
@@ -39,10 +30,7 @@
     "ua-parser-js": "^1.0.2",
     "validator": "^13.7.0"
   },
-  "engines": {
-    "node": "12.19.0"
-  },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.15"
   }
 }

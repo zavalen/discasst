@@ -8,7 +8,7 @@ const UserEpisodesHistory = require('./UserEpisodesHistory')
 const EpisodeProgress = require('./EpisodeProgress')
 const PodcastsManagers = require('./PodcastsManagers')
 const Subscriptions = require('./Subscriptions')
-
+const ApplePodcastInfo = require('./ApplePodcastInfo')
 const setAssociations = function() {
   User.hasMany(VisitorInfo, {as: 'visitors', foreignKey: 'userId'})
   Episode.belongsTo(Podcast, {as: 'podcast', foreignKey: 'podcastId'})
@@ -25,6 +25,10 @@ const setAssociations = function() {
     foreignKey: 'userId'
   })
   Visitor.belongsToMany(Episode, {through: UserEpisodesHistory})
+  Episode.hasMany(UserEpisodesHistory, {
+    onDelete: 'cascade',
+    foreignKey: 'episodeId'
+  })
 
   Visitor.hasMany(VisitorInfo, {onDelete: 'cascade', foreignKey: 'visitorId'})
   Episode.hasOne(EpisodeProgress, {
@@ -55,5 +59,8 @@ const setAssociations = function() {
     otherKey: 'userId'
   })
   Episode.hasMany(Rating, {foreignKey: 'episodeId'})
+
+  Podcast.hasOne(ApplePodcastInfo)
 }
+
 module.exports = setAssociations

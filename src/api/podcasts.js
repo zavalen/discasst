@@ -12,8 +12,8 @@ const getPodcastBySlug = podcastSlug => {
   return axios.get(`/podcasts`, {params: {podcastSlug}})
 }
 
-const findOrAddPodcast = rss => {
-  return axios.post(`/podcasts`, {rss: rss})
+const findOrAddPodcast = podcastInfo => {
+  return axios.post(`/podcasts`, {podcastInfo})
 }
 
 const getSubscribtions = () => {

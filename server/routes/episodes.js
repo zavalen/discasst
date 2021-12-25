@@ -16,6 +16,6 @@ router.post(
   appendUserByTokenIfExist,
   EpisodeController.addToHistory
 )
-router.get('/history', appendUserByTokenIfExist, EpisodeController.getHistory)
+router.get('/history', authByToken, EpisodeController.getHistory)
 
 module.exports = router

@@ -42,7 +42,6 @@ module.exports.getPodcastJson = async url => {
   }
 
   const meta = getPodcastMeta(podcastJson, url)
-  console.log(meta)
 
   const episodes = getEpisodes(podcastJson)
 
@@ -110,8 +109,13 @@ function getEpisodes(podcastJson) {
     episode.description =
       item['content:encoded'] || item.content || item['content:encodedSnippet']
     episode.description = jsonToHtml(episode.description)
+    episode.description = jsonToHtml(episode.description)
     episode.pubDate = new Date(item.pubDate).toISOString()
-    episode.link = item.link
+    episode.imageURL =
+      item.itunes.image ||
+      podcastJson.itunes.image ||
+      podcastJson.image?.url ||
+      ''
     episode.file = item.enclosure.url
     episode.enclosure = item.enclosure
     episode.duration = convertTimeToSeconds(item.itunes.duration)

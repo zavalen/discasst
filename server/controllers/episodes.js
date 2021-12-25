@@ -210,22 +210,24 @@ module.exports.getHistory = async (req, res) => {
     let {limit = 20, offset = 0} = req.query
     limit = limit > 100 ? 100 : limit
 
-    const modelsToInclude = []
+    const modelsToInclude = [
+      {
+        model: Podcast,
+        as: 'podcast'
+      },
 
-    if (req.user) {
-      modelsToInclude.push({
-        model: UserEpisodesHistory,
-        required: true,
-        where: {userId: req.user.id}
-      })
-    } else {
-      const visitorId = req.headers.visitorid
-      modelsToInclude.push({
-        model: UserEpisodesHistory,
-        required: true,
-        where: {userId: visitorId}
-      })
-    }
+      {
+        model: Rating,
+        required: false
+      }
+    ]
+
+    modelsToInclude.push({
+      model: UserEpisodesHistory,
+      required: true,
+      where: {userId: req.user.id}
+    })
+
     const episodes = await Episode.findAll({
       limit: parseInt(limit),
       offset: parseInt(offset),

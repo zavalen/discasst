@@ -269,13 +269,18 @@ export default {
         this.playerJs.api('pause')
       }
     },
-    queue() {
-      if (this.$refs.queueCounter) {
-        this.$refs.queueCounter.classList.add('counter-changed')
-        setTimeout(() => {
-          this.$refs.queueCounter.classList.remove('counter-changed')
-        }, 500)
-      }
+    queue: {
+      handler: function (newVal, oldVal) {
+        console.log(newVal.length)
+        console.log(oldVal.length)
+        if (this.$refs.queueCounter) {
+          this.$refs.queueCounter.classList.add('counter-changed')
+          setTimeout(() => {
+            this.$refs.queueCounter.classList.remove('counter-changed')
+          }, 500)
+        }
+      },
+      deep: true,
     },
   },
   methods: {

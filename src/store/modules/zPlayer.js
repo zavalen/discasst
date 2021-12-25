@@ -22,6 +22,7 @@ export const zPlayerMutations = {
   addToQueue: '[zPlayer] addToQueue',
   removeFromQueue: '[zPlayer] removeFromQueue',
   addToHistory: '[zPlayer] addToHistory',
+  setHistory: '[zPlayer] setHistory',
   removeFromHistory: '[zPlayer] removeFromHistory',
   toggle: '[zPlayer] toggle',
   setReallyListened: '[zPlayer] setReallyListened',
@@ -36,6 +37,7 @@ export const zPlayerActions = {
   addToQueue: '[zPlayer] addToQueue',
   removeFromQueue: '[zPlayer] removeFromQueue',
   addToHistory: '[zPlayer] addToHistory',
+  getHistory: '[zPlayer] getHistory',
   removeFromHistory: '[zPlayer] removeFromHistory',
   toggle: '[zPlayer] toggle'
 }
@@ -76,12 +78,16 @@ const mutations = {
     }
   },
   [zPlayerMutations.addToQueue](state, payload) {
+    // if (state.currentEpisode) {
     state.queue.push(payload)
+    // } else {
+    //   state.currentEpisode = payload
+    // }
 
     // delete duplicates
-    state.queue = state.queue.filter(
-      (v, i, a) => a.findIndex(t => t.id === v.id) === i
-    )
+    // state.queue = state.queue.filter(
+    //   (v, i, a) => a.findIndex(t => t.id === v.id) === i
+    // )
   },
   [zPlayerMutations.removeFromQueue](state, payload) {
     state.queue = state.queue.filter(ep => ep.id != payload.id)
@@ -89,6 +95,9 @@ const mutations = {
 
   [zPlayerMutations.addToHistory](state, payload) {
     state.history.unshift(payload)
+  },
+  [zPlayerMutations.setHistory](state, payload) {
+    state.history = payload
   },
   [zPlayerMutations.removeFromHistory](state, payload) {
     state.history = state.history.filter(ep => ep.id != payload.id)
@@ -145,6 +154,16 @@ const actions = {
   },
   [zPlayerActions.toggle](context) {
     context.commit(zPlayerMutations.toggle)
+  },
+  [zPlayerActions.getHistory](context, payload) {
+    api
+      .getHistory(payload)
+      .then(response => {
+        context.commit(zPlayerMutations.setHistory, response.data.episodes)
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
 

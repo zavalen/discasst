@@ -13,7 +13,7 @@
         :key="episode.rating.sum"
         class="rating__number"
         :class="{
-          rating__number_minus: !episode.rating.sum < 0,
+          rating__number_minus: episode.rating.sum < 0,
         }"
         v-tooltip="
           '- ' +
@@ -122,9 +122,11 @@ export default {
   backdrop-filter: blur(5px);
   overflow: hidden;
   transition: 0.3s;
+  // box-shadow: 0 1px 1px var(--color-light-shadow);
+
   &__plus,
   &__minus {
-    padding: 2px 8px;
+    padding: 1px 8px;
     cursor: pointer;
     position: relative;
 
@@ -151,9 +153,9 @@ export default {
     }
   }
   &__number {
-    min-width: 24px;
+    min-width: 20px;
     display: flex;
-    height: 28px;
+    height: 24px;
     flex: auto;
     text-align: center;
     font-size: 14px;
@@ -168,10 +170,10 @@ export default {
 }
 
 .slide-fade-enter-active {
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 .slide-fade-leave-active {
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 .slide-fade-enter-from {
   transform: translateY(-10px);

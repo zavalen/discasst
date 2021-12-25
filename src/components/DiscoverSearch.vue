@@ -41,7 +41,7 @@
           class="discover-search__result discover-search-result"
           v-for="searchResult in searchResults"
           :key="searchResult.collectionId"
-          @click="rss = searchResult.feedUrl"
+          @click="findOrAddPodcast(searchResult)"
           :class="{
             'discover-search-result_active': searchResult == selectedResult,
           }"
@@ -109,7 +109,8 @@ export default {
 
         if (event.code === 'Enter') {
           if (this.selectedResult) {
-            this.rss = this.selectedResult.feedUrl
+            // this.rss = this.selectedResult.feedUrl
+            this.findOrAddPodcast(this.selectedResult)
           }
         }
       }
@@ -141,6 +142,7 @@ export default {
     getRssFromUrl(searchQuery) {
       this.rss = searchQuery
     },
+
     async search(searchQuery) {
       const encodedSearchQuery = encodeURI(searchQuery)
       try {
@@ -162,10 +164,16 @@ export default {
         this.isLoading = false
       }
     },
-    async findOrAddPodcast(rss) {
+    async findOrAddPodcast(searchResult) {
       this.isLoading = true
+      const rss = searchResult.feedUrl
+
+      const podcastInfo = {
+        rss: rss,
+        appleInfo: searchResult,
+      }
       const addedPodcast = await podcasts
-        .findOrAddPodcast(rss)
+        .findOrAddPodcast(podcastInfo)
         .then((response) => response.data)
 
       this.isLoading = false
@@ -226,17 +234,17 @@ export default {
         this.searchResults = []
       }
     },
-    rss(newRss) {
-      if (typeof newRss === 'object') {
-        this.rss = this.searchQuery
-      }
-      if (typeof newRss === 'string') {
-        this.findOrAddPodcast(newRss)
-        this.selectedResultIndex = -1
-        this.selectedResult = null
-        document.activeElement.blur()
-      }
-    },
+    // rss(newRss) {
+    //   if (typeof newRss === 'object') {
+    //     this.rss = this.searchQuery
+    //   }
+    //   if (typeof newRss === 'string') {
+    //     this.findOrAddPodcast(newRss)
+    //     this.selectedResultIndex = -1
+    //     this.selectedResult = null
+    //     document.activeElement.blur()
+    //   }
+    // },
   },
 }
 </script>

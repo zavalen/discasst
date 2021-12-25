@@ -36,14 +36,8 @@
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
         <div class="feed-episode__left">
-          <!-- <img
-            v-lazy="episode.podcast.imageURL"
-            class="loading"
-            alt=""
-            srcset=""
-          /> -->
           <div class="feed-episode__image">
-            <img v-lazy="episode.podcast.imageURL" />
+            <img v-lazy="episode.imageURL" />
             <div class="feed-episode__play" @click="playEpisode(episode)">
               <svg-icon
                 v-if="
@@ -61,19 +55,10 @@
             </div>
           </div>
 
-          <episode-rating :episode="episode" />
+          <episode-rating class="feed-episode__rating" :episode="episode" />
         </div>
 
-        <router-link
-          class="feed-episode__right"
-          :to="{
-            name: 'episode',
-            params: {
-              podcastSlug: episode.podcast.slug,
-              episodeSlug: episode.slug,
-            },
-          }"
-        >
+        <div class="feed-episode__right">
           <div class="feed-episode__heading">
             <div class="feed-episode__time">
               {{ formatDate(episode.pubDate) }} <strong>·</strong>
@@ -92,15 +77,22 @@
                   name: 'podcast',
                   params: {podcastSlug: episode.podcast.slug},
                 }"
-                >{{ episode.podcast.title }}</router-link
+                ><img
+                  class="feed-episode__podcast-image"
+                  :src="episode.podcast.imageURL"
+                  alt=""
+                />
+                {{ episode.podcast.title }}</router-link
               >
               <svg-icon
                 v-if="!userSubscriptions.includes(episode.podcast.id)"
+                class="feed-episode__subscribe"
                 @click.stop.prevent="subscribe(episode.podcast)"
                 name="add-circle"
                 v-tooltip="'Подписаться'"
               />
               <svg-icon
+                class="feed-episode__subscribe"
                 v-if="userSubscriptions.includes(episode.podcast.id)"
                 @click.stop.prevent="unsubscribe(episode.podcast)"
                 name="tick-square"
@@ -123,7 +115,7 @@
               Обсудить</router-link
             >
           </div>
-        </router-link>
+        </div>
         <div class="feed-episode__buttons-block">
           <template v-if="!currentEpisode || currentEpisode.id != episode.id">
             <svg-icon
@@ -149,7 +141,7 @@
               name="now-playing"
             />
           </template>
-          <div class="feed-episode__more">
+          <div class="button feed-episode__more">
             <svg-icon name="more" />
           </div>
         </div>
@@ -160,6 +152,17 @@
             :style="{width: episode.progress?.percentage + '%'}"
           ></div>
         </div>
+        <router-link
+          class="feed-episode__link"
+          :to="{
+            name: 'episode',
+            params: {
+              podcastSlug: episode.podcast.slug,
+              episodeSlug: episode.slug,
+            },
+          }"
+        >
+        </router-link>
       </div>
 
       <button
@@ -371,9 +374,30 @@ export default {
     }
   }
 
+  &__link {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 0;
+  }
+
+  &__podcast-image {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--color-border);
+    margin-right: 8px;
+  }
+
   &__podcast-link {
     z-index: 2;
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    // padding-right: 10px;
+
     &:hover {
       text-shadow: 0 0 0.5px var(--color-text);
     }
@@ -394,6 +418,9 @@ export default {
       z-index: 3;
       // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
       transition: 0.3s;
+      &:active {
+        top: 1;
+      }
       & > svg {
         min-width: 32px;
         min-height: 32px;
@@ -401,21 +428,27 @@ export default {
     }
 
     & > .play {
-      border-radius: 20%;
+      border-radius: 50%;
+      // border-radius: 20%;
+      border: 1px solid var(--color-text);
       padding: 34px;
       // padding: 38px 38px 38px 32px;
       // border-start-end-radius: 150%;
       // border-end-start-radius: 50%;
       // border-start-start-radius: 50%;
       // border-end-end-radius: 150%;
+      position: relative;
+
       & > svg {
-        margin-left: 4px;
+        margin-left: 6px;
       }
     }
 
     & > .pause {
-      border-radius: 20%;
+      border: 1px solid var(--color-text);
+      border-radius: 50%;
       padding: 34px;
+      position: relative;
     }
 
     display: flex;
@@ -429,7 +462,7 @@ export default {
     min-width: 156px;
     max-width: 156px;
     border-radius: 10px;
-    padding: 12px 12px 14px 20px;
+    padding: 8px 8px 12px 16px;
   }
 
   &__image {
@@ -438,7 +471,7 @@ export default {
       border-radius: 10px;
       border: 1px solid var(--color-border);
       // box-shadow: 0 0.25rem 0.5rem 0.125rem var(--color-default-shadow);
-      box-shadow: 0 2px 2px var(--color-light-shadow);
+      // box-shadow: 0 2px 2px var(--color-light-shadow);
       background-color: var(--bg-block-hover);
     }
     position: relative;
@@ -446,7 +479,7 @@ export default {
   }
 
   &__right {
-    padding: 12px 36px 14px 16px;
+    padding: 10px 16px 14px 10px;
     flex: auto;
     position: relative;
     color: inherit;
@@ -455,6 +488,10 @@ export default {
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;
+  }
+
+  &__subscribe {
+    z-index: 2;
   }
 
   &__buttons-block {
@@ -491,7 +528,7 @@ export default {
     -webkit-box-orient: vertical;
     line-clamp: 3;
     box-orient: vertical;
-    margin-bottom: 2px;
+    margin-bottom: 6px;
     line-height: 120%;
   }
 
@@ -499,7 +536,11 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 4px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border);
+    // box-shadow: 0 1px 1px var(--color-light-shadow);
 
+    width: fit-content;
     & svg {
       min-width: 16px;
       width: 16px;
@@ -534,9 +575,14 @@ export default {
     align-items: center;
     text-decoration: none;
     border-radius: 10px;
+    z-index: 2;
     // border: 1px solid var(--color-text);
   }
 
+  .button,
+  button {
+    z-index: 2;
+  }
   &__icon {
     padding: 16px;
     border-radius: 50%;
@@ -556,6 +602,14 @@ export default {
     box-orient: vertical;
     color: var(--color-text);
     text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding-right: 4px;
+    // border: 1px solid var(--color-border);
+
+    &:hover,
+    &:active {
+    }
   }
 
   transition: 0.5s;
@@ -585,6 +639,7 @@ export default {
   }
 
   &__rating {
+    z-index: 2;
   }
 }
 

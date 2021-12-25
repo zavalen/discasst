@@ -9,19 +9,31 @@
 <script>
 import {mapState} from 'vuex'
 import zPlayerEpisode from '@/components/zPlayer/ZPlayerEpisode'
-
+import {zPlayerActions} from '@/store/modules/zPlayer'
 export default {
-  name: 'zQueue',
+  name: 'zHistory',
+  data() {
+    return {
+      limit: 10,
+      offset: 0,
+    }
+  },
   components: {
-    zPlayerEpisode
+    zPlayerEpisode,
+  },
+  mounted() {
+    this.$store.dispatch(zPlayerActions.getHistory, {
+      limit: this.limit,
+      offset: this.offset,
+    })
   },
   computed: {
     ...mapState({
-      isPlaying: state => state.zPlayer.isPlaying,
-      currentEpisode: state => state.zPlayer.currentEpisode,
-      history: state => state.zPlayer.history
-    })
-  }
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+      history: (state) => state.zPlayer.history,
+    }),
+  },
 }
 </script>
 

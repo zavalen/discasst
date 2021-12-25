@@ -25,6 +25,10 @@ const Episode = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true
     },
+    imageURL: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     pubDate: {
       type: DataTypes.STRING,
       allowNull: true
