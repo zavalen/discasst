@@ -20,8 +20,10 @@ const toastOptions = {
   position: 'bottom-left',
   draggable: true,
   closeOnClick: true,
-  timeout: 4000
+  timeout: 4000,
 }
+
+import VueDOMPurifyHTML from 'vue-dompurify-html'
 
 createApp(App)
   .use(i18n)
@@ -30,11 +32,11 @@ createApp(App)
   .use(vClickOutside)
   .use(VueLazyLoad, {
     log: false,
-    error: '/images/placeholder.png'
+    error: '/images/placeholder.png',
   })
   .use(VTooltip)
   .component('SvgIcon', SvgIcon)
   .directive('ripple', Ripple)
-
+  .use(VueDOMPurifyHTML)
   .use(Toast, toastOptions)
   .mount('#app')

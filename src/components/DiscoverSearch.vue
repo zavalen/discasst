@@ -1,5 +1,5 @@
 <template>
-  <div class="discover-search" v-click-outside="blur" @click="focus">
+  <div v-click-outside="blur" class="discover-search" @click="focus">
     <form class="discover-search__form" @submit.prevent.stop>
       <svg-icon
         v-if="!isLoading"
@@ -8,17 +8,17 @@
       />
       <pd-loader v-if="isLoading" class="discover-search__loading" />
       <input
-        class="discover-search__input"
         ref="discoverSearch"
+        v-model.trim="searchQuery"
+        class="discover-search__input"
         placeholder="Умный поиск"
         type="text"
-        v-model.trim="searchQuery"
       />
       <button
-        class="discover-search__clear"
         v-if="searchQuery.length"
-        @click.prevent.stop="clearSearch"
         v-tooltip="'Очистить поиск'"
+        class="discover-search__clear"
+        @click.prevent.stop="clearSearch"
       >
         <svg-icon name="close" />
       </button>
@@ -26,25 +26,25 @@
 
     <template v-if="focusing">
       <div class="discover-search__results scrollbar">
-        <div class="discover-search__message" v-if="searchQuery.length < 2">
+        <div v-if="searchQuery.length < 2" class="discover-search__message">
           Это поиск по всем подкастам в интернете. Если на Discasst нет
           подкаста, который вы ищете, то он появится после того, как вы его
           найдёте в поиске.
         </div>
         <div
-          class="discover-search__message"
           v-if="searchQuery.length > 2 && !searchResults.length"
+          class="discover-search__message"
         >
           Ничего не найдено.
         </div>
         <div
-          class="discover-search__result discover-search-result"
           v-for="searchResult in searchResults"
           :key="searchResult.collectionId"
-          @click="findOrAddPodcast(searchResult)"
+          class="discover-search__result discover-search-result"
           :class="{
             'discover-search-result_active': searchResult == selectedResult,
           }"
+          @click="findOrAddPodcast(searchResult)"
         >
           <img
             v-lazy="searchResult.artworkUrl60"
@@ -66,7 +66,7 @@ import podcasts from '@/api/podcasts'
 import PdLoader from '@/components/ui/PdLoader'
 
 export default {
-  name: 'discoverSearch',
+  name: 'DiscoverSearch',
   components: {PdLoader},
   props: {
     isActive: {
@@ -75,6 +75,7 @@ export default {
       default: false,
     },
   },
+  emits: ['found'],
   data() {
     return {
       isLoading: false,
@@ -86,6 +87,43 @@ export default {
       selectedResult: null,
       selectedResultIndex: -1,
     }
+  },
+
+  watch: {
+    async searchQuery(newVal) {
+      this.errors = null
+      if (newVal.length > 1) {
+        if (
+          newVal.startsWith('https://podcasts.apple.com/') ||
+          newVal.startsWith('id')
+        ) {
+          this.getRssFromAppleById(newVal)
+        } else if (this.isValidHttpUrl(newVal)) {
+          this.getRssFromUrl(newVal)
+        } else {
+          if (window.waitForSearch) {
+            clearTimeout(window.waitForSearch)
+          }
+          this.isLoading = true
+          window.waitForSearch = setTimeout(() => {
+            this.search(newVal)
+          }, 800)
+        }
+      } else {
+        this.searchResults = []
+      }
+    },
+    // rss(newRss) {
+    //   if (typeof newRss === 'object') {
+    //     this.rss = this.searchQuery
+    //   }
+    //   if (typeof newRss === 'string') {
+    //     this.findOrAddPodcast(newRss)
+    //     this.selectedResultIndex = -1
+    //     this.selectedResult = null
+    //     document.activeElement.blur()
+    //   }
+    // },
   },
   mounted() {
     window.scrollTo({top: 0})
@@ -208,43 +246,6 @@ export default {
     focus() {
       this.focusing = true
     },
-  },
-
-  watch: {
-    async searchQuery(newVal) {
-      this.errors = null
-      if (newVal.length > 1) {
-        if (
-          newVal.startsWith('https://podcasts.apple.com/') ||
-          newVal.startsWith('id')
-        ) {
-          this.getRssFromAppleById(newVal)
-        } else if (this.isValidHttpUrl(newVal)) {
-          this.getRssFromUrl(newVal)
-        } else {
-          if (window.waitForSearch) {
-            clearTimeout(window.waitForSearch)
-          }
-          this.isLoading = true
-          window.waitForSearch = setTimeout(() => {
-            this.search(newVal)
-          }, 800)
-        }
-      } else {
-        this.searchResults = []
-      }
-    },
-    // rss(newRss) {
-    //   if (typeof newRss === 'object') {
-    //     this.rss = this.searchQuery
-    //   }
-    //   if (typeof newRss === 'string') {
-    //     this.findOrAddPodcast(newRss)
-    //     this.selectedResultIndex = -1
-    //     this.selectedResult = null
-    //     document.activeElement.blur()
-    //   }
-    // },
   },
 }
 </script>

@@ -4,13 +4,15 @@
     <div v-if="errors">Something goes wrong...</div>
 
     <template v-if="podcasts">
-      <div class="podcast" v-for="podcast in podcasts" :key="podcast.id">
+      <div v-for="podcast in podcasts" :key="podcast.id" class="podcast">
         <div class="podcast__top">
           <img v-lazy="podcast.imageURL" class="podcast__image" />
         </div>
 
         <div class="podcast__bottom">
-          <h2 class="podcast__title">{{ podcast.title }}</h2>
+          <h2 class="podcast__title">
+            {{ podcast.title }}
+          </h2>
         </div>
         <router-link
           class="podcast__link"
@@ -18,7 +20,7 @@
             name: 'podcast',
             params: {podcastSlug: podcast.slug},
           }"
-        ></router-link>
+        />
       </div>
     </template>
   </div>
@@ -39,6 +41,7 @@ export default {
     apiUrl: {
       type: String,
       required: false,
+      default: null,
     },
   },
 

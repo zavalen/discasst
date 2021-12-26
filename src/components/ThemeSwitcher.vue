@@ -15,9 +15,6 @@ import {authGetters} from '@/store/modules/auth'
 
 export default {
   name: 'ThemeSwitcher',
-  mounted() {
-    this.setTheme()
-  },
   computed: {
     ...mapState({
       theme: (state) => state.theme.theme,
@@ -25,16 +22,6 @@ export default {
     ...mapGetters({
       currentUser: authGetters.currentUser,
     }),
-  },
-  methods: {
-    switchTheme() {
-      const newTheme = this.theme === 'light' ? 'dark' : 'light'
-      this.$store.dispatch(themeActions.setAndSave, newTheme)
-    },
-    setTheme(theme = this.theme) {
-      let html = document.getElementsByTagName('html')[0]
-      html.setAttribute('data-theme', theme)
-    },
   },
   watch: {
     theme(newTheme) {
@@ -44,6 +31,20 @@ export default {
       if (user && user.theme) {
         this.$store.dispatch(themeActions.setAndSave, user.theme)
       }
+    },
+  },
+
+  mounted() {
+    this.setTheme()
+  },
+  methods: {
+    switchTheme() {
+      const newTheme = this.theme === 'light' ? 'dark' : 'light'
+      this.$store.dispatch(themeActions.setAndSave, newTheme)
+    },
+    setTheme(theme = this.theme) {
+      let html = document.getElementsByTagName('html')[0]
+      html.setAttribute('data-theme', theme)
     },
   },
 }

@@ -12,9 +12,6 @@ import {authGetters} from '@/store/modules/auth'
 
 export default {
   name: 'LangSwitcher',
-  mounted() {
-    this.setLang()
-  },
   computed: {
     ...mapState({
       lang: (state) => state.lang.lang,
@@ -22,15 +19,6 @@ export default {
     ...mapGetters({
       currentUser: authGetters.currentUser,
     }),
-  },
-  methods: {
-    switchLang() {
-      const newLang = this.lang === 'en' ? 'ru' : 'en'
-      this.$store.dispatch(langActions.setAndSave, newLang)
-    },
-    setLang(lang = this.lang) {
-      this.$i18n.locale = lang
-    },
   },
   watch: {
     lang(newLang) {
@@ -40,6 +28,18 @@ export default {
       if (user && user.lang) {
         this.$store.dispatch(langActions.setAndSave, user.lang)
       }
+    },
+  },
+  mounted() {
+    this.setLang()
+  },
+  methods: {
+    switchLang() {
+      const newLang = this.lang === 'en' ? 'ru' : 'en'
+      this.$store.dispatch(langActions.setAndSave, newLang)
+    },
+    setLang(lang = this.lang) {
+      this.$i18n.locale = lang
     },
   },
 }

@@ -1,6 +1,13 @@
 <template>
-  <div @click="scrollTop" v-if="windowWidth > 1240" class="scrollTop">
-    <svg-icon :class="{down: lastPageYOffset}" name="arrow-up" />
+  <div
+    v-if="windowWidth > 1240"
+    class="scrollTop"
+    @click="scrollTop"
+  >
+    <svg-icon
+      :class="{down: lastPageYOffset}"
+      name="arrow-up"
+    />
   </div>
 </template>
 

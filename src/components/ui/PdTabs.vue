@@ -1,10 +1,11 @@
 <template>
   <nav class="tabs" :class="wrapperClass">
     <span
-      class="tabs__item"
       v-for="tab in tabs"
       :ref="tab.value"
       :key="tab.title"
+      v-dompurify-html="tab.title"
+      class="tabs__item"
       :class="[
         {tabs__item_active: tab.value === currentTab},
         tab.value === currentTab && tabActiveClass ? tabActiveClass : '',
@@ -12,7 +13,6 @@
       ]"
       :disabled="tab.disabled || false"
       @click="handleClick(tab.value)"
-      v-html="tab.title"
     />
 
     <div
@@ -28,7 +28,7 @@
 
 <script>
 export default {
-  name: 'Pd-tabs',
+  name: 'PdTabs',
   props: {
     currentTab: {
       type: String,
@@ -45,19 +45,31 @@ export default {
     wrapperClass: {
       type: String,
       required: false,
+      default: null,
     },
     tabClass: {
       type: String,
       required: false,
+      default: null,
     },
     tabActiveClass: {
       type: String,
       required: false,
+      default: null,
     },
     lineClass: {
       type: String,
       required: false,
+      default: null,
     },
+  },
+  emits: ['onClick'],
+  data() {
+    return {
+      activeLineWidth: 0,
+      activeLineOffset: 0,
+      newTab: '',
+    }
   },
   watch: {
     currentTab(newCurrentTab) {
@@ -69,12 +81,9 @@ export default {
       this.moveActiveLine(this.currentTab)
     },
   },
-  data() {
-    return {
-      activeLineWidth: 0,
-      activeLineOffset: 0,
-      newTab: '',
-    }
+  mounted() {
+    this.newTab = this.currentTab
+    this.moveActiveLine(this.currentTab)
   },
   methods: {
     handleClick(value) {
@@ -99,10 +108,6 @@ export default {
         this.activeLineOffset = 16
       }
     },
-  },
-  mounted() {
-    this.newTab = this.currentTab
-    this.moveActiveLine(this.currentTab)
   },
 }
 </script>

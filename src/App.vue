@@ -1,10 +1,10 @@
 <template>
-  <pd-header class="app__header"> </pd-header>
+  <pd-header class="app__header" />
   <main class="app__main">
     <router-view />
     <ZPlayer class="app__zPlayer" />
   </main>
-  <footer class="app__footer"></footer>
+  <footer class="app__footer" />
   <auth-popup v-if="isAnonymus" />
   <visitor-info />
   <scroll-to-top />
@@ -24,7 +24,7 @@ import {useToast} from 'vue-toastification'
 const toast = useToast()
 
 export default {
-  name: 'app',
+  name: 'App',
   components: {
     PdHeader,
     AuthPopup,
@@ -32,15 +32,15 @@ export default {
     VisitorInfo,
     ScrollToTop,
   },
+    data() {
+    return {
+      user: null,
+    }
+  },
   computed: {
     ...mapGetters({
       isAnonymus: authGetters.isAnonymus,
     }),
-  },
-  data() {
-    return {
-      user: null,
-    }
   },
   async mounted() {
     this.user = await this.$store.dispatch(authActions.getCurrentUser)

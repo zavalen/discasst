@@ -1,22 +1,36 @@
 <template>
   <div class="home container">
-    <div class="discover-search" v-click-outside="blur" @click="focus">
-      <form class="discover-search__form" @submit.prevent.stop>
-        <button v-if="!isLoading" class="discover-search__submit" type="submit">
+    <div
+      v-click-outside="blur"
+      class="discover-search"
+      @click="focus"
+    >
+      <form
+        class="discover-search__form"
+        @submit.prevent.stop
+      >
+        <button
+          v-if="!isLoading"
+          class="discover-search__submit"
+          type="submit"
+        >
           <svg-icon name="search" />
         </button>
-        <pd-loader v-if="isLoading" class="discover-search__loading" />
+        <pd-loader
+          v-if="isLoading"
+          class="discover-search__loading"
+        />
 
         <input
+          v-model.trim="searchQuery"
           class="discover-search__input"
           placeholder="Умный поиск"
           type="text"
-          v-model.trim="searchQuery"
           autocomplete="off"
-        />
+        >
         <button
-          class="discover-search__clear"
           v-if="searchQuery.length"
+          class="discover-search__clear"
           @click.prevent.stop="clearSearch"
         >
           <svg-icon name="close" />
@@ -40,19 +54,21 @@
           </div>
 
           <div
-            class="discover-search__result discover-search-result"
             v-for="searchResult in searchResults"
             :key="searchResult.collectionId"
+            class="discover-search__result discover-search-result"
             @click="rss = searchResult.feedUrl"
           >
             <img
               v-lazy="searchResult.artworkUrl60"
               class="loading discover-search-result__image"
               alt=""
-            />
+            >
             <div>{{ searchResult.collectionName }}</div>
           </div>
-          <div v-if="errors">{{ errors }}</div>
+          <div v-if="errors">
+            {{ errors }}
+          </div>
         </div>
       </template>
 
@@ -66,7 +82,7 @@ import podcasts from '@/api/podcasts'
 import PdLoader from '@/components/ui/PdLoader'
 
 export default {
-  name: 'findOrAddPodcast',
+  name: 'FindOrAddPodcast',
   components: {PdLoader},
 
   data() {
@@ -78,6 +94,34 @@ export default {
       errors: null,
       searchResults: null,
     }
+  },
+
+  watch: {
+    async searchQuery(newVal) {
+      this.errors = null
+      if (newVal.length > 2) {
+        if (
+          newVal.startsWith('https://podcasts.apple.com/') ||
+          newVal.startsWith('id')
+        ) {
+          this.getRssFromAppleById(newVal)
+        } else if (this.isValidHttpUrl(newVal)) {
+          this.getRssFromUrl(newVal)
+        } else {
+          this.search(newVal)
+        }
+      } else {
+        this.searchResults = []
+      }
+    },
+    rss(newRss) {
+      if (typeof newRss === 'object') {
+        this.rss = this.searchQuery
+      }
+      if (typeof newRss === 'string') {
+        this.findOrAddPodcast(newRss)
+      }
+    },
   },
   mounted() {
     window.scrollTo({top: 0})
@@ -163,34 +207,6 @@ export default {
     },
     focus() {
       this.focusing = true
-    },
-  },
-
-  watch: {
-    async searchQuery(newVal) {
-      this.errors = null
-      if (newVal.length > 2) {
-        if (
-          newVal.startsWith('https://podcasts.apple.com/') ||
-          newVal.startsWith('id')
-        ) {
-          this.getRssFromAppleById(newVal)
-        } else if (this.isValidHttpUrl(newVal)) {
-          this.getRssFromUrl(newVal)
-        } else {
-          this.search(newVal)
-        }
-      } else {
-        this.searchResults = []
-      }
-    },
-    rss(newRss) {
-      if (typeof newRss === 'object') {
-        this.rss = this.searchQuery
-      }
-      if (typeof newRss === 'string') {
-        this.findOrAddPodcast(newRss)
-      }
     },
   },
 }

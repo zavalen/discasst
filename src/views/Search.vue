@@ -3,23 +3,29 @@
     <div class="feed-container">
       <div class="feed">
         <div class="search-header">
-          <form class="search" @submit.prevent="">
+          <form
+            class="search"
+            @submit.prevent=""
+          >
             <input
-              type="text"
+              ref="searchInput"
               v-model="search"
+              type="text"
               class="search__input"
               :placeholder="$t('search.placeholder')"
-              ref="searchInput"
-            />
+            >
 
-            <button type="submit" class="search__submit">
+            <button
+              type="submit"
+              class="search__submit"
+            >
               <svg-icon name="search" />
             </button>
           </form>
         </div>
         <pd-episodes :api-url="apiUrl" />
       </div>
-      <div class="sidebar"></div>
+      <div class="sidebar" />
     </div>
   </div>
 </template>

@@ -1,5 +1,8 @@
 <template>
-  <pd-popup v-if="isOpen" ref="authPopup">
+  <pd-popup
+    v-if="isOpen"
+    ref="authPopup"
+  >
     <div class="authpopup__header">
       <router-link
         class="button"
@@ -9,8 +12,9 @@
             auth: 'login',
           },
         }"
-        >{{ $t('header.login') }}</router-link
       >
+        {{ $t('header.login') }}
+      </router-link>
       <router-link
         class="button"
         :class="{button_active: authComponent === 'RegisterForm'}"
@@ -19,8 +23,9 @@
             auth: 'register',
           },
         }"
-        >{{ $t('header.register') }}</router-link
       >
+        {{ $t('header.register') }}
+      </router-link>
     </div>
 
     <component :is="authComponent" />
@@ -36,10 +41,16 @@ import {nextTick} from 'vue'
 
 export default {
   name: 'AuthPopup',
+  components: {
+    PdPopup,
+    LoginForm,
+    RegisterForm,
+  },
   props: {
     authType: {
       type: String,
       required: false,
+      default: null
     },
   },
   data() {
@@ -47,11 +58,6 @@ export default {
       authComponent: 'LoginForm',
       isOpen: false,
     }
-  },
-  components: {
-    PdPopup,
-    LoginForm,
-    RegisterForm,
   },
   computed: {
     ...mapState({

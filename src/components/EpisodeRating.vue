@@ -8,20 +8,23 @@
     >
       <svg-icon name="rating-arrow-down" />
     </div>
-    <transition name="slide-fade" mode="out-in">
+    <transition
+      name="slide-fade"
+      mode="out-in"
+    >
       <span
         :key="episode.rating.sum"
+        v-tooltip="
+          '- ' +
+            episode.rating.minusesCount +
+            ' | ' +
+            episode.rating.plusesCount +
+            ' +'
+        "
         class="rating__number"
         :class="{
           rating__number_minus: episode.rating.sum < 0,
         }"
-        v-tooltip="
-          '- ' +
-          episode.rating.minusesCount +
-          ' | ' +
-          episode.rating.plusesCount +
-          ' +'
-        "
       >
         {{
           episode.rating.plusesCount || episode.rating.minusesCount

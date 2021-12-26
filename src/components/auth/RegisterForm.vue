@@ -8,39 +8,43 @@
     />
 
     <form
-      @submit.prevent="onSubmit"
       class="ng-pristine ng-valid ng-valid-email"
+      @submit.prevent="onSubmit"
     >
       <div>
         <div class="form-group">
           <input
             ref="firstInput"
+            v-model="username"
             class="form-control form-control-lg"
             type="text"
             :placeholder="$t('username')"
-            v-model="username"
-          />
+          >
         </div>
 
         <div class="form-group">
           <input
+            v-model="email"
             class="form-control form-control-lg"
             placeholder="Email"
             type="email"
-            v-model="email"
-          />
+          >
         </div>
 
         <div class="form-group">
           <input
+            v-model="password"
             class="form-control form-control-lg"
             type="password"
             :placeholder="$t('password')"
-            v-model="password"
-          />
+          >
         </div>
 
-        <button :disabled="isSubmitting" class="button_primary" type="submit">
+        <button
+          :disabled="isSubmitting"
+          class="button_primary"
+          type="submit"
+        >
           {{ $t('register.button') }}
         </button>
       </div>

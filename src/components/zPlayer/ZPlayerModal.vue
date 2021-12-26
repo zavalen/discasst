@@ -16,13 +16,13 @@
                 class="zcurrent-episode__image"
                 :src="currentEpisode.podcast.imageURL"
               />
-              <div class="zcurrent-episode__controls"></div>
+              <div class="zcurrent-episode__controls" />
             </div>
             <div class="zcurrent-episode__body">
               <h2 class="zcurrent-episode__heading">
                 {{ currentEpisode.title }}
               </h2>
-              <div v-html="currentEpisode.description"></div>
+              <div v-dompurify-html="currentEpisode.description" />
             </div>
           </div>
         </slide-right-transition>
@@ -32,7 +32,7 @@
       <div class="zmodal__top">
         <pd-tabs
           :tabs="tabs"
-          :currentTab="currentTab"
+          :current-tab="currentTab"
           :wrapper-class="'tabs'"
           :tab-class="'tabs__item'"
           :tab-active-class="'tabs__item_active'"
@@ -40,16 +40,16 @@
           @onClick="handleClick"
         />
 
-        <div @click="closeModal" class="zmodal__close">
+        <div class="zmodal__close" @click="closeModal">
           <svg-icon name="arrow-down" />
         </div>
       </div>
       <div class="zmodal__content scrollbar">
-        <component :is="currentTab"></component>
+        <component :is="currentTab" />
       </div>
     </div>
     <!-- <div class="zmodal__bottom">sssssssss</div> -->
-    <span class="zmodal__bottom-arrow"> </span>
+    <span class="zmodal__bottom-arrow" />
   </div>
 </template>
 
@@ -62,7 +62,7 @@ import {zPlayerMutations} from '@/store/modules/zPlayer'
 import SlideRightTransition from '@/components/animations/SlideRightTransition'
 import PdTabs from '@/components/ui/PdTabs'
 export default {
-  name: 'zPlayerModal',
+  name: 'ZPlayerModal',
   components: {
     ZPlayerHistory,
     ZPlayerQueue,

@@ -2,8 +2,14 @@
   <div class="container">
     <div class="feed-container">
       <div class="sidebar-left">
-        <ul class="left-menu" :class="{'menu-margin': scrollDown}">
-          <template v-for="button in episodesButtons" :key="button.title">
+        <ul
+          class="left-menu"
+          :class="{'menu-margin': scrollDown}"
+        >
+          <template
+            v-for="button in episodesButtons"
+            :key="button.title"
+          >
             <li v-if="button.loggedUsers ? isLoggedIn : true">
               <router-link
                 :to="{name: button.pathName}"
@@ -14,14 +20,14 @@
               </router-link>
             </li>
           </template>
-          <hr style="margin-bottom: 16px" />
+          <hr style="margin-bottom: 16px">
         </ul>
       </div>
 
       <div class="feed">
         <router-view />
       </div>
-      <div class="sidebar"></div>
+      <div class="sidebar" />
     </div>
   </div>
 </template>

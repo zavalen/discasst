@@ -8,7 +8,10 @@
     >
       <svg-icon name="notification" />
       <fade-transition>
-        <span v-if="notWatchedNotifications" class="notifications-counter">{{
+        <span
+          v-if="notWatchedNotifications"
+          class="notifications-counter"
+        >{{
           notWatchedNotifications > 9 ? '9+' : notWatchedNotifications
         }}</span>
       </fade-transition>
@@ -23,26 +26,32 @@
           <h3>{{ $t('notifications.title') }}</h3>
           <button
             v-if="isLoggedIn && notifications.length"
-            @click="clearNotifications"
             class="notifications__clear"
+            @click="clearNotifications"
           >
             {{ $t('notifications.clear') }}
           </button>
         </div>
         <div class="notifications__main scrollbar">
-          <div class="notifications__zero" v-if="!notifications.length">
+          <div
+            v-if="!notifications.length"
+            class="notifications__zero"
+          >
             {{ $t('notifications.zero') }}
           </div>
           <template
             v-for="notification in notifications"
             :key="notification.id"
           >
-            <router-link :to="notification.link" class="notification">
+            <router-link
+              :to="notification.link"
+              class="notification"
+            >
               {{ notification.message }}
             </router-link>
           </template>
         </div>
-        <div class="notifications__bottom"></div>
+        <div class="notifications__bottom" />
       </div>
     </fade-transition>
   </li>
@@ -80,24 +89,6 @@ export default {
       return this.notifications.filter((x) => x.watched === false).length
     },
   },
-  methods: {
-    async getNotifications() {
-      this.notifications = await this.$store.dispatch(
-        notificationsActions.getNotifications
-      )
-    },
-    hideNotifications() {
-      this.isNotificationsOpen = false
-    },
-    toggleNotifications() {
-      this.isNotificationsOpen = !this.isNotificationsOpen
-    },
-    clearNotifications() {
-      console.log(notificationsMutations.clear)
-      this.notifications = []
-      this.$store.commit(notificationsMutations.clear)
-    },
-  },
   watch: {
     isAnonymus(newVal) {
       if (newVal) {
@@ -123,6 +114,24 @@ export default {
       if (newVal) {
         this.getNotifications()
       }
+    },
+  },
+  methods: {
+    async getNotifications() {
+      this.notifications = await this.$store.dispatch(
+        notificationsActions.getNotifications
+      )
+    },
+    hideNotifications() {
+      this.isNotificationsOpen = false
+    },
+    toggleNotifications() {
+      this.isNotificationsOpen = !this.isNotificationsOpen
+    },
+    clearNotifications() {
+      console.log(notificationsMutations.clear)
+      this.notifications = []
+      this.$store.commit(notificationsMutations.clear)
     },
   },
 }

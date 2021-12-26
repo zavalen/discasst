@@ -1,11 +1,11 @@
 <template>
   <span
+    v-if="isIconExist"
+    v-dompurify-html="require(`!html-loader!@/assets/icons/${name}.svg`)"
     class="icon"
     :class="name"
-    v-if="isIconExist"
     :style="{height: height + 'px', width: width + 'px'}"
-    v-html="require(`!html-loader!@/assets/icons/${name}.svg`)"
-  ></span>
+  />
 </template>
 
 <script>
@@ -22,6 +22,7 @@ export default {
     name: {
       type: String,
       require: true,
+      default: null,
       validator(value) {
         return Object.prototype.hasOwnProperty.call(icons, value)
       },
@@ -29,10 +30,12 @@ export default {
     height: {
       type: Number,
       require: false,
+      default: null,
     },
     width: {
       type: Number,
       require: false,
+      default: null,
     },
   },
   computed: {

@@ -1,7 +1,10 @@
 <template>
   <div>
     <ul class="error-messages">
-      <li v-for="error in validationErrors" :key="error">
+      <li
+        v-for="error in validationErrors"
+        :key="error"
+      >
         {{ error }}
       </li>
     </ul>

@@ -1,11 +1,11 @@
 <template>
   <transition name="slideright">
-    <slot></slot>
+    <slot />
   </transition>
 </template>
 <script>
 export default {
-  name: 'slideright',
+  name: 'Slideright',
 }
 </script>
 <style>

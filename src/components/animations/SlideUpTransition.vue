@@ -1,6 +1,6 @@
 <template>
   <transition name="slideup">
-    <slot></slot>
+    <slot />
   </transition>
 </template>
 <script>

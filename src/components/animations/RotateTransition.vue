@@ -1,6 +1,10 @@
 <template>
-  <transition-group name="rotate" mode="out-in" :duration="500">
-    <slot></slot>
+  <transition-group
+    name="rotate"
+    mode="out-in"
+    :duration="500"
+  >
+    <slot />
   </transition-group>
 </template>
 <script>

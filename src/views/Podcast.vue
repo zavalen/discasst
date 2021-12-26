@@ -6,10 +6,12 @@
           <img :src="podcast.imageURL" alt="" />
         </div>
         <div class="podcast-info__main">
-          <h1 class="podcast-info__title">{{ podcast.title }}</h1>
-          <p v-html="podcast.description"></p>
+          <h1 class="podcast-info__title">
+            {{ podcast.title }}
+          </h1>
+          <p v-dompurify-html="podcast.description" />
         </div>
-        <div class="podcast-info__side"></div>
+        <div class="podcast-info__side" />
       </template>
     </div>
     <pd-episodes :api-url="apiUrl" :podcast-slug="podcastSlug" />

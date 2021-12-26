@@ -14,7 +14,10 @@
       @end="drag = false"
     >
       <template #item="{element}">
-        <div v-if="element" class="zmodal__episode zEpisode">
+        <div
+          v-if="element"
+          class="zmodal__episode zEpisode"
+        >
           <div class="zEpisode__main">
             <div
               class="zEpisode__play"
@@ -28,10 +31,12 @@
                 "
               />
             </div>
-            <img class="zEpisode__image" v-lazy="element.podcast.imageURL" />
+            <img
+              v-lazy="element.podcast.imageURL"
+              class="zEpisode__image"
+            >
             <div class="zEpisode__creditials">
               <router-link
-                @click="closeModal"
                 :to="{
                   name: 'episode',
                   params: {
@@ -40,10 +45,11 @@
                   },
                 }"
                 class="zEpisode__title"
-                >{{ element.title }}</router-link
-              >
-              <router-link
                 @click="closeModal"
+              >
+                {{ element.title }}
+              </router-link>
+              <router-link
                 :to="{
                   name: 'podcast',
                   params: {
@@ -51,14 +57,19 @@
                   },
                 }"
                 class="zEpisode__podcast"
-                >{{ element.podcast.title }}</router-link
+                @click="closeModal"
               >
+                {{ element.podcast.title }}
+              </router-link>
             </div>
           </div>
           <div class="zEpisode__icon">
             <svg-icon name="drag" />
           </div>
-          <div @click="removeFromQueue(element.id)" class="zEpisode__icon">
+          <div
+            class="zEpisode__icon"
+            @click="removeFromQueue(element.id)"
+          >
             <svg-icon name="close" />
           </div>
         </div>
@@ -73,7 +84,7 @@ import draggable from 'vuedraggable'
 import {zPlayerActions, zPlayerMutations} from '@/store/modules/zPlayer'
 
 export default {
-  name: 'zQueue',
+  name: 'ZQueue',
   components: {
     draggable,
   },

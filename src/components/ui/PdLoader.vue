@@ -1,9 +1,9 @@
 <template>
   <div class="spin-loading">
-    <div></div>
-    <div></div>
-    <div></div>
-    <div></div>
+    <div />
+    <div />
+    <div />
+    <div />
   </div>
 </template>
 <script>

@@ -11,7 +11,6 @@
         </div>
         <div class="zEpisode__creditials">
           <router-link
-            @click="closeModal"
             :to="{
               name: 'episode',
               params: {
@@ -20,10 +19,11 @@
               },
             }"
             class="zEpisode__title"
-            >{{ episode.title }}</router-link
-          >
-          <router-link
             @click="closeModal"
+          >
+            {{ episode.title }}
+          </router-link>
+          <router-link
             :to="{
               name: 'podcast',
               params: {
@@ -31,8 +31,10 @@
               },
             }"
             class="zEpisode__podcast"
-            >{{ episode.podcast.title }}</router-link
+            @click="closeModal"
           >
+            {{ episode.podcast.title }}
+          </router-link>
         </div>
         <div class="zEpisode__description-toggle" @click="toggleDescription">
           <svg-icon name="description" />
@@ -40,9 +42,9 @@
       </div>
       <div
         v-if="descriptionOpen"
+        v-dompurify-html="episode.description"
         class="zEpisode__description"
-        v-html="episode.description"
-      ></div>
+      />
     </div>
   </slide-right-transition>
 </template>
@@ -52,20 +54,26 @@ import {mapState} from 'vuex'
 import {zPlayerActions, zPlayerMutations} from '@/store/modules/zPlayer'
 import SlideRightTransition from '@/components/animations/SlideRightTransition'
 export default {
-  name: 'zEpisode',
+  name: 'ZEpisode',
+  components: {
+    SlideRightTransition,
+  },
   props: {
     episode: {
       type: Object,
       required: true,
     },
   },
-  components: {
-    SlideRightTransition,
-  },
   data() {
     return {
       descriptionOpen: false,
     }
+  },
+  computed: {
+    ...mapState({
+      isPlaying: (state) => state.zPlayer.isPlaying,
+      currentEpisode: (state) => state.zPlayer.currentEpisode,
+    }),
   },
   methods: {
     playEpisode(episode) {
@@ -81,12 +89,6 @@ export default {
     toggleDescription() {
       this.descriptionOpen = !this.descriptionOpen
     },
-  },
-  computed: {
-    ...mapState({
-      isPlaying: (state) => state.zPlayer.isPlaying,
-      currentEpisode: (state) => state.zPlayer.currentEpisode,
-    }),
   },
 }
 </script>

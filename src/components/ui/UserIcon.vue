@@ -8,7 +8,7 @@
       v-if="isLoggedIn && currentUser && currentUser.image"
       :src="currentUser.image"
       :title="currentUser.username"
-    />
+    >
   </div>
 </template>
 

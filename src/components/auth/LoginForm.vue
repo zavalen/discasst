@@ -7,26 +7,33 @@
       :validation-errors="validationErrors"
     />
 
-    <form class="auth-wrapper_form auth-form" @submit.prevent="onSubmit">
+    <form
+      class="auth-wrapper_form auth-form"
+      @submit.prevent="onSubmit"
+    >
       <div>
         <div>
           <input
+            ref="firstInput"
+            v-model="email"
             :placeholder="$t('email')"
             type="email"
-            v-model="email"
-            ref="firstInput"
-          />
+          >
         </div>
 
         <div>
           <input
+            v-model="password"
             type="password"
             :placeholder="$t('password')"
-            v-model="password"
-          />
+          >
         </div>
 
-        <button :disabled="isSubmitting" class="button_primary" type="submit">
+        <button
+          :disabled="isSubmitting"
+          class="button_primary"
+          type="submit"
+        >
           {{ $t('login.button') }}
         </button>
       </div>

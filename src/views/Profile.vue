@@ -1,5 +1,7 @@
 <template>
-  <div class="home container">{{ $t('message') }}</div>
+  <div class="home container">
+    {{ $t('message') }}
+  </div>
   <!-- <global-feed /> -->
 </template>
 

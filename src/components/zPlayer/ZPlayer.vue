@@ -17,15 +17,15 @@
               :style="{
                 width: progress ? progress + '%' : '0%',
               }"
-            ></div>
+            />
             <div
-              class="zPlayer__progress-overflow"
               ref="progressOverflow"
+              class="zPlayer__progress-overflow"
               @mousedown="moveTo"
               @mouseup="closeMousepress"
               @mousemove="progressMouseOver"
               @mouseleave="hideProgressMouseOver"
-            ></div>
+            />
             <div class="zPlayer__time unselectable">
               {{ time && time > 0 ? toHHMMSS(time) : '' }}
             </div>
@@ -37,7 +37,7 @@
               :style="{
                 width: time ? (time * 100) / buffered + '%' : '0%',
               }"
-            ></div>
+            />
             <div
               v-if="mouseOverShow"
               class="zPlayer__progress-overflow-time"
@@ -64,8 +64,8 @@
               <svg-icon name="previous" />
             </div> -->
             <div class="zPlayer__play" @click="togglePlay">
-              <svg-icon name="play" v-if="!isPlaying" />
-              <svg-icon name="pause" v-if="isPlaying" />
+              <svg-icon v-if="!isPlaying" name="play" />
+              <svg-icon v-if="isPlaying" name="pause" />
             </div>
 
             <div
@@ -95,15 +95,14 @@
               :class="isEpisodeLoading ? 'show' : ''"
             >
               <div class="lds-ring">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+                <div />
+                <div />
+                <div />
+                <div />
               </div>
             </div>
             <div class="zPlayer__credits">
               <router-link
-                @click="closeModal"
                 :to="{
                   name: 'episode',
                   params: {
@@ -114,11 +113,11 @@
                   },
                 }"
                 class="zPlayer__title"
+                @click="closeModal"
               >
                 {{ currentEpisode ? currentEpisode.title : 'No track' }}
               </router-link>
               <router-link
-                @click="closeModal"
                 :to="{
                   name: 'podcast',
                   params: {
@@ -128,6 +127,7 @@
                   },
                 }"
                 class="zPlayer__podcast"
+                @click="closeModal"
               >
                 {{ currentEpisode ? currentEpisode.podcast.title : 'No track' }}
               </router-link>
@@ -143,11 +143,11 @@
             </div>
           </div>
           <div class="zPlayer__volume-block">
-            <svg-icon @click="toggleVolume" v-if="volume > 0" name="volume" />
+            <svg-icon v-if="volume > 0" name="volume" @click="toggleVolume" />
             <svg-icon
-              @click="toggleVolume"
               v-if="volume == 0"
               name="volume-zero"
+              @click="toggleVolume"
             />
 
             <div class="zPlayer__volume-line">
@@ -156,7 +156,7 @@
                 :style="{
                   height: volume * 100 + '%',
                 }"
-              ></div>
+              />
 
               <div
                 class="zPlayer__volume-overflow"
@@ -164,22 +164,22 @@
                 @mouseup="volumeMouseLeave"
                 @mousemove="volumeMouseOver"
                 @mouseleave="volumeMouseLeave"
-              ></div>
+              />
               <div
                 v-if="mouseOverShow"
                 class="zPlayer__volume-overflow-persentage"
                 :style="{
                   left: mouseOverTimePx + 'px',
                 }"
-              ></div>
+              />
             </div>
           </div>
 
           <div
+            ref="zplaylist"
             class="zPlayer__playlist"
             :class="{zPlayer__playlist_active: isModalOpen}"
             @click="toggleModal"
-            ref="zplaylist"
           >
             <svg-icon name="playlist" />
             <span ref="queueCounter" class="zPlayer__playlist-counter">{{
@@ -206,9 +206,6 @@ export default {
     SlideUpTransition,
     ZPlayerModal,
     EpisodeRating,
-  },
-  created() {
-    this.addPlayerJS()
   },
 
   data() {
@@ -283,6 +280,10 @@ export default {
       deep: true,
     },
   },
+  created() {
+    this.addPlayerJS()
+  },
+
   methods: {
     addPlayerJS() {
       const script = document.createElement('script')

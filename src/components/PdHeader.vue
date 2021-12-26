@@ -1,28 +1,28 @@
 <template>
   <header :class="{hide: !isHeaderVisible && !isModalOpen}" class="header">
     <div class="header__wrapper container">
-      <div class="header__left" v-click-outside="closeMenu">
+      <div v-click-outside="closeMenu" class="header__left">
         <a href="#" class="header__burger" @click="toggleMenu">
           <fade-transition>
             <svg-icon
-              style="position: absolute"
               v-if="!isMenuActive"
+              style="position: absolute"
               name="menu"
             />
           </fade-transition>
           <fade-transition>
             <svg-icon
-              style="position: absolute"
               v-if="isMenuActive"
+              style="position: absolute"
               name="close"
             />
           </fade-transition>
         </a>
 
         <router-link
-          @click="closeMenu"
           class="header__logo"
           :to="{name: 'home'}"
+          @click="closeMenu"
         >
           <svg-icon name="logo" />
         </router-link>
@@ -38,20 +38,22 @@
                   v-ripple
                   :to="{name: 'episodes'}"
                   class="main-nav__item-link button"
-                  @click="closeMenu"
                   active-class="button_active"
-                  >{{ $t('header.feed') }}</router-link
+                  @click="closeMenu"
                 >
+                  {{ $t('header.feed') }}
+                </router-link>
               </li>
               <li class="main-nav__item">
                 <router-link
                   v-ripple
                   :to="{name: 'podcasts'}"
                   class="main-nav__item-link button"
-                  @click="closeMenu"
                   active-class="button_active"
-                  >{{ $t('header.podcasts') }}</router-link
+                  @click="closeMenu"
                 >
+                  {{ $t('header.podcasts') }}
+                </router-link>
               </li>
             </div>
             <div class="main-nav__right">
@@ -69,21 +71,21 @@
       </div>
 
       <ul class="header__user-menu nav">
-        <template v-if="isAnonymus"> </template>
-        <template v-if="isLoggedIn"> </template>
+        <template v-if="isAnonymus" />
+        <template v-if="isLoggedIn" />
         <li class="nav__item">
           <span
-            @click="toggleSearch"
             v-ripple
             :class="{button_active: searchActive}"
             class="nav__item-link button"
+            @click="toggleSearch"
           >
             <svg-icon :name="searchActive ? 'close' : 'search'" />
           </span>
         </li>
         <pd-notifications class="nav__item" />
 
-        <li class="nav__item" v-click-outside="hideUserSubMenu">
+        <li v-click-outside="hideUserSubMenu" class="nav__item">
           <a
             v-ripple
             class="nav__item-link button"
@@ -102,7 +104,7 @@
               class="user-submenu"
             >
               <div v-if="isAnonymus" class="user-submenu__top">
-                <span class="user-submenu__top-arrow"></span>
+                <span class="user-submenu__top-arrow" />
 
                 {{ $t('header.anonymus') }}
               </div>
@@ -111,17 +113,16 @@
                 class="user-submenu__top"
                 :class="{'user-submenu__top_logged': isLoggedIn}"
               >
-                <span class="user-submenu__top-arrow"></span>
+                <span class="user-submenu__top-arrow" />
 
                 <user-icon />
                 {{ cutString(currentUser.username, 21) }}
                 <router-link
                   class="user-submenu__profile-link"
-                  @click="closeUserSubMenu"
                   :to="{name: 'profile'}"
-                >
-                </router-link>
-                <span class="user-submenu__arrow-right" v-ripple
+                  @click="closeUserSubMenu"
+                />
+                <span v-ripple class="user-submenu__arrow-right"
                   ><svg-icon name="arrow-right"
                 /></span>
               </div>
@@ -133,10 +134,11 @@
                   <li class="user-submenu__item">
                     <router-link
                       class="user-submenu__item-link"
-                      @click="closeUserSubMenu"
                       :to="{name: 'settings'}"
-                      >{{ $t('header.settings') }}</router-link
+                      @click="closeUserSubMenu"
                     >
+                      {{ $t('header.settings') }}
+                    </router-link>
                   </li>
                   <li class="user-submenu__item">
                     <a
@@ -145,23 +147,25 @@
                       @click.prevent="logout"
                       >{{ $t('header.logout') }}</a
                     >
-                  </li></template
-                >
+                  </li>
+                </template>
 
                 <template v-if="isAnonymus">
                   <li class="user-submenu__item">
                     <router-link
                       :to="{name: 'login'}"
                       class="user-submenu__item-link"
-                      >{{ $t('header.login') }}</router-link
                     >
+                      {{ $t('header.login') }}
+                    </router-link>
                   </li>
                   <li class="user-submenu__item">
                     <router-link
                       :to="{name: 'register'}"
                       class="user-submenu__item-link"
-                      >{{ $t('header.register') }}</router-link
                     >
+                      {{ $t('header.register') }}
+                    </router-link>
                   </li>
                 </template>
               </ul>
@@ -174,22 +178,22 @@
         </li>
       </ul>
     </div>
-    <pd-popup type="confirmation" ref="logoutConfirmation">
-      <template v-slot:header>
+    <pd-popup ref="logoutConfirmation" type="confirmation">
+      <template #header>
         {{ $t('logout.confirmationHeader') }}
       </template>
       {{ $t('logout.confirmation') }}
     </pd-popup>
     <div
+      v-if="searchActive"
       class="header__search-wrapper"
       @click="closeSearch"
-      v-if="searchActive"
     >
       <discover-search
-        @click.stop
-        @found="closeSearch"
         :is-active="true"
         class="header__search"
+        @click.stop
+        @found="closeSearch"
       />
     </div>
   </header>
@@ -230,17 +234,6 @@ export default {
       searchActive: false,
     }
   },
-  mounted() {
-    document.addEventListener('swiped-right', (e) => {
-      if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
-        this.toggleMenu()
-    })
-
-    document.addEventListener('mousewheel', this.wheelHandler)
-  },
-  unmounted() {
-    document.removeEventListener('mousewheel', this.wheelHandler)
-  },
   computed: {
     ...mapState({
       theme: (state) => state.theme.theme,
@@ -253,6 +246,18 @@ export default {
       isAnonymus: authGetters.isAnonymus,
     }),
   },
+  mounted() {
+    document.addEventListener('swiped-right', (e) => {
+      if (!e.target.closest('.notifications') && !e.target.closest('.zPlayer'))
+        this.toggleMenu()
+    })
+
+    document.addEventListener('mousewheel', this.wheelHandler)
+  },
+  unmounted() {
+    document.removeEventListener('mousewheel', this.wheelHandler)
+  },
+
   methods: {
     cutString(string, lettersNumber) {
       if (string.length > lettersNumber) {

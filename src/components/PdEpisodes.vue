@@ -2,18 +2,27 @@
   <div class="feed">
     <template v-if="isLoading">
       <div
-        class="feed-episode skeleton"
         v-for="item in [1, 2, 3, 4, 5]"
         :key="item"
+        class="feed-episode skeleton"
       >
         <div class="feed-episode__left">
-          <img v-lazy="" alt="" srcset="" class="loading" />
-          <div class="feed-episode__play"></div>
+          <img
+            v-lazy=""
+            alt=""
+            srcset=""
+            class="loading"
+          >
+          <div class="feed-episode__play" />
         </div>
         <div class="feed-episode__right">
           <div class="feed-episode__heading">
-            <div class="feed-episode__time skeleton-time loading">&nbsp;</div>
-            <h2 class="feed-episode__title skeleton-title loading">&nbsp;</h2>
+            <div class="feed-episode__time skeleton-time loading">
+&nbsp;
+            </div>
+            <h2 class="feed-episode__title skeleton-title loading">
+&nbsp;
+            </h2>
             <div class="feed-episode__subline skeleton-subline loading">
               &nbsp;
             </div>
@@ -21,28 +30,33 @@
         </div>
       </div>
     </template>
-    <div v-if="errors">Something goes wrong...</div>
+    <div v-if="errors">
+      Something goes wrong...
+    </div>
     <div
-      class="no-episode"
       v-if="!episodes.length && apiUrl.includes('subscriptions')"
+      class="no-episode"
     >
       У вас ещё нет ни одной подписки :(
     </div>
     <template v-if="episodes.length">
       <div
-        class="feed-episode"
         v-for="episode in episodes"
         :key="episode?.id"
+        class="feed-episode"
         :class="{playing: currentEpisode && currentEpisode.id == episode.id}"
       >
         <div class="feed-episode__left">
           <div class="feed-episode__image">
-            <img v-lazy="episode.imageURL" />
-            <div class="feed-episode__play" @click="playEpisode(episode)">
+            <img v-lazy="episode.imageURL">
+            <div
+              class="feed-episode__play"
+              @click="playEpisode(episode)"
+            >
               <svg-icon
                 v-if="
                   !isPlaying ||
-                  (currentEpisode && currentEpisode.id != episode.id)
+                    (currentEpisode && currentEpisode.id != episode.id)
                 "
                 name="play"
               />
@@ -55,7 +69,10 @@
             </div>
           </div>
 
-          <episode-rating class="feed-episode__rating" :episode="episode" />
+          <episode-rating
+            class="feed-episode__rating"
+            :episode="episode"
+          />
         </div>
 
         <div class="feed-episode__right">
@@ -77,26 +94,27 @@
                   name: 'podcast',
                   params: {podcastSlug: episode.podcast.slug},
                 }"
-                ><img
+              >
+                <img
                   class="feed-episode__podcast-image"
                   :src="episode.podcast.imageURL"
                   alt=""
-                />
-                {{ episode.podcast.title }}</router-link
-              >
+                >
+                {{ episode.podcast.title }}
+              </router-link>
               <svg-icon
                 v-if="!userSubscriptions.includes(episode.podcast.id)"
-                class="feed-episode__subscribe"
-                @click.stop.prevent="subscribe(episode.podcast)"
-                name="add-circle"
                 v-tooltip="'Подписаться'"
+                class="feed-episode__subscribe"
+                name="add-circle"
+                @click.stop.prevent="subscribe(episode.podcast)"
               />
               <svg-icon
-                class="feed-episode__subscribe"
                 v-if="userSubscriptions.includes(episode.podcast.id)"
-                @click.stop.prevent="unsubscribe(episode.podcast)"
-                name="tick-square"
                 v-tooltip="'Вы подписаны'"
+                class="feed-episode__subscribe"
+                name="tick-square"
+                @click.stop.prevent="unsubscribe(episode.podcast)"
               />
             </div>
           </div>
@@ -111,46 +129,52 @@
                 },
               }"
             >
-              <svg-icon style="margin-right: 8px" name="comments" />
-              Обсудить</router-link
-            >
+              <svg-icon
+                style="margin-right: 8px"
+                name="comments"
+              />
+              Обсудить
+            </router-link>
           </div>
         </div>
         <div class="feed-episode__buttons-block">
           <template v-if="!currentEpisode || currentEpisode.id != episode.id">
             <svg-icon
               v-if="!isEpisodeInQueue(episode.id)"
-              class="button feed-episode__icon"
               v-tooltip="'Добавить в очередь'"
-              @click.stop.prevent="toggleInQueue(episode)"
+              class="button feed-episode__icon"
               name="add-to-playlist"
+              @click.stop.prevent="toggleInQueue(episode)"
             />
             <svg-icon
               v-if="isEpisodeInQueue(episode.id)"
-              class="button feed-episode__icon"
               v-tooltip="'Убрать из очередь'"
-              @click.stop.prevent="toggleInQueue(episode)"
+              class="button feed-episode__icon"
               name="in-playlist"
+              @click.stop.prevent="toggleInQueue(episode)"
             />
           </template>
           <template v-if="currentEpisode && currentEpisode.id == episode.id">
             <svg-icon
               v-tooltip="'Сейчас играет'"
               class="button feed-episode__icon"
-              @click.stop
               name="now-playing"
+              @click.stop
             />
           </template>
           <div class="button feed-episode__more">
             <svg-icon name="more" />
           </div>
         </div>
-        <div v-if="isLoggedIn" class="feed-episode__progress-wrapper">
+        <div
+          v-if="isLoggedIn"
+          class="feed-episode__progress-wrapper"
+        >
           <div
             v-if="isLoggedIn"
             class="feed-episode__progress"
             :style="{width: episode.progress?.percentage + '%'}"
-          ></div>
+          />
         </div>
         <router-link
           class="feed-episode__link"
@@ -161,15 +185,14 @@
               episodeSlug: episode.slug,
             },
           }"
-        >
-        </router-link>
+        />
       </div>
 
       <button
+        v-if="!lastPage"
         ref="loadMore"
         class="load-more"
         @click="loadFeed"
-        v-if="!lastPage"
       >
         Загрузить ещё
       </button>
@@ -202,6 +225,7 @@ export default {
     podcastSlug: {
       type: String,
       required: false,
+      default: null
     },
   },
   data() {
@@ -240,10 +264,6 @@ export default {
       }
     },
   },
-  mounted() {
-    this.loadFeed()
-    this.getNextPage()
-  },
   watch: {
     lang(newLang) {
       moment.locale(newLang)
@@ -262,6 +282,10 @@ export default {
         this.loadFeed()
       }
     },
+  },
+  mounted() {
+    this.loadFeed()
+    this.getNextPage()
   },
   methods: {
     playEpisode(episode) {

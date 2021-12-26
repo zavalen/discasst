@@ -6,9 +6,9 @@
           <svg-icon name="close" />
         </div>
         <h2 class="modal__header">
-          <slot name="header"></slot>
+          <slot name="header" />
         </h2>
-        <slot> </slot>
+        <slot />
         <div v-if="isBtnsEnabled" class="modal__buttons">
           <button
             v-if="okBtnText"
@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="modal__bg" @click="close"></div>
+      <div class="modal__bg" @click="close" />
     </div>
   </fade-transition>
 </template>
@@ -37,24 +37,32 @@ import FadeTransition from '@/components/animations/FadeTransition'
 
 export default {
   name: 'PdPopup',
+  components: {
+    FadeTransition,
+  },
   props: {
     type: {
       type: String,
       required: false,
+      default: null,
     },
     okBtn: {
       type: String,
       required: false,
+      default: null,
     },
     cancelBtn: {
       type: String,
       required: false,
+      default: null,
     },
   },
-  components: {
-    FadeTransition,
-  },
   currentPopupController: null,
+  data() {
+    return {
+      isOpen: false,
+    }
+  },
 
   computed: {
     isBtnsEnabled() {
@@ -66,11 +74,6 @@ export default {
     cancelBtnText() {
       return this.cancelBtn || this.$t('popup.cancel')
     },
-  },
-  data() {
-    return {
-      isOpen: false,
-    }
   },
   mounted() {
     document.addEventListener('keydown', this.controleByKeys)
