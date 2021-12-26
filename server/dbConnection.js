@@ -1,15 +1,26 @@
-const {Sequelize} = require('sequelize')
+const { Sequelize } = require('sequelize')
 require('dotenv').config()
 
 //LOCAL CONNECTION
+// const sequelize = new Sequelize(
+//   process.env.DB_NAME || 'discasst',
+//   process.env.DB_USER || 'root',
+//   process.env.DB_PASS || 'root',
+//   {
+//     dialect: 'mysql',
+//     host: process.env.DB_HOST || 'localhost',
+//     logging: false
+//   }
+// )
+
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'discasst',
   process.env.DB_USER || 'root',
   process.env.DB_PASS || 'root',
   {
-    dialect: 'mysql',
+    dialect: process.env.DB_DIALECT || 'mysql',
     host: process.env.DB_HOST || 'localhost',
-    logging: false
+    logging: false,
   }
 )
 

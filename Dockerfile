@@ -8,7 +8,7 @@ RUN mkdir /discasst/server
 
 COPY server/package.json /discasst/server
 
-RUN npm run install
+RUN npm run install-all
 
 COPY . .
 

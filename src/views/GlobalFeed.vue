@@ -2,17 +2,11 @@
   <div class="container">
     <div class="feed-container">
       <div class="sidebar-left">
-        <ul
-          class="left-menu"
-          :class="{'menu-margin': scrollDown}"
-        >
-          <template
-            v-for="button in episodesButtons"
-            :key="button.title"
-          >
+        <ul class="left-menu" :class="{ 'menu-margin': scrollDown }">
+          <template v-for="button in episodesButtons" :key="button.title">
             <li v-if="button.loggedUsers ? isLoggedIn : true">
               <router-link
-                :to="{name: button.pathName}"
+                :to="{ name: button.pathName }"
                 class="left-menu__item"
                 exact-active-class="left-menu__item_active"
               >
@@ -20,7 +14,7 @@
               </router-link>
             </li>
           </template>
-          <hr style="margin-bottom: 16px">
+          <hr style="margin-bottom: 16px" />
         </ul>
       </div>
 
@@ -33,8 +27,8 @@
 </template>
 
 <script>
-import {mapState, mapGetters} from 'vuex'
-import {authGetters} from '@/store/modules/auth'
+import { mapState, mapGetters } from 'vuex'
+import { authGetters } from '@/store/modules/auth'
 
 const episodesButtons = [
   {
@@ -71,7 +65,7 @@ export default {
   },
   mounted() {
     document.addEventListener('mousewheel', this.wheelHandler)
-    window.scrollTo({top: 0})
+    window.scrollTo({ top: 0 })
   },
   unmounted() {
     document.removeEventListener('mousewheel', this.wheelHandler)
